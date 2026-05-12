@@ -64,6 +64,10 @@ def _extract_frontmatter(text: str) -> str | None:
     return m.group(1) if m else None
 
 
+class DuplicateYamlKey(ValueError):
+    """Raised when a frontmatter has the same top-level key more than once."""
+
+
 def _yaml_top_key(fm: str, key: str) -> str | None:
     """Return value of a top-level scalar or block-scalar `key:` line.
 
@@ -73,12 +77,17 @@ def _yaml_top_key(fm: str, key: str) -> str | None:
     - YAML block scalars (`key: |` or `key: >`, then indented lines).
 
     Returns the concatenated text content for block scalars. Returns
-    None when the key is missing.
+    None when the key is missing. Raises DuplicateYamlKey if the key
+    appears more than once at column 0 — YAML forbids duplicate keys
+    and a regex parser cannot disambiguate which value is authoritative.
     """
     inline = re.compile(rf"^{re.escape(key)}:\s*(.*?)\s*$", re.MULTILINE)
-    m = inline.search(fm)
-    if not m:
+    matches = list(inline.finditer(fm))
+    if not matches:
         return None
+    if len(matches) > 1:
+        raise DuplicateYamlKey(f"duplicate top-level key {key!r}")
+    m = matches[0]
 
     raw = m.group(1)
     if raw in ("|", ">", "|-", ">-", "|+", ">+"):
@@ -125,7 +134,13 @@ def validate_skill(skill_dir: Path) -> int:
         print(f"[ERR] {name}: missing frontmatter delimiter")
         return errors + 1
 
-    fm_name = _yaml_top_key(fm, "name")
+    try:
+        fm_name = _yaml_top_key(fm, "name")
+        description = _yaml_top_key(fm, "description")
+    except DuplicateYamlKey as exc:
+        print(f"[ERR] {name}: {exc}")
+        return errors + 1
+
     if fm_name is None:
         print(f"[ERR] {name}: missing frontmatter name")
         errors += 1
@@ -133,7 +148,6 @@ def validate_skill(skill_dir: Path) -> int:
         print(f"[ERR] {name}: frontmatter name {fm_name!r} != directory name")
         errors += 1
 
-    description = _yaml_top_key(fm, "description")
     if not description:
         print(f"[ERR] {name}: missing frontmatter description")
         errors += 1
@@ -157,16 +171,22 @@ def validate_agent(agent_md: Path) -> int:
         return 1
 
     errors = 0
-    if not _yaml_top_key(fm, "description") and "description:" not in fm:
+    try:
+        description = _yaml_top_key(fm, "description")
+        mode = _yaml_top_key(fm, "mode")
+        color = _yaml_top_key(fm, "color")
+    except DuplicateYamlKey as exc:
+        print(f"[ERR] agent {name}: {exc}")
+        return errors + 1
+
+    if not description and "description:" not in fm:
         print(f"[ERR] agent {name}: missing description")
         errors += 1
 
-    mode = _yaml_top_key(fm, "mode")
     if mode and mode not in ("primary", "subagent"):
         print(f"[ERR] agent {name}: invalid mode {mode!r}")
         errors += 1
 
-    color = _yaml_top_key(fm, "color")
     if color is not None:
         valid_named = {"primary", "secondary", "accent", "success", "warning", "error", "info"}
         if color not in valid_named and not re.match(r"^#[0-9a-fA-F]{6}$", color):
@@ -188,7 +208,13 @@ def validate_command(cmd_md: Path) -> int:
         print(f"[ERR] command {name}: missing frontmatter delimiter")
         return 1
 
-    if not _yaml_top_key(fm, "description"):
+    try:
+        description = _yaml_top_key(fm, "description")
+    except DuplicateYamlKey as exc:
+        print(f"[ERR] command {name}: {exc}")
+        return 1
+
+    if not description:
         print(f"[ERR] command {name}: missing description")
         return 1
 

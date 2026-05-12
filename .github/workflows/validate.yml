@@ -12,8 +12,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
       - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
         run: bash scripts/validate_config.sh
+
+      - name: Install pytest
+        run: python3 -m pip install --upgrade pip pytest
+
+      - name: Run validator unit tests
+        run: python3 -m pytest scripts/tests/ -v
 
       - name: Report project file count
         run: |
