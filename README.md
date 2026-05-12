@@ -63,8 +63,9 @@ A self-contained OpenCode project configuration that provides:
 | Plugins | `.opencode/plugins/*.ts` | 5 |
 | MCP servers | `opencode.json` → `mcp` | 13 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
-| Reference docs | `references/*.md` | 15 |
-| Diagnostic scripts | `scripts/*.sh` + helpers | 11 |
+| Reference docs (skill/agent contracts) | `references/*.md` | 15 |
+| Operator guides | `docs/*.md` | 3 |
+| Diagnostic scripts (10 bash + 1 python helper) | `scripts/` | 11 |
 
 ## Commands
 

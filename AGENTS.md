@@ -18,7 +18,8 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 - `.opencode/skills/*/SKILL.md`: on-demand skill definitions with name and description frontmatter.
 - `.opencode/commands/*.md`: single source of truth for slash command definitions (frontmatter + template body). Do NOT duplicate in `opencode.json`.
 - `.opencode/plugins/*.ts`: OpenCode plugin event handlers.
-- `references/*.md`: durable reference docs for skills and agents.
+- `references/*.md`: durable reference docs consumed by skills and agents.
+- `docs/*.md`: durable operational guides for marketplace operators (release, dependency-updates, rollback-restore).
 - `AGENTS.md`: this file — cross-tool root instructions for any AI agent working in this repository.
 - `.serena/memories/*.md`: verified high-signal project knowledge.
 - `VERSION` and `CHANGELOG.md`: release version and change history.
@@ -60,6 +61,7 @@ Rules:
 ### Agents
 - Place in `.opencode/agents/<name>.md`.
 - Frontmatter: `description` (required, 1-1024 chars), `mode` (primary/subagent), `model`, `temperature`, `steps`, `permission`, `hidden`, `color`, `prompt` (or in markdown body).
+- `color` must match `^#[0-9a-fA-F]{6}$` (hex) or one of the enum values `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`. Named CSS colors (`blue`, `red`, …) are rejected by OpenCode v1.14.
 - Subagents are invoked via `@agent_name` in messages or via the Task tool by primary agents.
 - Reviewer subagents use `mode: subagent`, `hidden: true`, `permission: { edit: "deny" }`.
 - Permission keys support glob patterns: `bash: { "*": "ask", "git diff": "allow" }`.
@@ -105,8 +107,13 @@ Rules:
 - Place in `.opencode/plugins/` (project-level) or `~/.config/opencode/plugins/` (global). npm packages listed in `opencode.json.plugin` install via Bun at startup; this repo's `plugin: []` is intentional — only local TypeScript plugins are used.
 - Plugin file exports a named `Plugin` from `@opencode-ai/plugin`. Plugin factory receives `{ project, client, $, directory, worktree }` and returns an object keyed by event names.
 - Events available in OpenCode v1.14 (subset of upstream): `event` (with `event.type` filter for `session.created`, `session.idle`, `session.compacted`, `session.deleted`, `session.diff`, `session.error`, `session.status`, `session.updated`, `command.executed`, `installation.updated`, `server.connected`, `todo.updated`, `file.edited`, `file.watcher.updated`, `message.removed`, `message.updated`, `message.part.removed`, `message.part.updated`, `lsp.client.diagnostics`, `lsp.updated`), `tool.execute.before`, `tool.execute.after`, `shell.env`, `permission.asked`, `permission.replied`, `experimental.session.compacting`, `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`.
-- Dependencies live in `.opencode/package.json` — OpenCode runs `bun install` at startup and may auto-pin `@opencode-ai/plugin` to its own runtime version.
-- rldyour plugins: `ry-bootstrap.ts` (session.created banner + experimental.session.compacting context push), `ry-env-protection.ts` (tool.execute.before — blocks read/bash of sensitive files), `ry-shell-strategy.ts` (shell.env env injection + tool.execute.before force-push and rm guards), `ry-sync-reminder.ts` (session.idle reminder + post-commit advice), `ry-flow-hooks.ts` (tool.execute.after Conventional Commits advice + memory-sync nudge).
+- Dependencies live in `.opencode/package.json` — OpenCode runs `bun install` at startup and rewrites the `@opencode-ai/plugin` pin to match its own runtime version. Committing the current pin is expected; the file may drift after a runtime upgrade. Do not manually downgrade — that fights the runtime and produces version-mismatch warnings.
+- rldyour plugins (5):
+  - `ry-bootstrap.ts` — `session.created` banner + `experimental.session.compacting` context push (MCP list read dynamically from `opencode.json` via `Bun.file()`).
+  - `ry-env-protection.ts` — `tool.execute.before` blocks read/bash of sensitive files (`.env*`, `.pem`, `.key`, etc.) with `.env.example` whitelist.
+  - `ry-shell-strategy.ts` — `shell.env` injects non-interactive git/CI env; `tool.execute.before` blocks `git push --force` without `--force-with-lease` and warns on destructive `rm`.
+  - `ry-sync-reminder.ts` — `session.idle` ending-session checklist.
+  - `ry-flow-hooks.ts` — `tool.execute.after` Conventional Commits advice and post-commit `/ry-sync` nudge (sole owner of post-commit advice; ry-sync-reminder does not duplicate).
 
 ### Permissions
 - Global permissions in `opencode.json` → `permission`.
