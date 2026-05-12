@@ -20,6 +20,7 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 - `.opencode/plugins/*.ts`: OpenCode plugin event handlers.
 - `references/*.md`: durable reference docs consumed by skills and agents.
 - `docs/*.md`: durable operational guides for marketplace operators (release, dependency-updates, rollback-restore).
+- `docs/decisions/*.md`: architecture decision archive (MADR-style ADRs; moved from former `thinking/` directory).
 - `AGENTS.md`: this file — cross-tool root instructions for any AI agent working in this repository.
 - `.serena/memories/*.md`: verified high-signal project knowledge.
 - `VERSION` and `CHANGELOG.md`: release version and change history.
@@ -248,7 +249,9 @@ Runtime rules for LSP skills:
 
 ## Validation Commands
 
-- `scripts/validate_config.sh` — Validate opencode.json, skill frontmatter, agent frontmatter, commands.
+- `scripts/validate_config.sh` — Validate opencode.json, skill / agent / command frontmatter, VERSION semver. Backed by `scripts/_validate_helpers.py`.
+- `python3 -m pytest scripts/tests/` (or `uvx --from "pytest==9.0.2" pytest scripts/tests/`) — Unit tests for `_validate_helpers.py` and `_extract_pins.py`. Required green for release.
+- `scripts/check_deps_freshness.sh` (with helper `scripts/_extract_pins.py`) — List pinned MCP dependencies (`--json` mode for automation).
 - `scripts/bootstrap_opencode.sh` — Bootstrap project structure and exclude patterns.
 - `scripts/doctor_opencode.sh` — Check dependencies and configuration health.
 - `scripts/check_lsps.sh` — Check LSP server commands and project prerequisites.
@@ -258,6 +261,7 @@ Runtime rules for LSP skills:
 - `scripts/deploy_readiness.sh` — Check deploy readiness for a target server.
 - `scripts/detect_project_checks.sh` — Auto-detect project-native test/lint/typecheck commands.
 - `scripts/fullrepo_sync.sh status` — Check git and fullrepo sync state.
+- Native: `opencode debug config | agent <name> | skill | info | startup` — authoritative resolved state.
 
 ## Done Criteria
 
