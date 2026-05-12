@@ -46,11 +46,33 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 - Commands are invoked via `/command-name` in the TUI.
 
 ### MCP Configuration
-- All MCP servers are configured in `opencode.json` → `mcp` section.
-- Local servers use `"type": "local"` with `"command"` array.
-- Remote servers use `"type": "remote"` with `"url"`.
+- All MCP servers are configured in `opencode.json` → `mcp` section (13 servers total).
+- Local servers use `"type": "local"` with `"command"` array and optional `"environment"`.
+- Remote servers use `"type": "remote"` with `"url"` and optional `"headers"`.
 - Environment variables use `{env:VAR_NAME}` syntax.
 - Tool names follow pattern `mcp__<servername>__<toolname>`.
+- Use `bunx` for npm packages (never `npx`), `uvx` for Python packages, `dart` for Dart SDK.
+- Pin exact versions for all packages to ensure reproducibility.
+- `dart-flutter` is disabled by default (requires Dart SDK 3.9+ on PATH); enable per-project as needed.
+- `context7` supports higher rate limits with `CONTEXT7_API_KEY`; works without key at lower limits.
+
+#### MCP servers (13)
+
+| Server | Type | Launcher | Version | Purpose |
+|---|---|---|---|---|
+| serena | local | uvx | 1.3.0 | Semantic code navigation, analysis, editing |
+| sequential-thinking | local | bunx | 2025.12.18 | Structured reasoning and planning |
+| playwright | local | bunx | 0.0.75 | Browser automation, UI validation |
+| chrome-devtools | local | bunx | 0.25.0 | Chrome DevTools diagnostics |
+| context7 | remote | https | — | Current library documentation |
+| deepwiki | remote | https | — | Repository documentation |
+| grep | remote | https | — | Search across public GitHub repos |
+| semgrep | local | uvx | 1.162.0 | Static analysis and security |
+| shadcn | local | bunx | 4.7.0 | shadcn/ui registry access |
+| dart-flutter | local | dart | — | Dart/Flutter project support (disabled by default) |
+| figma | remote | https | — | Figma design context |
+| github | remote | https | — | GitHub Copilot MCP (requires PAT) |
+| openai-docs | remote | https | — | Official OpenAI/Codex documentation |
 
 ### Plugins
 - Place in `.opencode/plugins/` (project-level) or `~/.config/opencode/plugins/` (global).
