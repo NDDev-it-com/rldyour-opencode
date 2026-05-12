@@ -78,234 +78,6 @@
         "lsp": "allow",
         "skill": "allow"
       }
-    },
-    "flow-architecture-review": {
-      "description": "Orchestrated architecture review: boundaries, dependency direction, public API, data flow. Read-only. Invoked by ry-start or ry-review.",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.1,
-      "steps": 36,
-      "hidden": true,
-      "color": "blue",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow",
-          "git status*": "allow"
-        },
-        "webfetch": "allow",
-        "websearch": "allow",
-        "lsp": "allow",
-        "skill": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow"
-      },
-      "prompt": "You are the architecture reviewer subagent for rldyour-flow. You are invoked only by the ry-start or ry-review review phase.\n\n## Identity\n\n- Read-only architecture reviewer.\n- Evidence-first: every finding cites code (file path, symbol, line) and concrete behavior.\n- No file edits.\n\n## Review Focus\n\n- Layer boundaries: respect of project architecture pattern (FSD, clean architecture, hexagonal, layered, monorepo, modular monolith).\n- Dependency direction: imports flow from upper to lower layers.\n- Module coupling: cohesion within slices; coupling through public APIs only.\n- Public API surface: explicit exports, no leaked internals.\n- Data flow: clear ownership, single source of truth per concern.\n- Consistency with established patterns.\n\n## Output Format\n\nPer-finding: Severity / Confidence (0-100) / Location (path:line) / Evidence / Impact / Fix / Disposition (must-fix, should-fix, defer, false-positive). Drop confidence <30.\n\nReply in Russian when the user wrote in Russian."
-    },
-    "flow-quality-review": {
-      "description": "Orchestrated quality review: correctness, completeness, edge cases, error handling, resource lifecycle. Read-only. Invoked by ry-start or ry-review.",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.1,
-      "steps": 36,
-      "hidden": true,
-      "color": "green",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow",
-          "git status*": "allow"
-        },
-        "webfetch": "allow",
-        "websearch": "allow",
-        "lsp": "allow",
-        "skill": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow"
-      },
-      "prompt": "You are the quality reviewer subagent for rldyour-flow. Invoked only by ry-start or ry-review review phase.\n\n## Identity\n\n- Read-only quality reviewer. Evidence-first.\n- Look for real issues affecting correctness, robustness, maintainability — not personal style preferences.\n\n## Review Focus\n\n- Correctness, completeness, edge cases, error handling, resource lifecycle.\n- Performance traps: N+1, accidental quadratic, blocking I/O, missing indexes.\n- Copy-paste, hardcoded values, TODO/HACK/FIXME.\n\n## Output Format\n\nPer-finding: Severity / Confidence / Location / Evidence / Impact / Fix / Disposition. Drop confidence <30.\n\nReply in Russian when the user wrote in Russian."
-    },
-    "flow-consistency-review": {
-      "description": "Orchestrated consistency review: naming, style, imports, public API shape. Read-only. Invoked by ry-start or ry-review.",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.1,
-      "steps": 36,
-      "hidden": true,
-      "color": "purple",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow"
-        },
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow"
-      },
-      "prompt": "You are the consistency reviewer for rldyour-flow. Invoked only by ry-start or ry-review review phase.\n\n## Identity\n\n- Read-only consistency reviewer. Project-baseline-first.\n- Detect what the project does already, then compare changed code against that baseline.\n- No personal style preferences.\n\n## Output Format\n\nPer-finding: Severity / Confidence / Location / Evidence / Impact / Fix / Disposition. Drop confidence <30.\n\nReply in Russian when the user wrote in Russian."
-    },
-    "flow-integration-review": {
-      "description": "Orchestrated integration review: cross-module contracts, schemas, configs, backward compatibility. Read-only. Invoked by ry-start or ry-review.",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.1,
-      "steps": 36,
-      "hidden": true,
-      "color": "orange",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow"
-        },
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow",
-        "lsp": "allow"
-      },
-      "prompt": "You are the integration reviewer for rldyour-flow. Invoked only by ry-start or ry-review review phase.\n\n## Review Focus\n\n- API/client/DTO/schema/validation/service/repository/database alignment.\n- Config/env/docs/migrations alignment.\n- Generated code and type contracts.\n- Backward compatibility.\n\n## Output Format\n\nPer-finding: Severity / Confidence / Location / Evidence / Impact / Fix / Disposition. Drop confidence <30.\n\nReply in Russian when the user wrote in Russian."
-    },
-    "flow-verification-review": {
-      "description": "Orchestrated verification review: tests, quality gates, browser/server evidence. Read-only. Invoked by ry-start or ry-review.",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.1,
-      "steps": 36,
-      "hidden": true,
-      "color": "pink",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow"
-        },
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow",
-        "lsp": "allow"
-      },
-      "prompt": "You are the verification reviewer for rldyour-flow. Invoked only by ry-start or ry-review review phase.\n\n## Review Focus\n\n- Tests: every new public behavior has a test; critical paths and business rules covered.\n- Type/LSP checks are appropriate.\n- Browser validation for UI-visible work.\n- Security checks for sensitive scope.\n- Server/deploy evidence for deployment changes.\n\n## Output Format\n\nPer-finding: Severity / Confidence / Location / Evidence / Impact / Fix / Disposition. Drop confidence <30.\n\nReply in Russian when the user wrote in Russian."
-    },
-    "flow-security-review": {
-      "description": "Orchestrated security review: OWASP Top 10, auth/authz, injection, secrets. Defensive-only. Read-only. Invoked by ry-start or ry-review.",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.1,
-      "steps": 42,
-      "hidden": true,
-      "color": "red",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow"
-        },
-        "webfetch": "allow",
-        "websearch": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow"
-      },
-      "prompt": "You are the security reviewer for rldyour-flow. Invoked only when scope is security-sensitive or explicitly requested.\n\n## Identity\n\n- Read-only defensive security reviewer. Evidence-first. Variant-aware.\n- Defensive-only: never produce weaponized exploits.\n\n## Review Focus\n\n- Authentication and authorization boundaries.\n- Input validation and output encoding.\n- Injection, XSS, SSRF, path traversal, insecure deserialization.\n- Secrets handling and logs.\n- Dependency/config changes.\n- Unsafe deploy/rollback.\n\n## Output Format\n\nPer-finding: Severity / Category (OWASP/ASVS) / Confidence / Location / Evidence / Attack path (defensive) / Impact / Fix / Verification / Disposition.\n\nReply in Russian when the user wrote in Russian."
-    },
-    "flow-memory-sync": {
-      "description": "Fact-only Serena memory synchronization agent. Updates .serena/memories against verified current code. Invoked by ry-sync or Stop advisory.",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.1,
-      "steps": 36,
-      "hidden": true,
-      "color": "yellow",
-      "permission": {
-        "edit": "allow",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow",
-          "git rev-parse*": "allow"
-        },
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow",
-        "lsp": "allow",
-        "skill": "allow"
-      },
-      "prompt": "You are the dedicated memory-sync subagent for rldyour-opencode. You run after a task wave commits to refresh .serena/memories/ so they reflect the current code state at HEAD.\n\n## Source-of-truth hierarchy (highest first)\n\n1. Current file content at HEAD\n2. Tests at HEAD\n3. Recent git history\n4. Git diff between newest synced commit and HEAD\n5. Existing memory content (to be verified, not trusted)\n\n## Anti-hallucination contract\n\n- Every factual claim in memory must trace to a verifiable source.\n- Never speculate, paraphrase advice, or copy chat history.\n- Never store secrets, tokens, cookies, or private credentials.\n- Remove-first principle for unverifiable claims.\n\n## Workflow\n\n1. Run git status and check serena memory state.\n2. List memories and diff changed files against synced HEAD.\n3. Verify each impacted claim against current code.\n4. Edit or remove stale claims; add new durable facts only.\n5. Every touched memory must have a Last commit SHA line.\n6. Report a JSON summary of changes.\n\nReply in Russian when the user wrote in Russian."
-    },
-    "ry-explore": {
-      "description": "Глубокое многоисточниковое исследование: MCP-first lookup (Context7, DeepWiki, Grep), cross-validation, structured reports. Триггеры: исследуй детально, глубокое исследование, investigate thoroughly, research deeply.",
-      "mode": "subagent",
-      "model": "anthropic/claude-opus-4-20250514",
-      "temperature": 0.2,
-      "steps": 90,
-      "color": "cyan",
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "ask",
-          "git diff": "allow",
-          "git log*": "allow",
-          "git show*": "allow"
-        },
-        "webfetch": "allow",
-        "websearch": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "read": "allow",
-        "lsp": "allow",
-        "skill": "allow"
-      },
-      "prompt": "You are a meticulous deep-research specialist. Read, query, verify, synthesize. Never modify code or files.\n\n## Research workflow (strict order)\n\n1. MCP-first: Context7 for official docs, DeepWiki for repo architecture, Grep for production patterns.\n2. Web validation only if MCP gaps remain.\n3. Cross-validate critical claims against 2+ sources.\n4. Produce structured report with confidence labels and source citations.\n\n## Output format\n\n### Finding: <headline>\n**Confidence**: Confirmed | Strongly supported | Inferred\n**Details**: bullets with inline citations\n**Sources consulted**: numbered source list\n\n## Language\n\nRussian if user wrote in Russian. Technical terminology consistent across languages.\n\n## Anti-patterns\n\n- Surface-level summaries without quotes\n- WebSearch as primary source when MCP servers have the answer\n- Single-source claims for critical decisions\n- Generic best practices without dated, named sources"
-    }
-  },
-  "command": {
-    "ry-init": {
-      "template": "Initialize the current project scope. Run git status audit, bootstrap agent-only context, read Serena memories, map architecture with Serena semantic tools or rg/file reads, and produce a Russian report with exact paths, current behavior, integration points, risks, and memory candidates.",
-      "description": "Initialize scoped project context (read-only)",
-      "agent": "build"
-    },
-    "ry-start": {
-      "template": "Implement a task through the full quality workflow: init if needed, research, plan, implement with atomic commits, quality gates, reviewer subagents, and post-task sync. Run @ry-init if context is missing. Use helper skills automatically. Finish with /ry-sync.",
-      "description": "Full task lifecycle: init, research, plan, implement, verify, review, sync",
-      "agent": "build"
-    },
-    "ry-review": {
-      "template": "Deep review of a diff, PR, or scope with research and reviewer subagents. Read-only by default. Use architecture/quality/consistency/integration/verification/security reviewer subagents. Produce a Russian report with exact paths, severity, confidence, and fixes.",
-      "description": "Deep review with research and reviewer tracks",
-      "agent": "plan"
-    },
-    "ry-newp": {
-      "template": "Plan a new project: ask skeptical questions in Russian, research best technologies with @ry-explore, write architecture docs, and optionally scaffold. Do not create code without explicit approval.",
-      "description": "Plan a new project with skeptical questions and research",
-      "agent": "build"
-    },
-    "ry-deploy": {
-      "template": "Deploy with local/GitHub/server sync, log checks, health verification, and memory/docs/git finalization. Run deploy readiness checks, verify baseline, sync code, run migrations, restart services, verify health, fix-forward on failure. Finish with /ry-sync.",
-      "description": "Deploy with sync, checks, and finalization",
-      "agent": "build"
-    },
-    "ry-sync": {
-      "template": "Synchronize project state: verify Serena memories are current, update AGENTS.md and instruction docs from verified code, run applicable quality checks, commit atomically with Conventional Commits, push upstream, and publish git state. This is the manual finalization command.",
-      "description": "Synchronize memories, docs, git, and fullrepo",
-      "agent": "build"
     }
   },
   "mcp": {
@@ -313,7 +85,7 @@
       "type": "local",
       "command": ["uvx", "--from", "serena-agent==1.3.0", "--python", "3.13", "--prerelease", "allow", "serena", "start-mcp-server", "--project-from-cwd", "--context=agent", "--enable-web-dashboard", "False", "--open-web-dashboard", "False"],
       "enabled": true,
-      "timeout": 90000
+      "timeout": 30000
     },
     "sequential-thinking": {
       "type": "local",
@@ -322,19 +94,19 @@
       "environment": {
         "DISABLE_THOUGHT_LOGGING": "true"
       },
-      "timeout": 90000
+      "timeout": 30000
     },
     "playwright": {
       "type": "local",
       "command": ["bunx", "@playwright/mcp@0.0.75", "--headless", "--caps=network,storage,testing,devtools"],
       "enabled": true,
-      "timeout": 90000
+      "timeout": 30000
     },
     "chrome-devtools": {
       "type": "local",
       "command": ["bunx", "chrome-devtools-mcp@0.25.0", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"],
       "enabled": true,
-      "timeout": 90000
+      "timeout": 30000
     },
     "context7": {
       "type": "remote",
@@ -343,43 +115,43 @@
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       },
-      "timeout": 60000
+      "timeout": 15000
     },
     "deepwiki": {
       "type": "remote",
       "url": "https://mcp.deepwiki.com/mcp",
       "enabled": true,
-      "timeout": 60000
+      "timeout": 15000
     },
     "grep": {
       "type": "remote",
       "url": "https://mcp.grep.app",
       "enabled": true,
-      "timeout": 60000
+      "timeout": 15000
     },
     "semgrep": {
       "type": "local",
       "command": ["uvx", "--from", "semgrep==1.162.0", "semgrep", "mcp"],
       "enabled": true,
-      "timeout": 90000
+      "timeout": 30000
     },
     "shadcn": {
       "type": "local",
       "command": ["bunx", "shadcn@4.7.0", "mcp"],
       "enabled": true,
-      "timeout": 90000
+      "timeout": 30000
     },
     "dart-flutter": {
       "type": "local",
       "command": ["dart", "mcp-server", "--force-roots-fallback"],
       "enabled": true,
-      "timeout": 90000
+      "timeout": 30000
     },
     "figma": {
       "type": "remote",
       "url": "https://mcp.figma.com/mcp",
       "enabled": true,
-      "timeout": 60000
+      "timeout": 15000
     },
     "github": {
       "type": "remote",
@@ -388,13 +160,13 @@
       "headers": {
         "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}"
       },
-      "timeout": 60000
+      "timeout": 15000
     },
     "openai-docs": {
       "type": "remote",
       "url": "https://developers.openai.com/mcp",
       "enabled": true,
-      "timeout": 60000
+      "timeout": 15000
     }
   },
   "instructions": ["AGENTS.md"],

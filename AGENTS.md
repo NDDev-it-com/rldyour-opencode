@@ -13,10 +13,11 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 
 ## Source Of Truth
 
-- `opencode.json`: master configuration — providers, models, agents, permissions, MCP servers, LSP, commands, tools, skills.
-- `.opencode/agents/*.md`: subagent definitions with YAML frontmatter (mode, model, temperature, steps, permission, description, prompt).
+- `opencode.json`: master configuration — providers, models, primary agents (build, plan), permissions, MCP servers, LSP, plugins, watcher, compaction.
+- `.opencode/agents/*.md`: single source of truth for subagent definitions (frontmatter + prompt body). Do NOT duplicate in `opencode.json`.
 - `.opencode/skills/*/SKILL.md`: on-demand skill definitions with name and description frontmatter.
-- `.opencode/commands/*.md`: slash command templates.
+- `.opencode/commands/*.md`: single source of truth for slash command definitions (frontmatter + template body). Do NOT duplicate in `opencode.json`.
+- `.opencode/plugins/*.ts`: OpenCode plugin event handlers.
 - `references/*.md`: durable reference docs for skills and agents.
 - `AGENTS.md`: this file — cross-tool root instructions for any AI agent working in this repository.
 - `.serena/memories/*.md`: verified high-signal project knowledge.
@@ -34,16 +35,18 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 
 ### Agents
 - Place in `.opencode/agents/<name>.md`.
-- Frontmatter: `description` (required), `mode` (primary/subagent), `model`, `temperature`, `steps`, `permission`, `hidden`, `color`, `prompt`.
+- Frontmatter: `description` (required, 1-1024 chars), `mode` (primary/subagent), `model`, `temperature`, `steps`, `permission`, `hidden`, `color`, `prompt` (or in markdown body).
 - Subagents are invoked via `@agent_name` in messages or via the Task tool by primary agents.
 - Reviewer subagents use `mode: subagent`, `hidden: true`, `permission: { edit: "deny" }`.
-- Permission keys support glob patterns: `bash: { "git diff": "allow", "*": "ask" }`.
+- Permission keys support glob patterns: `bash: { "*": "ask", "git diff": "allow" }`.
+- Subagents defined ONLY in `.opencode/agents/*.md` — never duplicated in `opencode.json`.
+- Primary agents (build, plan) with just permissions can stay in `opencode.json`.
 
 ### Commands
-- Place in `.opencode/commands/<name>.md` or define in `opencode.json` → `command`.
-- Frontmatter: `description`, `agent`, `model`.
-- Body is the template sent to the agent.
-- Commands are invoked via `/command-name` in the TUI.
+- Place in `.opencode/commands/<name>.md`.
+- Frontmatter: `description`, `agent`, `model`, `subtask` (optional, forces subagent invocation).
+- Body is the template sent to the agent. Supports `$ARGUMENTS`, `$1`/`$2`/..., `!`command`` for shell output, `@file` for file references.
+- Commands defined ONLY in `.opencode/commands/*.md` — never duplicated in `opencode.json`.
 
 ### MCP Configuration
 - All MCP servers are configured in `opencode.json` → `mcp` section (13 servers total).

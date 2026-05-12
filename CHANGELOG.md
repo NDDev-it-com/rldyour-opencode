@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-05-12
+
+### Changed
+
+- **Breaking: single source of truth for agents and commands.**
+  - Removed 8 subagent definitions from `opencode.json` — they live only in `.opencode/agents/*.md`.
+  - Removed 6 command definitions from `opencode.json` — they live only in `.opencode/commands/*.md`.
+  - `opencode.json` now only contains `build` and `plan` primary agent overrides (permissions).
+- Reduced MCP timeout values: 30s for local servers, 15s for remote (was 90s/60s).
+- Updated AGENTS.md to document single-source-of-truth convention explicitly.
+
 ## [0.4.0] - 2026-05-12
 
 ### Changed
