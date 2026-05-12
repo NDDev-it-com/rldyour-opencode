@@ -51,11 +51,11 @@ Rules:
 
 ### Skills
 - Place in `.opencode/skills/<name>/SKILL.md`.
-- Frontmatter: `name` (required, 1-64 chars, kebab-case, must match directory name), `description` (required, 1-1024 chars).
-- OpenCode does NOT support `allowed-tools`, `disable-model-invocation`, `model`, `effort`, `maxTurns`, `paths`, `context`, or `agent` in skill frontmatter.
-- Tool routing is controlled through agent `permission` config in `opencode.json`.
-- Skills are loaded on-demand via the `skill` tool when an agent needs them.
-- Skill discovery is automatic — agents see available skills and can call `skill({ name: "skill-name" })`.
+- Required frontmatter: `name` (1-64 chars, kebab-case, must match directory name), `description` (1-1024 chars).
+- Optional frontmatter accepted by OpenCode v1.14: `license`, `compatibility`, `metadata` (string-to-string map). Unknown fields are ignored silently.
+- Forbidden in OpenCode skills: `allowed-tools`, `disable-model-invocation`, `model`, `effort`, `maxTurns`, `paths`, `context`, `agent`. These are Claude Code / Codex leftovers and are not honored.
+- Tool routing is governed by agent `permission` config (global in `opencode.json` or per-agent in `.opencode/agents/<name>.md`), never by skill frontmatter.
+- Skills are loaded on-demand via the built-in `skill` tool — agents see name + description and invoke via `skill({ name: "skill-name" })`.
 
 ### Agents
 - Place in `.opencode/agents/<name>.md`.
@@ -102,11 +102,11 @@ Rules:
 | openai-docs | remote | https | — | Official OpenAI/Codex documentation |
 
 ### Plugins
-- Place in `.opencode/plugins/` (project-level) or `~/.config/opencode/plugins/` (global).
-- TypeScript/JavaScript modules exporting plugin functions.
-- Events: `session.created`, `session.idle`, `session.compacted`, `file.edited`, `lsp.client.diagnostics`, `lsp.updated`, `message.updated`, `tool.execute.before`, `tool.execute.after`, `experimental.session.compacting`, `shell.env`, `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`, `permission.asked`, `permission.replied`.
-- Dependencies go in `.opencode/package.json` — OpenCode runs `bun install` at startup.
-- rldyour plugins: `ry-bootstrap.ts` (session context, compaction preservation), `ry-env-protection.ts` (block sensitive reads), `ry-shell-strategy.ts` (non-interactive shell, env injection, force-push guard), `ry-sync-reminder.ts` (idle sync reminder, commit format advice), `ry-flow-hooks.ts` (post-tool commit advice, auto-sync nudge).
+- Place in `.opencode/plugins/` (project-level) or `~/.config/opencode/plugins/` (global). npm packages listed in `opencode.json.plugin` install via Bun at startup; this repo's `plugin: []` is intentional — only local TypeScript plugins are used.
+- Plugin file exports a named `Plugin` from `@opencode-ai/plugin`. Plugin factory receives `{ project, client, $, directory, worktree }` and returns an object keyed by event names.
+- Events available in OpenCode v1.14 (subset of upstream): `event` (with `event.type` filter for `session.created`, `session.idle`, `session.compacted`, `session.deleted`, `session.diff`, `session.error`, `session.status`, `session.updated`, `command.executed`, `installation.updated`, `server.connected`, `todo.updated`, `file.edited`, `file.watcher.updated`, `message.removed`, `message.updated`, `message.part.removed`, `message.part.updated`, `lsp.client.diagnostics`, `lsp.updated`), `tool.execute.before`, `tool.execute.after`, `shell.env`, `permission.asked`, `permission.replied`, `experimental.session.compacting`, `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`.
+- Dependencies live in `.opencode/package.json` — OpenCode runs `bun install` at startup and may auto-pin `@opencode-ai/plugin` to its own runtime version.
+- rldyour plugins: `ry-bootstrap.ts` (session.created banner + experimental.session.compacting context push), `ry-env-protection.ts` (tool.execute.before — blocks read/bash of sensitive files), `ry-shell-strategy.ts` (shell.env env injection + tool.execute.before force-push and rm guards), `ry-sync-reminder.ts` (session.idle reminder + post-commit advice), `ry-flow-hooks.ts` (tool.execute.after Conventional Commits advice + memory-sync nudge).
 
 ### Permissions
 - Global permissions in `opencode.json` → `permission`.
