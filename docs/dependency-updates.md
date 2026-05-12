@@ -35,4 +35,4 @@ This repository pins exact versions for every external dependency to keep startu
 
 ## Automation surface (future)
 
-A future `scripts/check_deps_freshness.sh` should compare each pinned version in `opencode.json` against the upstream registry and report drift. Not yet implemented — track via TODO in CHANGELOG.
+A future `scripts/check_deps_freshness.sh` should compare each pinned version in `opencode.json` against the upstream registry and report drift. Not yet implemented.
