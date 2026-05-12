@@ -12,71 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate opencode.json
-        run: python3 -c "import json; json.load(open('opencode.json')); print('opencode.json: valid JSON')"
+      - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
+        run: bash scripts/validate_config.sh
 
-      - name: Validate skill frontmatter
+      - name: Report project file count
         run: |
-          errors=0
-          for skill_dir in .opencode/skills/*/; do
-            name=$(basename "$skill_dir")
-            skill_file="${skill_dir}SKILL.md"
-            if [ ! -f "$skill_file" ]; then
-              echo "ERROR: Missing $skill_file"
-              errors=$((errors + 1))
-              continue
-            fi
-            if ! echo "$name" | grep -qE '^[a-z][a-z0-9-]{0,63}$'; then
-              echo "ERROR: Invalid skill name: $name (must be kebab-case, 1-64 chars)"
-              errors=$((errors + 1))
-            fi
-            head_line=$(head -1 "$skill_file")
-            if ! echo "$head_line" | grep -qi '^---'; then
-              echo "ERROR: $skill_file missing frontmatter delimiter"
-              errors=$((errors + 1))
-            fi
-          done
-          [ "$errors" -eq 0 ] && echo "All skills valid" || exit 1
-
-      - name: Validate agent frontmatter
-        run: |
-          errors=0
-          for agent_file in .opencode/agents/*.md; do
-            if [ ! -f "$agent_file" ]; then
-              echo "ERROR: Missing agent file: $agent_file"
-              errors=$((errors + 1))
-              continue
-            fi
-            head_line=$(head -1 "$agent_file")
-            if ! echo "$head_line" | grep -qi '^---'; then
-              echo "ERROR: $agent_file missing frontmatter delimiter"
-              errors=$((errors + 1))
-            fi
-          done
-          [ "$errors" -eq 0 ] && echo "All agents valid" || exit 1
-
-      - name: Validate commands
-        run: |
-          errors=0
-          for cmd_file in .opencode/commands/*.md; do
-            if [ ! -f "$cmd_file" ]; then
-              echo "ERROR: Missing command file: $cmd_file"
-              errors=$((errors + 1))
-              continue
-            fi
-          done
-          [ "$errors" -eq 0 ] && echo "All commands valid" || exit 1
-
-      - name: Check file count
-        run: |
-          total=$(find . -type f \( -name '*.md' -o -name '*.json' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' -o -name '*.ts' -o -name 'VERSION' -o -name 'LICENSE' -o -name '.gitignore' \) ! -path './.git/*' ! -path './.github/*' | wc -l | tr -d ' ')
+          total=$(find . -type f \( -name '*.md' -o -name '*.json' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' -o -name '*.ts' -o -name '*.py' -o -name 'VERSION' -o -name 'LICENSE' -o -name '.gitignore' \) ! -path './.git/*' ! -path './.github/*' | wc -l | tr -d ' ')
           echo "Total project files: $total"
-
-      - name: Check VERSION file
-        run: |
-          version=$(cat VERSION)
-          if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "ERROR: Invalid VERSION: $version"
-            exit 1
-          fi
-          echo "VERSION: $version"
