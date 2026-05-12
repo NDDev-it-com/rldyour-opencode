@@ -15,15 +15,17 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 ## Release checklist
 
 1. `bash scripts/validate_config.sh` — exit 0.
-2. `opencode debug config` — must resolve without error.
-3. `opencode debug skill | python3 -c "import json,sys;print(len(json.load(sys.stdin)))"` — equals the `.opencode/skills/` directory count.
-4. `bash scripts/check_lsps.sh` — at minimum every LSP defined in `opencode.json.lsp` must resolve to an executable.
-5. Update `CHANGELOG.md` with a new dated section; group entries under `Added` / `Changed` / `Fixed` / `Removed` per Keep a Changelog 1.1.0.
-6. Update `VERSION` to the new SemVer.
-7. Update `README.md` if catalog counts changed (skills / commands / MCP / plugins).
-8. `git commit` with subject `chore(release): X.Y.Z` and the CHANGELOG block in the body.
-9. `git tag vX.Y.Z` (annotated, signed if configured).
-10. Push `main` and tags; CI (`.github/workflows/validate.yml`) must stay green.
+2. `python3 -m pytest scripts/tests/` — all unit tests green (validator + extract_pins).
+3. `opencode debug config` — must resolve without error.
+4. `opencode debug skill | python3 -c "import json,sys;print(len(json.load(sys.stdin)))"` — equals the `.opencode/skills/` directory count.
+5. `bash scripts/check_lsps.sh` — at minimum every LSP defined in `opencode.json.lsp` must resolve to an executable.
+6. `bash scripts/check_deps_freshness.sh` — report all pinned MCP dependencies; cross-reference each against its registry before bumping.
+7. Update `CHANGELOG.md` with a new dated section; group entries under `Added` / `Changed` / `Fixed` / `Removed` per Keep a Changelog 1.1.0.
+8. Update `VERSION` to the new SemVer.
+9. Update `README.md` if catalog counts changed (skills / commands / MCP / plugins / scripts / tests).
+10. `git commit` with subject `chore(release): X.Y.Z` and the CHANGELOG block in the body.
+11. `git tag vX.Y.Z` (annotated, signed if configured).
+12. Push `main` and tags; CI (`.github/workflows/validate.yml`) must stay green — that workflow now runs both `validate_config.sh` and `pytest scripts/tests/`.
 
 ## Publishing agent-only context
 

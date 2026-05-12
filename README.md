@@ -137,12 +137,14 @@ Run `opencode models anthropic` to list every accepted ID. All current IDs are v
 ## Validation
 
 ```bash
-bash scripts/validate_config.sh        # JSON shape + skill/agent/command frontmatter + VERSION semver
-bash scripts/doctor_opencode.sh        # full diagnostics: MCP, LSP binaries, agent/skill/command discovery, git
-bash scripts/check_lsps.sh             # 16 language servers + project prereqs
-opencode debug config                  # native resolved config (authoritative)
-opencode debug agent <name>            # validate individual agent
-opencode models anthropic              # list available models for the active provider
+bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter + VERSION semver
+uvx --from "pytest==9.0.2" pytest scripts/tests/           # validator + extract_pins unit tests (39 cases)
+bash scripts/check_deps_freshness.sh                       # list pinned MCP dependencies (npm/PyPI/Dart)
+bash scripts/doctor_opencode.sh                            # full diagnostics: MCP, LSP binaries, agent/skill/command discovery, git
+bash scripts/check_lsps.sh                                 # 16 language servers + project prereqs
+opencode debug config                                      # native resolved config (authoritative)
+opencode debug agent <name>                                # validate individual agent
+opencode models anthropic                                  # list available models for the active provider
 ```
 
 CI mirrors the core checks via `.github/workflows/validate.yml` on every push/PR to `main`.

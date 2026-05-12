@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-05-13
+
+Post-0.8.0 hardening based on parallel reviewer findings (architecture / quality / consistency / integration / verification / security tracks).
+
+### Added
+
+- `scripts/tests/test_validate_helpers.py` (27 cases) and `scripts/tests/test_extract_pins.py` (12 cases) — full pytest coverage of the validator and pin extractor. Run via `python3 -m pytest scripts/tests/` or `uvx --from "pytest==9.0.2" pytest scripts/tests/`.
+- `scripts/tests/__init__.py` and `scripts/tests/conftest.py` — package marker and pytest session config (adds `scripts/` to `sys.path`). Removes the previous inline `sys.path.insert` hack from the test module body.
+- `scripts/check_deps_freshness.sh` + `scripts/_extract_pins.py` — list every pinned MCP dependency in `opencode.json` (npm via bunx, PyPI via uvx, Dart SDK). `--json` mode emits a documented JSON envelope (`{pins: [{kind,server,name,version}], count}`).
+- `DuplicateYamlKey` exception in `_validate_helpers.py` — rejects skill/agent/command frontmatter that contains the same top-level key twice (regex YAML parser previously kept the first match silently).
+- `.github/workflows/validate.yml` — Python 3.13 setup + pinned `pytest==9.0.2` install + pytest run. CI and local validation now exercise the same surface.
+- `docs/decisions/*.md` — architecture decision archive (4 files moved from former `thinking/` directory in commit `159fd99`).
+- AGENTS.md Source Of Truth gains a `docs/decisions/*.md` entry; Validation Commands gains pytest, check_deps_freshness, and `opencode debug *` rows.
+- README Validation block lists pytest + check_deps_freshness; Catalog has new rows for `docs/decisions/` and `scripts/tests/`.
+
+### Changed
+
+- `_validate_helpers.py`: `_yaml_top_key` now (a) supports YAML block scalars (`description: |`), (b) reads `utf-8-sig` so files with UTF-8 BOM parse correctly, (c) anchors trailing whitespace as `[^\S\n]*` so an empty inline scalar no longer captures the next line's text.
+- `_validate_helpers.py`: SSoT command-block gate added — rejects an `opencode.json` that defines a `command` block (commands must live in `.opencode/commands/*.md`).
+- `scripts/validate_config.sh`: rewritten without inline zsh-heredoc Python; delegates to `_validate_helpers.py`. Adds `log_warn` / `log_info` helpers consistent with other scripts.
+- `scripts/fullrepo_sync.sh`: `AGENT_ONLY_PATTERNS` updated `thinking/` → `docs/` (matches actual layout after the `159fd99` rename). Secret detector warning now uses `cut -d: -f1` (was `cut -d: -1`, a no-op flag that suppressed the file path in the warning).
+- `scripts/check_deps_freshness.sh`: `--json` path writes directly to stdout (no `mktemp` temp file, no trap risk).
+- `scripts/_extract_pins.py`: `UV_FROM_RE` accepts PyPI names containing `.` (e.g. `zope.interface`); module docstring documents the full JSON envelope contract.
+- AGENTS.md Plugins section rewritten against `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts` v1.14.48: removed non-existent `permission.asked`/`permission.replied`/`tui.*` server hooks; added `config`, `chat.message`, `chat.params`, `chat.headers`, `command.execute.before`, `tool.definition`, `auth`, `provider`, four `experimental.*`.
+- `.opencode/plugins/ry-bootstrap.ts`: MCP list pushed into compaction context is read dynamically from `opencode.json` via `Bun.file()` instead of being hardcoded. Catch path logs a warning before falling back to neutral hint.
+- `.opencode/plugins/ry-sync-reminder.ts`: removed duplicate `tool.execute.after` handler — Conventional Commits advice owned exclusively by `ry-flow-hooks.ts`.
+- `.opencode/agents/customize-opencode.md`: body forbids adding `command` block to `opencode.json`; color schema constraint documented; new-agent flow uses `opencode debug agent <name>`.
+- `.github/workflows/validate.yml`: CI delegates to `bash scripts/validate_config.sh` instead of inline Python/bash checks (eliminates CI-vs-local schema drift).
+- README placeholder env vars renamed `your-key` → `YOUR_PLACEHOLDER_KEY` so the `fullrepo_sync.sh publish` secret detector whitelist correctly ignores them.
+
+### Removed
+
+- `.claude/CLAUDE.md`: Claude Code project-memory thin pointer (anti-pattern called out by `project-instructions-policy` skill; AGENTS.md cross-tool standard covers Claude Code without a separate memory file).
+
+### Fixed
+
+- Model IDs in `opencode.json` and `.opencode/agents/*.md` migrated to OpenCode v1.14.48 registry-valid IDs (`claude-sonnet-4-6`, `claude-haiku-4-5-20251001`, `claude-opus-4-7`). Previous IDs caused `config.providers` / `provider.list` / `app.agents` / `config.get` `ConfigInvalidError`.
+- Agent `color` frontmatter migrated from named CSS colors to hex / enum per schema. Prior values (`blue`, `yellow`, `purple`, …) were rejected by OpenCode v1.14.
+- `_validate_helpers.py` correctly handles `description: |` block scalars and UTF-8 BOM; empty inline `description:` no longer silently slurps the next line.
+
 ## [0.8.0] - 2026-05-13
 
 Validated against OpenCode v1.14.48 (`opencode debug config` resolves cleanly).
