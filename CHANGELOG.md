@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-05-13
+
+Validated against OpenCode v1.14.48 (`opencode debug config` resolves cleanly).
+
+### Added
+
+- **`docs/`**: marketplace operator guides — `release-process.md`, `dependency-updates.md`, `rollback-restore.md`.
+- **`scripts/_validate_helpers.py`**: Python module backing the rewritten `scripts/validate_config.sh`. Validates `opencode.json` shape, skill name/description, agent frontmatter (description + mode + color enum or hex), command frontmatter, VERSION semver. Supports YAML block scalars (`description: |`) and UTF-8 BOM. Single source of truth gate: rejects `command` block in `opencode.json` (commands must live in `.opencode/commands/*.md`).
+- AGENTS.md skill spec: explicit allowed optional frontmatter (`license`, `compatibility`, `metadata`) and explicit forbidden Claude-Code/Codex residue fields.
+- AGENTS.md plugin event list expanded to match OpenCode v1.14 actual surface.
+- AGENTS.md agent spec: explicit `color` schema constraint (hex `^#[0-9a-fA-F]{6}$` or enum `primary|secondary|accent|success|warning|error|info`).
+- README catalog tables for Models, MCP servers, reviewer subagents (with schema-valid colors), validation commands.
+
+### Changed
+
+- **`.opencode/plugins/ry-bootstrap.ts`**: MCP list pushed into compaction context is now read dynamically from `opencode.json` via `Bun.file()` instead of being hardcoded. Catch path now logs a warning before falling back.
+- **`.opencode/plugins/ry-sync-reminder.ts`**: removed duplicate `tool.execute.after` handler — Conventional Commits advice is owned exclusively by `ry-flow-hooks.ts`.
+- **`.opencode/agents/customize-opencode.md`**: body forbids adding `command` block to `opencode.json` (single source of truth); color schema constraint documented; new-agent flow uses `opencode debug agent <name>` for verification.
+- **`.github/workflows/validate.yml`**: CI now delegates to `bash scripts/validate_config.sh` instead of inline Python/bash checks, keeping CI and local validators identical.
+- **`scripts/validate_config.sh`**: rewritten without zsh-heredoc Python (delegates to `_validate_helpers.py`). Added `log_warn` / `log_info` helpers consistent with other scripts.
+- `docs/dependency-updates.md`: removed dangling "track via TODO in CHANGELOG" cross-reference.
+
+### Removed
+
+- **`.claude/CLAUDE.md`**: Claude Code project-memory pointer file. This is an OpenCode-native marketplace and the AGENTS.md cross-tool standard (https://agents.md/) already covers any Claude Code use case. The previous thin-pointer file matched the anti-pattern called out in `project-instructions-policy` skill.
+
+### Fixed
+
+- Model IDs in `opencode.json` and all `.opencode/agents/*.md` use OpenCode v1.14.48 registry-valid identifiers (`claude-sonnet-4-6`, `claude-haiku-4-5-20251001`, `claude-opus-4-7`). Prior IDs (`claude-sonnet-4-20250514`, `claude-haiku-4-20250514`, `claude-opus-4-20250514`) caused `config.providers` / `provider.list` / `app.agents` / `config.get` `ConfigInvalidError`.
+- Agent `color` frontmatter migrated from named CSS colors to hex / enum per schema. Prior values (`blue`, `yellow`, `purple`, `orange`, `green`, `red`, `pink`, `cyan`) were rejected by OpenCode v1.14 (only hex `^#[0-9a-fA-F]{6}$` or enum `primary|secondary|accent|success|warning|error|info` accepted).
+- `_validate_helpers.py` handles `description: |` block scalars correctly; previously returned the literal `|` and skipped the length check.
+- `_validate_helpers.py` uses `utf-8-sig` encoding so files with UTF-8 BOM do not produce spurious `missing frontmatter delimiter` errors.
+
 ## [0.7.0] - 2026-05-12
 
 ### Added
