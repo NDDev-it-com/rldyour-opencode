@@ -106,7 +106,7 @@ Rules:
 - TypeScript/JavaScript modules exporting plugin functions.
 - Events: `session.created`, `session.idle`, `session.compacted`, `file.edited`, `lsp.client.diagnostics`, `lsp.updated`, `message.updated`, `tool.execute.before`, `tool.execute.after`, `experimental.session.compacting`, `shell.env`, `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`, `permission.asked`, `permission.replied`.
 - Dependencies go in `.opencode/package.json` — OpenCode runs `bun install` at startup.
-- rldyour plugins: `ry-bootstrap.ts` (session context, compaction preservation), `ry-env-protection.ts` (block sensitive reads), `ry-shell-strategy.ts` (non-interactive shell, env injection, force-push guard), `ry-sync-reminder.ts` (idle sync reminder, commit format advice).
+- rldyour plugins: `ry-bootstrap.ts` (session context, compaction preservation), `ry-env-protection.ts` (block sensitive reads), `ry-shell-strategy.ts` (non-interactive shell, env injection, force-push guard), `ry-sync-reminder.ts` (idle sync reminder, commit format advice), `ry-flow-hooks.ts` (post-tool commit advice, auto-sync nudge).
 
 ### Permissions
 - Global permissions in `opencode.json` → `permission`.
@@ -236,6 +236,12 @@ Runtime rules for LSP skills:
 - `scripts/validate_config.sh` — Validate opencode.json, skill frontmatter, agent frontmatter, commands.
 - `scripts/bootstrap_opencode.sh` — Bootstrap project structure and exclude patterns.
 - `scripts/doctor_opencode.sh` — Check dependencies and configuration health.
+- `scripts/check_lsps.sh` — Check LSP server commands and project prerequisites.
+- `scripts/install_lsps.sh` — Brew-first LSP server installation.
+- `scripts/flow_post_task_state.sh` — Compute git/Serena/fullrepo/instruction-docs state as JSON.
+- `scripts/git_sync_audit.sh` — Audit git state: branch, upstream, dirty files, worktrees.
+- `scripts/deploy_readiness.sh` — Check deploy readiness for a target server.
+- `scripts/detect_project_checks.sh` — Auto-detect project-native test/lint/typecheck commands.
 - `scripts/fullrepo_sync.sh status` — Check git and fullrepo sync state.
 
 ## Done Criteria
