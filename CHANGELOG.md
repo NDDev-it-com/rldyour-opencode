@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-05-12
+
+### Added
+
+- **4 missing commands**: ry-design, ry-explore, ry-sec-review, ry-rules-review (matching reference implementations).
+- **LSP utility scripts**: check_lsps.sh (health check for 17+ language servers) and install_lsps.sh (brew-first installation).
+- **Flow utility scripts**: flow_post_task_state.sh (JSON state computation), git_sync_audit.sh, deploy_readiness.sh, detect_project_checks.sh.
+- **New plugin**: ry-flow-hooks.ts (post-tool commit advice and auto-sync nudge).
+- AGENTS.md updated with validation commands section listing all 9 scripts.
+
+### Changed
+
+- Commands now use OpenCode-specific features: `subtask: true` for ry-explore, correct MCP tool names (`mcp__figma__*` not `mcp__plugin_rldyour-mcps_figma__*`).
+- All 10 commands now present (6 original + 4 new), matching reference implementation coverage.
+
 ## [0.6.0] - 2026-05-12
 
 ### Added
