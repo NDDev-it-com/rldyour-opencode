@@ -1,6 +1,6 @@
 # CORE_00 Memory Index
 
-Last commit: f28aadd
+Last commit: 9cac4bd
 
 ## Purpose
 
@@ -24,8 +24,8 @@ Master registry of `.serena/memories/` for rldyour-opencode. Every memory in thi
 - **Type**: OpenCode AI coding agent configuration marketplace.
 - **Version**: `VERSION` → `0.7.0`. All 7 entries in `CHANGELOG.md` dated `2026-05-12`.
 - **License**: MIT (`LICENSE`).
-- **HEAD**: `f28aadd` — "feat: add missing commands, LSP scripts, flow scripts, and flow hooks plugin".
-- **Sync commit**: `41950f5` — "chore(serena): sync project knowledge after f28aadd".
+- **HEAD**: `9cac4bd` — "fix(config): refresh Anthropic model IDs to May 2026 releases".
+- **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, plus subsequent edits after `9cac4bd`.
 - **Branch**: `main`. Upstream: not configured (no `origin`). Worktrees: 1.
 
 ## Anti-Hallucination Contract
