@@ -1,6 +1,6 @@
 # CORE_00 Memory Index
 
-Last commit: 3c434ae
+Last commit: 3c442a4
 
 ## Purpose
 
@@ -14,9 +14,10 @@ Master registry of `.serena/memories/` for rldyour-opencode. Every memory in thi
 | CORE_01 | `CORE_01_project_shape.md` | architecture | Repo topology, layout, source-of-truth contract, communication policy |
 | CORE_02 | `CORE_02_opencode_config.md` | config | `opencode.json` master config + MCP (13) + LSP (8 custom) + permissions |
 | CORE_03 | `CORE_03_plugins_agents_commands.md` | components | 5 plugins + 9 agents + 10 commands + domain boundaries |
-| CORE_04 | `CORE_04_skills_references_scripts.md` | components | 32 skills + 15 references + 10 scripts + CI gate |
+| CORE_04 | `CORE_04_skills_references_scripts.md` | components | 32 skills + 15 references + 11 scripts + CI gate + docs/ |
 | CONTRACT_10 | `CONTRACT_10_fullrepo_and_excludes.md` | contract | Fullrepo orphan branch + `.git/info/exclude` workflow detail |
 | POLICY_12 | `POLICY_12_communication_quality.md` | policy | RU/EN, Conventional Commits, engineering rules, /ry-sync gate, 10 Don'ts |
+| DOCS_14 | `DOCS_14_marketplace_operations.md` | operations | `docs/` marketplace guides (release / dependency / rollback) |
 
 ## Project facts
 
@@ -24,9 +25,10 @@ Master registry of `.serena/memories/` for rldyour-opencode. Every memory in thi
 - **Type**: OpenCode AI coding agent configuration marketplace.
 - **Version**: `VERSION` → `0.7.0`. All 7 entries in `CHANGELOG.md` dated `2026-05-12`.
 - **License**: MIT (`LICENSE`).
-- **HEAD**: `3c434ae` — "fix(agents): use schema-valid color values for OpenCode v1.14".
-- **Validated against**: `opencode v1.14.48` (`opencode debug config` resolves cleanly).
-- **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, `9d954db`, plus subsequent edits after `3c434ae`.
+- **HEAD**: `3c442a4` — "docs(agent): correct customize-opencode body for single source of truth".
+- **Validated against**: `opencode v1.14.48` (`opencode debug config` resolves cleanly; `bash scripts/validate_config.sh` exits 0).
+- **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, `9d954db`, `c4d8d9c`, plus subsequent edits after `3c442a4`.
+- **Last ry-start lifecycle**: commits `a5d50f8` (validator rewrite), `37d6861` (AGENTS.md skill+plugin events), `f961349` (README catalog refresh), `05e5a75` (ry-bootstrap dynamic MCP), `104a13d` (docs/ marketplace guides), `3c442a4` (customize-opencode body fix).
 - **Branch**: `main`. Upstream: not configured (no `origin`). Worktrees: 1.
 
 ## Anti-Hallucination Contract
