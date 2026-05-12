@@ -33,6 +33,6 @@ This repository pins exact versions for every external dependency to keep startu
 - Reject any package whose maintainer list, license, or homepage cannot be verified against `references/sources.md` policy.
 - Never silently downgrade a tool that another skill depends on; raise it through ADR (MADR 4.0.0) when affected.
 
-## Automation surface (future)
+## Automation surface
 
-A future `scripts/check_deps_freshness.sh` should compare each pinned version in `opencode.json` against the upstream registry and report drift. Not yet implemented.
+`scripts/check_deps_freshness.sh` (with helper `scripts/_extract_pins.py`) parses every pinned MCP server in `opencode.json` and lists the package + version. JSON output via `--json` is suitable for downstream automation. Network-backed comparison against npm / PyPI registries is not yet wired (intentional defer — local list is the primary value).
