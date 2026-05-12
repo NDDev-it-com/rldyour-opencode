@@ -20,16 +20,18 @@ async function readMcpNames(projectDir: string): Promise<string[]> {
     const cfg = JSON.parse(raw) as { mcp?: Record<string, { enabled?: boolean }> }
     const mcp = cfg.mcp ?? {}
     return Object.keys(mcp).filter((name) => mcp[name]?.enabled !== false).sort()
-  } catch {
+  } catch (err) {
+    console.warn(
+      `[rldyour] ry-bootstrap: could not read opencode.json (${err instanceof Error ? err.message : String(err)}). MCP list will be reported as unavailable.`,
+    )
     return []
   }
 }
 
-export const RyBootstrap: Plugin = async (ctx) => {
-  const project = (ctx as { project?: { name?: string; path?: string } }).project
-  const directory = (ctx as { directory?: string }).directory
-  const projectName = project?.name ?? "unknown"
-  const projectDir = project?.path ?? directory ?? "."
+export const RyBootstrap: Plugin = async ({ project, directory }) => {
+  const proj = project as { name?: string; path?: string } | undefined
+  const projectName = proj?.name ?? "unknown"
+  const projectDir = proj?.path ?? directory ?? "."
 
   return {
     event: async ({ event }) => {
