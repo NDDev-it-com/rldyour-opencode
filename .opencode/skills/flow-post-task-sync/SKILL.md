@@ -1,6 +1,6 @@
 ---
 name: flow-post-task-sync
-description: "Финализация задачи: Serena memories, agent-only файлы, fullrepo, git/GitHub, ветки. Use after ry-start/review/deploy/newp; триггеры: заверши задачу, синхронизируй, sync and finalize."
+description: "Финализация задачи: Serena memories, agent-only файлы, fullrepo, git/GitHub, ветки. Используй для: заверши задачу, синхронизируй, sync and finalize, заверши работу. EN triggers: finalize task, post-task sync, memory sync, sync to fullrepo, finalize before delivery."
 ---
 
 # Flow Post-Task Sync

@@ -1,6 +1,6 @@
 ---
 name: ry-newp
-description: "Новый проект: скептические вопросы, research, архитектура, ТЗ. Use for ry-newp, new project, новый проект, ТЗ, проект с нуля, спроектируй."
+description: "Дизайн нового проекта: скептические вопросы, research, архитектура, ТЗ, ADR. Используй для: новый проект, ТЗ, проект с нуля, спроектируй, ARCHITECTURE.md. EN triggers: ry-newp, new project, design project from scratch, requirements, architecture docs, scaffold project, MADR ADR."
 ---
 
 # ry-newp

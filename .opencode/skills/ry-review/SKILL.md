@@ -1,6 +1,6 @@
 ---
 name: ry-review
-description: "Глубокое ревью: diff, PR, scope с research и reviewer tracks. Report-only по умолчанию. Use for ry-review, review, audit diff, проверь реализацию, сделай ревью, найди проблемы."
+description: "Глубокое ревью diff/PR/scope с research и параллельными reviewer tracks. Report-only по умолчанию. Используй для: проверь реализацию, сделай ревью, найди проблемы, инспекция кода, audit diff. EN triggers: ry-review, code review, audit changes, deep review, multi-track review, report-only review, reviewer subagents."
 ---
 
 # ry-review

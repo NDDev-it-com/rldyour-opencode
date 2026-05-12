@@ -1,6 +1,6 @@
 ---
 name: ry-init
-description: "Инициализируй контекст проекта: read-only scoped discovery с Serena, fullrepo bootstrap, архитектура, отчёт. Use for ry-init, init scope, initialize context, project onboarding."
+description: "Инициализируй контекст проекта: read-only scoped discovery с Serena, fullrepo bootstrap, архитектура, отчёт. Используй для: изучи проект, инициализируй контекст, разбери репозиторий, scope/sphere/module discovery. EN triggers: ry-init, init project, init scope, initialize context, project onboarding, context pack, study repo, learn project, fullrepo bootstrap."
 ---
 
 # ry-init
