@@ -117,12 +117,16 @@ Rules:
   - Experimental: `experimental.chat.messages.transform`, `experimental.chat.system.transform`, `experimental.session.compacting`, `experimental.compaction.autocontinue`, `experimental.text.complete`.
 - TUI-side hooks (`tui.prompt.append`, `tui.command.execute`, `tui.toast.show`) live under `@opencode-ai/plugin/tui.d.ts` and require a different plugin shape (`PluginModule.tui`). They are NOT used in this repo's server plugins.
 - Dependencies live in `.opencode/package.json` — OpenCode runs `bun install` at startup and rewrites the `@opencode-ai/plugin` pin to match its own runtime version. Committing the current pin is expected; the file may drift after a runtime upgrade. Do not manually downgrade — that fights the runtime and produces version-mismatch warnings.
-- rldyour plugins (5):
+- rldyour plugins (8):
   - `ry-bootstrap.ts` — `session.created` banner + `experimental.session.compacting` context push (MCP list read dynamically from `opencode.json` via `Bun.file()`).
   - `ry-env-protection.ts` — `tool.execute.before` blocks read/bash of sensitive files (`.env*`, `.pem`, `.key`, etc.) with `.env.example` whitelist.
   - `ry-shell-strategy.ts` — `shell.env` injects non-interactive git/CI env; `tool.execute.before` blocks `git push --force` without `--force-with-lease` and warns on destructive `rm`.
   - `ry-sync-reminder.ts` — `session.idle` ending-session checklist.
   - `ry-flow-hooks.ts` — `tool.execute.after` Conventional Commits advice and post-commit `/ry-sync` nudge (sole owner of post-commit advice; ry-sync-reminder does not duplicate).
+  - `ry-tools.ts` — registers 5 custom tools (`rldyour_validate_config`, `rldyour_check_deps`, `rldyour_lsp_health`, `rldyour_git_audit`, `rldyour_fullrepo_status`) via the `tool` plugin hook. Each wraps an existing diagnostic script so the LLM can drive checks without a bash round-trip.
+  - `ry-command-audit.ts` — `command.execute.before` appends one credential-sanitized line per slash command invocation to `.serena/.command_audit.log` (runtime marker, never committed; 256 KiB rolling cap).
+  - `ry-tool-hints.ts` — `tool.definition` appends a one-sentence routing hint to known MCP tool descriptions so the AGENTS.md tool-priority matrix is visible inline to the LLM (e.g., "Prefer over raw grep when locating a known symbol").
+- See `references/opencode-plugin-patterns.md` for the full hook surface, adopted patterns, and CLI extension points the marketplace can drive.
 
 ### Permissions
 - Global permissions in `opencode.json` → `permission`.

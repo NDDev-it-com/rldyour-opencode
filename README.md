@@ -14,7 +14,9 @@ A self-contained OpenCode project configuration that provides:
   - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
   - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
 - **13 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, Semgrep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
-- **5 TypeScript plugins** for session lifecycle (`ry-bootstrap`, `ry-env-protection`, `ry-shell-strategy`, `ry-sync-reminder`, `ry-flow-hooks`).
+- **8 TypeScript plugins** for session lifecycle and LLM augmentation:
+  - lifecycle: `ry-bootstrap`, `ry-env-protection`, `ry-shell-strategy`, `ry-sync-reminder`, `ry-flow-hooks`
+  - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
 - **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
 - **Granular permissions** per agent (reviewer subagents are read-only with git-only bash allowlist).
 
@@ -61,14 +63,15 @@ A self-contained OpenCode project configuration that provides:
 | Subagents | `.opencode/agents/*.md` | 9 |
 | Skills | `.opencode/skills/<name>/SKILL.md` | 32 |
 | Slash commands | `.opencode/commands/*.md` | 10 |
-| Plugins | `.opencode/plugins/*.ts` | 5 |
+| Plugins | `.opencode/plugins/*.ts` | 8 |
+| Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
 | MCP servers | `opencode.json` → `mcp` | 13 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
-| Reference docs (skill/agent contracts) | `references/*.md` | 15 |
+| Reference docs (skill/agent contracts) | `references/*.md` | 16 |
 | Operator guides | `docs/*.md` | 3 |
 | Architecture decision archive | `docs/decisions/*.md` | 4 |
 | Diagnostic scripts (bash + python helpers) | `scripts/` | 13 |
-| Validator unit tests | `scripts/tests/*.py` | 1 (27 cases) |
+| Pytest suites | `scripts/tests/*.py` | 3 (168 cases: 27 validator + 12 extract_pins + 129 skill routing) |
 
 ## Commands
 
