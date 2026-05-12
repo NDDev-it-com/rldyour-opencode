@@ -31,7 +31,7 @@ import sys
 from pathlib import Path
 
 NPM_BUNX_RE = re.compile(r"^(?:@?[\w./-]+)@([0-9][\w.+\-]*)$")
-UV_FROM_RE = re.compile(r"^([A-Za-z0-9_-]+)==([0-9][\w.+\-]*)$")
+UV_FROM_RE = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)==([0-9][\w.+\-]*)$")
 
 
 def extract_pins(cfg_path: Path) -> list[dict[str, str]]:
