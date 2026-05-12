@@ -81,7 +81,10 @@ def _yaml_top_key(fm: str, key: str) -> str | None:
     appears more than once at column 0 — YAML forbids duplicate keys
     and a regex parser cannot disambiguate which value is authoritative.
     """
-    inline = re.compile(rf"^{re.escape(key)}:\s*(.*?)\s*$", re.MULTILINE)
+    # `\s` matches \n, so `\s*$` could eat the line break and slide into
+    # the next line — making `description:\nmode: subagent` return
+    # "mode: subagent". Constrain to non-newline whitespace.
+    inline = re.compile(rf"^{re.escape(key)}:[^\S\n]*(.*?)[^\S\n]*$", re.MULTILINE)
     matches = list(inline.finditer(fm))
     if not matches:
         return None

@@ -169,7 +169,7 @@ cmd_publish() {
   while IFS= read -r line; do
     if echo "$line" | grep -qiE '(PRIVATE_KEY|SECRET_KEY|PASSWORD|TOKEN|API_KEY)\s*=\s*[^"]*\S'; then
       if ! echo "$line" | grep -qiE '(example|template|sample|placeholder|xxx|todo)'; then
-        echo "[fullrepo] WARNING: Potential secret in $(echo "$line" | cut -d: -1)" >&2
+        echo "[fullrepo] WARNING: Potential secret in $(echo "$line" | cut -d: -f1)" >&2
         secrets_found=1
       fi
     fi

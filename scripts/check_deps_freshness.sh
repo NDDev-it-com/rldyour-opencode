@@ -50,10 +50,10 @@ fi
 PINS_JSON=$("$PYTHON" "$EXTRACT_SCRIPT" "$OPENCODE_JSON")
 
 if $OUTPUT_JSON; then
-    REPORT_TMP="$(mktemp)"
-    echo "$PINS_JSON" > "$REPORT_TMP"
-    cat "$REPORT_TMP"
-    rm -f "$REPORT_TMP"
+    # PINS_JSON is already an in-memory string from the Python helper —
+    # no need for a temp file. Direct echo keeps the script trap-free
+    # and trivially cleanup-safe under `set -euo pipefail`.
+    echo "$PINS_JSON"
     exit 0
 fi
 
