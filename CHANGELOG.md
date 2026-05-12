@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-05-12
+
+### Changed
+
+- MCP configuration: complete rewrite from scratch based on both reference implementations.
+- Replaced `npx -y` with `bunx` for all npm-based MCP servers (serena, sequential-thinking, playwright, chrome-devtools, context7, shadcn).
+- Fixed serena: changed from `@anthropic/serena-mcp` to `serena-agent==1.3.0` via `uvx` with correct flags.
+- Fixed sequential-thinking: version `0.7.0` → `2025.12.18`, added `DISABLE_THOUGHT_LOGGING` env var.
+- Fixed playwright: added `--headless` and `--caps=network,storage,testing,devtools` flags.
+- Fixed figma URL: `/` → `/mcp`.
+- Added `timeout` values: 90000ms for local servers, 60000ms for remote servers.
+- Added 5 missing MCP servers: chrome-devtools, semgrep, shadcn, dart-flutter, openai-docs.
+- Total MCP servers: 13 (8 local, 5 remote; dart-flutter disabled by default).
+
 ## [0.2.0] - 2026-05-12
 
 ### Added

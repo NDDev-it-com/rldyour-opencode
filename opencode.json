@@ -278,18 +278,30 @@
   "mcp": {
     "serena": {
       "type": "local",
-      "command": ["npx", "-y", "@anthropic/serena-mcp@1.3.0", "--context", "agent"],
-      "enabled": true
+      "command": ["uvx", "--from", "serena-agent==1.3.0", "--python", "3.13", "--prerelease", "allow", "serena", "start-mcp-server", "--project-from-cwd", "--context=agent", "--enable-web-dashboard", "False", "--open-web-dashboard", "False"],
+      "enabled": true,
+      "timeout": 90000
     },
     "sequential-thinking": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking@0.7.0"],
-      "enabled": true
+      "command": ["bunx", "@modelcontextprotocol/server-sequential-thinking@2025.12.18"],
+      "enabled": true,
+      "environment": {
+        "DISABLE_THOUGHT_LOGGING": "true"
+      },
+      "timeout": 90000
     },
     "playwright": {
       "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp@0.0.75"],
-      "enabled": true
+      "command": ["bunx", "@playwright/mcp@0.0.75", "--headless", "--caps=network,storage,testing,devtools"],
+      "enabled": true,
+      "timeout": 90000
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["bunx", "chrome-devtools-mcp@0.25.0", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"],
+      "enabled": true,
+      "timeout": 90000
     },
     "context7": {
       "type": "remote",
@@ -297,17 +309,44 @@
       "enabled": true,
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      }
+      },
+      "timeout": 60000
     },
     "deepwiki": {
       "type": "remote",
       "url": "https://mcp.deepwiki.com/mcp",
-      "enabled": true
+      "enabled": true,
+      "timeout": 60000
     },
     "grep": {
       "type": "remote",
       "url": "https://mcp.grep.app",
-      "enabled": true
+      "enabled": true,
+      "timeout": 60000
+    },
+    "semgrep": {
+      "type": "local",
+      "command": ["uvx", "--from", "semgrep==1.162.0", "semgrep", "mcp"],
+      "enabled": true,
+      "timeout": 90000
+    },
+    "shadcn": {
+      "type": "local",
+      "command": ["bunx", "shadcn@4.7.0", "mcp"],
+      "enabled": true,
+      "timeout": 90000
+    },
+    "dart-flutter": {
+      "type": "local",
+      "command": ["dart", "mcp-server", "--force-roots-fallback"],
+      "enabled": false,
+      "timeout": 90000
+    },
+    "figma": {
+      "type": "remote",
+      "url": "https://mcp.figma.com/mcp",
+      "enabled": true,
+      "timeout": 60000
     },
     "github": {
       "type": "remote",
@@ -315,12 +354,14 @@
       "enabled": true,
       "headers": {
         "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}"
-      }
+      },
+      "timeout": 60000
     },
-    "figma": {
+    "openai-docs": {
       "type": "remote",
-      "url": "https://mcp.figma.com/",
-      "enabled": true
+      "url": "https://developers.openai.com/mcp",
+      "enabled": true,
+      "timeout": 60000
     }
   },
   "instructions": ["AGENTS.md"],
