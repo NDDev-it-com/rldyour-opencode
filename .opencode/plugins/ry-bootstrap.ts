@@ -14,14 +14,14 @@ export const RyBootstrap: Plugin = async ({ project }) => {
 
     "experimental.session.compacting": async (input, output) => {
       output.context.push(`## rldyour Session Context (${projectName})
-Key facts to preserve:
-- Project: ${projectName} at ${projectDir}
-- Workflow: /ry-init → /ry-start → /ry-sync at end
-- Serena MCP available for symbol-level code navigation
-- Reviewer subagents available: architecture, quality, consistency, integration, verification, security
-- Always run /ry-sync before ending a session to synchronize memories, docs, and git state.
-- Communication language: Russian by default unless explicitly requested otherwise.
-- Engineering rules: quality-first, no hacks, no swallowed errors, conventional commits, atomic per logical unit.`)
+Project: ${projectName} at ${projectDir}
+Workflow: /ry-init → /ry-start → /ry-sync at end
+Available MCP servers: serena, sequential-thinking, playwright, chrome-devtools, context7, deepwiki, grep, semgrep, shadcn, dart-flutter, figma, github, openai-docs
+Available reviewer subagents: @flow-architecture-review, @flow-quality-review, @flow-consistency-review, @flow-integration-review, @flow-verification-review, @flow-security-review
+Deep research: @ry-explore for multi-source research with Context7, DeepWiki, Grep
+Communication: Russian by default unless explicitly requested otherwise
+Rules: quality-first, no hacks, no swallowed errors, conventional commits, atomic per logical unit
+Always run /ry-sync before ending a session to synchronize memories, docs, and git state.`)
     },
   }
 }
