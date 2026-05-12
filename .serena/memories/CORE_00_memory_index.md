@@ -1,6 +1,6 @@
 # CORE_00 Memory Index
 
-Last commit: 9cac4bd
+Last commit: 3c434ae
 
 ## Purpose
 
@@ -24,8 +24,9 @@ Master registry of `.serena/memories/` for rldyour-opencode. Every memory in thi
 - **Type**: OpenCode AI coding agent configuration marketplace.
 - **Version**: `VERSION` → `0.7.0`. All 7 entries in `CHANGELOG.md` dated `2026-05-12`.
 - **License**: MIT (`LICENSE`).
-- **HEAD**: `9cac4bd` — "fix(config): refresh Anthropic model IDs to May 2026 releases".
-- **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, plus subsequent edits after `9cac4bd`.
+- **HEAD**: `3c434ae` — "fix(agents): use schema-valid color values for OpenCode v1.14".
+- **Validated against**: `opencode v1.14.48` (`opencode debug config` resolves cleanly).
+- **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, `9d954db`, plus subsequent edits after `3c434ae`.
 - **Branch**: `main`. Upstream: not configured (no `origin`). Worktrees: 1.
 
 ## Anti-Hallucination Contract
