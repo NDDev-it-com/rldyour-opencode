@@ -1,7 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "anthropic/claude-sonnet-4-20250514",
-  "small_model": "anthropic/claude-haiku-4-20250514",
+  "model": "anthropic/claude-sonnet-4-6",
+  "small_model": "anthropic/claude-haiku-4-5-20251001",
+  "default_agent": "build",
   "autoupdate": true,
   "share": "manual",
   "snapshot": true,
@@ -54,7 +55,7 @@
   "agent": {
     "build": {
       "mode": "primary",
-      "model": "anthropic/claude-sonnet-4-20250514",
+      "model": "anthropic/claude-sonnet-4-6",
       "permission": {
         "edit": "allow",
         "bash": "allow",
@@ -69,7 +70,7 @@
     },
     "plan": {
       "mode": "primary",
-      "model": "anthropic/claude-sonnet-4-20250514",
+      "model": "anthropic/claude-sonnet-4-6",
       "permission": {
         "edit": "ask",
         "bash": "ask",

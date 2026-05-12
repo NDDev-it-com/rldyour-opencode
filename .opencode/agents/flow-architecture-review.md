@@ -1,7 +1,7 @@
 ---
 description: Orchestrated architecture review: boundaries, dependency direction, public API, data flow. Read-only. Invoked by ry-start or ry-review.
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: anthropic/claude-sonnet-4-6
 temperature: 0.1
 steps: 36
 hidden: true

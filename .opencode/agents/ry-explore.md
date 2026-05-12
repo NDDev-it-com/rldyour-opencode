@@ -2,7 +2,7 @@
 description: |
   Глубокое многоисточниковое исследование: MCP-first lookup (Context7, DeepWiki, Grep), cross-validation, structured reports. Триггеры: исследуй детально, глубокое исследование, investigate thoroughly, research deeply.
 mode: subagent
-model: anthropic/claude-opus-4-20250514
+model: anthropic/claude-opus-4-7
 temperature: 0.2
 steps: 90
 color: cyan
