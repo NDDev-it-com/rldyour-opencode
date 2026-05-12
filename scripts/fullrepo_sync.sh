@@ -10,7 +10,7 @@ AGENT_ONLY_PATTERNS=(
   ".agents/"
   ".windsurf/"
   ".aider"
-  "thinking/"
+  "docs/"
   "references/"
   "scripts/"
 )

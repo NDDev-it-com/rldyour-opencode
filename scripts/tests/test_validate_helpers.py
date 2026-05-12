@@ -8,15 +8,12 @@ and asserts the validator's exit code and stdout.
 """
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import pytest
 
-# Make scripts/ importable.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-import _validate_helpers as vh  # noqa: E402
+# sys.path setup happens in conftest.py at session start.
+import _validate_helpers as vh
 
 
 # ---------- opencode.json shape ----------
