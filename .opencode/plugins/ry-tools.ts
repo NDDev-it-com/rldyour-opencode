@@ -102,9 +102,10 @@ function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
   }
 }
 
-export const RyTools: Plugin = async ({ project, directory }) => {
-  const proj = project as { path?: string } | undefined
-  const getCwd = (): string => proj?.path ?? directory ?? "."
+export const RyTools: Plugin = async ({ directory }) => {
+  // PluginInput.directory is always defined per @opencode-ai/plugin v1.14
+  // type contract (string, not nullable). Bind once at factory time.
+  const getCwd = (): string => directory
   return {
     tool: buildTools(getCwd),
   }
