@@ -23,6 +23,30 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 - `.serena/memories/*.md`: verified high-signal project knowledge.
 - `VERSION` and `CHANGELOG.md`: release version and change history.
 
+## Domain Boundaries
+
+Each skill and agent belongs to exactly one domain. Cross-domain overlap is forbidden.
+
+| Domain | Skills | Agents | Commands |
+|---|---|---|---|
+| Flow (lifecycle) | flow-post-task-sync, ry-init, ry-start, ry-review, ry-newp, ry-deploy | flow-*review, flow-memory-sync | ry-init, ry-start, ry-review, ry-newp, ry-deploy, ry-sync |
+| Serena (MCP) | serena-code-workflow, serena-memory-sync, serena-lsp-integration | — | — |
+| Rules | quality-first-engineering, architecture-boundaries, implementation-discipline, dependency-compatibility-policy, verification-quality-gates, project-instructions-policy, ry-rules-review | — | — |
+| Explore | tech-research, web-research | ry-explore | — |
+| Browser | browser-tool-routing, browser-validation, browser-debug | — | — |
+| Design | ry-design, figma-to-code, design-system-implementation, fsd-frontend-architecture, design-validation | — | — |
+| Security | owasp-top-10-implementation, ry-sec-review | — | — |
+| LSP | lsp-routing, lsp-health-check, lsp-setup | — | — |
+| Docs sync | instruction-docs-sync | — | — |
+| Config | — | customize-opencode | — |
+
+Rules:
+- Only Serena domain may invoke MCP tool `mcp__serena__*`.
+- Only LSP domain may invoke LSP skills directly.
+- Only Browser domain may invoke Playwright/Chrome-DevTools MCP tools.
+- Flow domain orchestrates other domains via skills and subagents.
+- Security domain may invoke Semgrep MCP tools.
+
 ## OpenCode Conventions
 
 ### Skills
@@ -45,7 +69,7 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 ### Commands
 - Place in `.opencode/commands/<name>.md`.
 - Frontmatter: `description`, `agent`, `model`, `subtask` (optional, forces subagent invocation).
-- Body is the template sent to the agent. Supports `$ARGUMENTS`, `$1`/`$2`/..., `!`command`` for shell output, `@file` for file references.
+- Body is the template sent to the agent. Supports `$ARGUMENTS`, `$1`/`$2`/..., `` !`command` `` for shell output, `@file` for file references.
 - Commands defined ONLY in `.opencode/commands/*.md` — never duplicated in `opencode.json`.
 
 ### MCP Configuration
@@ -56,8 +80,8 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 - Tool names follow pattern `mcp__<servername>__<toolname>`.
 - Use `bunx` for npm packages (never `npx`), `uvx` for Python packages, `dart` for Dart SDK.
 - Pin exact versions for all packages to ensure reproducibility.
-- `dart-flutter` is disabled by default (requires Dart SDK 3.9+ on PATH); enable per-project as needed.
 - `context7` supports higher rate limits with `CONTEXT7_API_KEY`; works without key at lower limits.
+- Required env vars documented in `.env.example`.
 
 #### MCP servers (13)
 
@@ -72,7 +96,7 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 | grep | remote | https | — | Search across public GitHub repos |
 | semgrep | local | uvx | 1.162.0 | Static analysis and security |
 | shadcn | local | bunx | 4.7.0 | shadcn/ui registry access |
-| dart-flutter | local | dart | — | Dart/Flutter project support (disabled by default) |
+| dart-flutter | local | dart | — | Dart/Flutter project support |
 | figma | remote | https | — | Figma design context |
 | github | remote | https | — | GitHub Copilot MCP (requires PAT) |
 | openai-docs | remote | https | — | Official OpenAI/Codex documentation |
@@ -80,15 +104,15 @@ This repository is the owner's personal OpenCode configuration marketplace. It p
 ### Plugins
 - Place in `.opencode/plugins/` (project-level) or `~/.config/opencode/plugins/` (global).
 - TypeScript/JavaScript modules exporting plugin functions.
-- Events: `session.created`, `session.idle`, `session.compacted`, `file.edited`, `lsp.updated`, `message.updated`, `tool.execute.before`, `tool.execute.after`, `experimental.session.compacting`, `shell.env`, `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`, `permission.asked`, `permission.replied`.
+- Events: `session.created`, `session.idle`, `session.compacted`, `file.edited`, `lsp.client.diagnostics`, `lsp.updated`, `message.updated`, `tool.execute.before`, `tool.execute.after`, `experimental.session.compacting`, `shell.env`, `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`, `permission.asked`, `permission.replied`.
 - Dependencies go in `.opencode/package.json` — OpenCode runs `bun install` at startup.
-- rldyour plugins: `ry-bootstrap.ts` (compaction context), `ry-env-protection.ts` (block sensitive reads), `ry-shell-strategy.ts` (non-interactive shell, env injection), `ry-sync-reminder.ts` (idle session reminder).
+- rldyour plugins: `ry-bootstrap.ts` (session context, compaction preservation), `ry-env-protection.ts` (block sensitive reads), `ry-shell-strategy.ts` (non-interactive shell, env injection, force-push guard), `ry-sync-reminder.ts` (idle sync reminder, commit format advice).
 
 ### Permissions
 - Global permissions in `opencode.json` → `permission`.
-- Per-agent overrides in `opencode.json` → `agent.<name>.permission`.
+- Per-agent overrides in `.opencode/agents/<name>.md` frontmatter.
 - Values: `"allow"`, `"ask"`, `"deny"`, or object with glob patterns.
-- Key permission keys: `read`, `edit`, `glob`, `grep`, `bash`, `task`, `webfetch`, `websearch`, `lsp`, `skill`, `question`.
+- Key permission keys: `read`, `edit`, `glob`, `grep`, `bash`, `task`, `webfetch`, `websearch`, `lsp`, `skill`, `question`, `external_directory`, `doom_loop`, `todowrite`.
 
 ## Plugin Routing
 
@@ -144,6 +168,19 @@ MCP tools follow the `mcp__<servername>__<toolname>` naming pattern. For example
 - Conventional Commits for all changes. Atomic commits per logical unit.
 - Never commit secrets, runtime markers, browser artifacts, or local credentials.
 
+## Don'ts
+
+- Do NOT implement without passing context-sufficiency gate.
+- Do NOT skip reviewer phase for security-sensitive or user-visible changes.
+- Do NOT skip browser validation for UI changes without explicit reasoning.
+- Do NOT force-push product branches (use --force-with-lease if necessary).
+- Do NOT commit without Conventional Commits format.
+- Do NOT deliver final task without running /ry-sync.
+- Do NOT start `stdio` language servers manually; OpenCode manages lifecycle.
+- Do NOT use `bunx`/`uvx` as runtime for long-lived LSP servers.
+- Do NOT use `npx`; always use `bunx` for npm packages.
+- Do NOT auto-edit `.serena/project.yml` without explicit user request.
+
 ## LSP
 
 OpenCode has 35+ built-in LSP servers that auto-start when file extensions are detected. Enabled in `opencode.json` with `"lsp": {}` (object = built-ins enabled + custom overrides).
@@ -169,7 +206,7 @@ Runtime rules for LSP skills:
 - Use `lsp-setup` skill only on explicit user request (brew-first install policy).
 - Use `serena-lsp-integration` skill to align Serena MCP with supported language keys.
 
-## Serana Memories And Project Knowledge
+## Serena Memories And Project Knowledge
 
 - Store durable facts in `.serena/memories/` with the project memory metadata format.
 - Memories are facts only: exact paths, entry points, behavior, contracts, invariants.
@@ -186,8 +223,20 @@ Runtime rules for LSP skills:
   3. Run applicable quality checks.
   4. Commit atomically and push.
   5. Publish agent-only files to `fullrepo` branch if applicable.
-- `fullrepo` is the standard branch for portable agent-only context. Normal branches should exclude AGENTS.md, .serena/, .opencode/ agents/skills/commands, and similar AI workflow files through `.git/info/exclude`.
-- Agent-only files include: project-root `AGENTS.md`, `.serena/` knowledge, `.opencode/` agents/skills/commands, `.claude/`, `.cursor/rules/`, `.agents/`, and similar AI workflow directories.
+- `fullrepo` is the standard branch for portable agent-only context. Normal branches should exclude agent-only files through `.git/info/exclude`.
+- Agent-only files include: project-root `AGENTS.md`, `.serena/` knowledge, `.opencode/` agents/skills/commands/plugins, `.claude/`, `.cursor/rules/`, `.agents/`, and similar AI workflow directories.
+- Use `scripts/fullrepo_sync.sh` for fullrepo branch management:
+  - `bootstrap-init`: Install exclude patterns and restore from fullrepo.
+  - `restore`: Restore agent-only files from origin/fullrepo.
+  - `publish`: Publish current agent-only files to origin/fullrepo.
+  - `status` / `status-json`: Check sync state.
+
+## Validation Commands
+
+- `scripts/validate_config.sh` — Validate opencode.json, skill frontmatter, agent frontmatter, commands.
+- `scripts/bootstrap_opencode.sh` — Bootstrap project structure and exclude patterns.
+- `scripts/doctor_opencode.sh` — Check dependencies and configuration health.
+- `scripts/fullrepo_sync.sh status` — Check git and fullrepo sync state.
 
 ## Done Criteria
 
@@ -198,3 +247,4 @@ Runtime rules for LSP skills:
 - `git status` is clean of non-agent files.
 - Serena memories reflect current code state.
 - Conventional commits for source/docs/Serena knowledge are separate when it improves history clarity.
+- No secrets in agent-only files (checked by fullrepo_sync.sh publish).

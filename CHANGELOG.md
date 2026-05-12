@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-05-12
+
+### Added
+
+- **Fullrepo sync script** (`scripts/fullrepo_sync.sh`): bootstrap-init, restore, publish, status, status-json — full agent-only file branch management.
+- `.env.example` documenting required environment variables (CONTEXT7_API_KEY, GITHUB_PERSONAL_ACCESS_TOKEN).
+- Domain boundaries section in AGENTS.md mapping each skill/agent/command to its owning domain.
+- Don'ts section in AGENTS.md with 10 explicit prohibitions.
+- Validation commands section in AGENTS.md documenting all scripts.
+- `.git/info/exclude` pattern management documented in Git and Sync section.
+- Updated MCP servers table: dart-flutter now enabled, figma URL corrected to `/mcp`.
+
+### Changed
+
+- **Single source of truth for agents and commands**: removed all subagent and command definitions from `opencode.json` — they live exclusively in `.opencode/agents/*.md` and `.opencode/commands/*.md`.
+- **MCP timeouts reduced**: 30s for local servers, 15s for remote (was 90s/60s).
+- **AGENTS.md major rewrite**: added domain boundaries, don'ts, validation commands, fullrepo sync docs, plugin event reference.
+- **Plugins enhanced**: ry-bootstrap.ts now includes MCP server list and reviewer subagent list in compaction context; ry-env-protection.ts has improved pattern matching with .env.example whitelist; ry-shell-strategy.ts adds --force-with-lease guard and destructive rm warning; ry-sync-reminder.ts adds conventional commit format advice on commit events.
+
 ## [0.5.0] - 2026-05-12
 
 ### Changed
