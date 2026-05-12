@@ -4,6 +4,24 @@
 Walks `mcp.<name>.command` arrays and emits a JSON document listing every
 detected pin (npm via bunx, Python via uvx, Dart SDK reference). Used by
 `scripts/check_deps_freshness.sh` and any future freshness automation.
+
+Output JSON envelope (stdout):
+
+    {
+        "pins": [
+            {
+                "kind": "npm" | "pypi" | "dart",
+                "server": str,   # opencode.json mcp.<server> key
+                "name": str,     # package name (or "dart-sdk" for Dart)
+                "version": str   # pinned version (or "system" for Dart)
+            },
+            ...
+        ],
+        "count": int
+    }
+
+Consumers depend on this exact shape; do not rename fields without a
+PATCH/MINOR bump and an entry in CHANGELOG.md.
 """
 from __future__ import annotations
 
@@ -64,6 +82,12 @@ def extract_pins(cfg_path: Path) -> list[dict[str, str]]:
 
 
 def main(argv: list[str]) -> int:
+    """Entry point.
+
+    Usage: _extract_pins.py <opencode.json>
+    Emits JSON {"pins": [...], "count": <n>} to stdout.
+    Each pin: {"kind": "npm"|"pypi"|"dart", "server", "name", "version"}.
+    """
     if len(argv) < 2:
         print("usage: _extract_pins.py <opencode.json>", file=sys.stderr)
         return 2

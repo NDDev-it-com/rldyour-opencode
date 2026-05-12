@@ -20,9 +20,7 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OPENCODE_JSON="${PROJECT_ROOT}/opencode.json"
 PYTHON="${PYTHON:-python3}"
 
-GREEN='\033[0;32m'
 RED='\033[0;31m'
-YELLOW='\033[1;33m'
 NC='\033[0m'
 
 OUTPUT_JSON=false
@@ -32,9 +30,6 @@ fi
 
 log_err()  { $OUTPUT_JSON || echo -e "${RED}[ERR]${NC} $1"; }
 log_info() { $OUTPUT_JSON || echo -e "$1"; }
-# GREEN/YELLOW reserved for future freshness comparisons; not yet used.
-_unused_colors() { echo "$GREEN$YELLOW" >/dev/null; }
-_unused_colors
 
 if [ ! -f "$OPENCODE_JSON" ]; then
     log_err "opencode.json not found at ${OPENCODE_JSON}"
