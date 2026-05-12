@@ -143,9 +143,28 @@ MCP tools follow the `mcp__<servername>__<toolname>` naming pattern. For example
 
 ## LSP
 
-OpenCode has 30+ built-in LSP servers that auto-start when file extensions are detected. Enable in `opencode.json` with `"lsp": true`. No manual `.lsp.json` needed.
+OpenCode has 35+ built-in LSP servers that auto-start when file extensions are detected. Enabled in `opencode.json` with `"lsp": {}` (object = built-ins enabled + custom overrides).
 
-For custom LSP configuration, use `opencode.json` → `lsp` object with per-server overrides.
+Custom LSP servers added for coverage beyond built-ins:
+
+| Key | Server | Extensions | Notes |
+|---|---|---|---|
+| `ruff` | `ruff server` | `.py`, `.pyi` | Python linter companion to pyright |
+| `vscode-html` | `vscode-html-language-server --stdio` | `.html`, `.htm` | From vscode-langservers-extracted |
+| `vscode-css` | `vscode-css-language-server --stdio` | `.css`, `.scss`, `.sass`, `.less` | From vscode-langservers-extracted |
+| `vscode-json` | `vscode-json-language-server --stdio` | `.json`, `.jsonc` | From vscode-langservers-extracted |
+| `docker` | `docker-language-server start --stdio` | `.dockerfile` | Dockerfile/Compose support |
+| `taplo` | `taplo lsp stdio` | `.toml` | TOML schema support |
+| `marksman` | `marksman server` | `.md`, `.mdx`, `.markdown` | Markdown intelligence |
+| `qmlls` | `qmlls` | `.qml` | Qt QML support (optional) |
+
+Runtime rules for LSP skills:
+- Never start `stdio` language servers manually; OpenCode manages their lifecycle.
+- Never use `bunx`/`uvx` as runtime for long-lived LSP servers; use stable local executables.
+- Use `lsp-routing` skill for language-server selection guidance.
+- Use `lsp-health-check` skill to verify LSP commands and project prerequisites.
+- Use `lsp-setup` skill only on explicit user request (brew-first install policy).
+- Use `serena-lsp-integration` skill to align Serena MCP with supported language keys.
 
 ## Serana Memories And Project Knowledge
 
