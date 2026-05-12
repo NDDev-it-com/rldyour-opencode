@@ -339,7 +339,7 @@
     "dart-flutter": {
       "type": "local",
       "command": ["dart", "mcp-server", "--force-roots-fallback"],
-      "enabled": false,
+      "enabled": true,
       "timeout": 90000
     },
     "figma": {
