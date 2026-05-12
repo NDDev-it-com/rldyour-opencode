@@ -1,7 +1,7 @@
 ---
 description: Fact-only Serena memory synchronization agent. Updates .serena/memories against verified current code. Invoked by ry-sync or Stop advisory.
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: anthropic/claude-sonnet-4-6
 temperature: 0.1
 steps: 36
 hidden: true
