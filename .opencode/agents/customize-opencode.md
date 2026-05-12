@@ -78,12 +78,9 @@ Each agent key defines a subagent or primary agent:
 
 ### command section
 
-Each command key defines a slash command:
+In this repository slash commands live ONLY in `.opencode/commands/<name>.md` (single source of truth — see AGENTS.md § Source Of Truth). Do NOT add a `command` block to `opencode.json` — OpenCode still supports it for legacy compatibility, but mixing both creates two sources of truth and silently masks command-file changes.
 
-- `template` (required): the prompt template sent to the agent.
-- `description`: short description shown in the command list.
-- `agent`: which agent to invoke.
-- `model`: optional model override.
+If a command must be edited, modify the corresponding `.opencode/commands/<name>.md` file directly instead of touching `opencode.json`.
 
 ### mcp section
 
@@ -102,7 +99,7 @@ After every edit to `opencode.json`, verify:
 1. **JSON syntax**: valid JSON (no trailing commas, proper quoting).
 2. **Schema conformance**: `$schema` is present and correct. All top-level keys are recognized.
 3. **Agent definitions**: every agent has `description` and `mode`. Model IDs are valid provider/model format. `steps` is a positive integer. `permission` values are `"allow"`, `"ask"`, `"deny"`, or valid glob-pattern objects.
-4. **Command definitions**: every command has `template` and `agent` referencing an existing agent key.
+4. **No `command` block in opencode.json**: commands must live exclusively in `.opencode/commands/*.md` (single source of truth). Adding a `command` key to opencode.json is forbidden in this repo.
 5. **MCP definitions**: every server has `type` and `enabled`. Local servers have `command` array. Remote servers have `url` string. Headers use `{env:VAR_NAME}` syntax.
 6. **No duplicate keys**: JSON does not allow duplicate keys at the same level.
 7. **No secrets in config**: API keys, tokens, and passwords must use `{env:VAR_NAME}` syntax, never literal values.
@@ -121,9 +118,11 @@ After every edit to `opencode.json`, verify:
 
 ### Adding a new agent
 
-1. Add a new key under `agent` with: `description`, `mode`, `model`, `temperature`, `steps`, `hidden`, `color`, `permission`, `prompt`.
-2. If the agent should be invokable via slash command, also add a corresponding entry under `command`.
-3. Validate the agent key matches any corresponding `.opencode/agents/<name>.md` file.
+1. Create `.opencode/agents/<name>.md` with YAML frontmatter (single source of truth — agents are NOT added to `opencode.json.agent` except for built-in `build`/`plan` permission overrides).
+2. Required frontmatter: `description` (1-1024 chars), `mode` (`primary`|`subagent`). Recommended: `model`, `temperature`, `steps`, `permission`, `hidden` (subagent only), `color`.
+3. `color` must be a hex string matching `^#[0-9a-fA-F]{6}$` OR one of the enum values `primary|secondary|accent|success|warning|error|info`. Named CSS colors are rejected.
+4. If the agent should be invokable as a slash command, create a matching `.opencode/commands/<name>.md` with frontmatter `description` + `agent: <name>`. Add `subtask: true` if the command must run as a separate subagent task.
+5. Run `opencode debug agent <name>` to verify the new agent resolves without error.
 
 ### Adding a new MCP server
 
