@@ -1,3 +1,16 @@
+/**
+ * Multi-domain diagnostic aggregator.
+ *
+ * Tools registered here span multiple domains from AGENTS.md § Domain
+ * Boundaries — Flow (validate_config, git_audit, fullrepo_status),
+ * LSP (lsp_health), Dependency (check_deps). Bundling is intentional:
+ * the plugin only *exposes* diagnostic scripts; the scripts themselves
+ * stay within their respective domains. New tools added here MUST:
+ *   1. Wrap an existing script under scripts/ (no in-plugin business logic).
+ *   2. Pass args: {} (no user input flows into the spawn argv).
+ *   3. Be documented in AGENTS.md plugin block + CHANGELOG.
+ *   4. Have a tool ID prefixed `rldyour_` to keep namespace clean.
+ */
 import type { Plugin, ToolDefinition } from "@opencode-ai/plugin"
 import { tool } from "@opencode-ai/plugin"
 

@@ -70,7 +70,9 @@ return {
 | `tool.definition` | Sent to LLM | Modify `description` / `parameters` |
 | `shell.env` | Each shell spawn | Inject `env` vars |
 | `command.execute.before` | Slash command starts | Read `command`, `arguments`, `sessionID`; emit `parts` |
-| `permission.ask` | Permission prompt | Override `status` to `"allow"` / `"deny"` |
+| `permission.ask` | Permission prompt | Override `status` to `"allow"` / `"deny"` (see security note below) |
+
+> **Security note on `permission.ask`.** Setting `output.status = "allow"` unconditionally inside this hook bypasses the user's interactive consent — the central access control of OpenCode. Only use this hook with a precise, auditable allowlist condition (e.g., a narrow patterns array tied to a specific tool + sessionID). Never ship a plugin that auto-allows broadly. This repo's plugins do not subscribe to `permission.ask`.
 
 ### Auth / provider extension
 
