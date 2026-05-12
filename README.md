@@ -1,17 +1,22 @@
 # rldyour-opencode
 
-Personal OpenCode configuration marketplace by `rldyourmnd`. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules — all adapted for the OpenCode AI coding agent format.
+Personal OpenCode configuration marketplace by `rldyourmnd`. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules — all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
+
+Validated against OpenCode v1.14.48 (May 2026).
 
 ## What This Is
 
 A self-contained OpenCode project configuration that provides:
 
-- **32 skills** for automatic workflow routing (SDLC, Serena, research, browser, design, security, LSP, rules)
-- **9 subagents** for specialized tasks (6 reviewer tracks, memory sync, deep research)
-- **6 slash commands** for lifecycle orchestration (`/ry-init`, `/ry-start`, `/ry-review`, `/ry-newp`, `/ry-deploy`, `/ry-sync`)
-- **7 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Context7, DeepWiki, Grep, GitHub)
-- **Full LSP support** via OpenCode's built-in 30+ language servers
-- **Granular permissions** per agent (reviewers are read-only, bash allowlisted for git)
+- **32 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
+- **9 subagents** for specialized tasks (6 reviewer tracks, memory sync, deep research, config helper).
+- **10 slash commands** for lifecycle orchestration:
+  - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
+  - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
+- **13 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, Semgrep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
+- **5 TypeScript plugins** for session lifecycle (`ry-bootstrap`, `ry-env-protection`, `ry-shell-strategy`, `ry-sync-reminder`, `ry-flow-hooks`).
+- **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
+- **Granular permissions** per agent (reviewer subagents are read-only with git-only bash allowlist).
 
 ## Quick Start
 
@@ -28,11 +33,11 @@ A self-contained OpenCode project configuration that provides:
    cp AGENTS.md /path/to/your/project/AGENTS.md
    ```
 
-3. Set up API keys:
+3. Set up API keys (only required env vars; rest are optional):
    ```bash
-   export ANTHROPIC_API_KEY=your-key
-   export CONTEXT7_API_KEY=your-key      # optional, for Context7
-   export GITHUB_PERSONAL_ACCESS_TOKEN=your-token  # optional, for GitHub MCP
+   export ANTHROPIC_API_KEY=your-key                # primary model auth (or use /providers in TUI)
+   export CONTEXT7_API_KEY=your-key                 # optional, higher Context7 rate
+   export GITHUB_PERSONAL_ACCESS_TOKEN=your-token   # required for GitHub MCP
    ```
 
 4. Run OpenCode in your project:
@@ -46,40 +51,106 @@ A self-contained OpenCode project configuration that provides:
    /ry-init
    ```
 
-## Active Catalog
+## Catalog
 
-| Component | Description |
-|---|---|
-| **rldyour-mcps** (in opencode.json) | MCP transport: Serena, Sequential Thinking, Playwright, Context7, DeepWiki, Grep, GitHub, Figma |
-| **rldyour-agents** (9 subagents) | Reviewer tracks (architecture, quality, consistency, integration, verification, security), memory sync, deep research |
-| **rldyour-skills** (32 skills) | SDLC flow, Serena workflow, rules, research, browser, design, security, LSP |
-| **rldyour-commands** (6 commands) | `/ry-init`, `/ry-start`, `/ry-review`, `/ry-newp`, `/ry-deploy`, `/ry-sync` |
+| Layer | Where | Count |
+|---|---|---|
+| Master config | `opencode.json` | 1 (181 lines) |
+| Cross-tool instructions | `AGENTS.md` | 1 |
+| Subagents | `.opencode/agents/*.md` | 9 |
+| Skills | `.opencode/skills/<name>/SKILL.md` | 32 |
+| Slash commands | `.opencode/commands/*.md` | 10 |
+| Plugins | `.opencode/plugins/*.ts` | 5 |
+| MCP servers | `opencode.json` → `mcp` | 13 |
+| Custom LSP servers | `opencode.json` → `lsp` | 8 |
+| Reference docs | `references/*.md` | 15 |
+| Diagnostic scripts | `scripts/*.sh` + helpers | 11 |
 
 ## Commands
 
-| Command | Description |
-|---|---|
-| `/ry-init` | Initialize scoped read-only project context with Serena-first discovery |
-| `/ry-start` | Full task lifecycle: init → research → plan → implement → verify → review → sync |
-| `/ry-review` | Deep review with research and reviewer subagents |
-| `/ry-newp` | Plan a new project with skeptical questions and research |
-| `/ry-deploy` | Deploy with sync, checks, and finalization |
-| `/ry-sync` | Synchronize memories, docs, git, and fullrepo |
+| Command | Agent | Purpose |
+|---|---|---|
+| `/ry-init` | `build` | Scoped read-only project context with Serena-first discovery |
+| `/ry-start` | `build` | Full task lifecycle: init → research → plan → implement → verify → review → sync |
+| `/ry-review` | `plan` | Report-only deep review with parallel reviewer subagents |
+| `/ry-newp` | `build` | Plan a new project (skeptical questions, research, ADRs, architecture docs) |
+| `/ry-deploy` | `build` | Deploy with sync, log checks, fix-forward |
+| `/ry-sync` | `build` | Synchronize memories, docs, git, and fullrepo |
+| `/ry-design` | `build` | End-to-end design: Figma → tokens → FSD → shadcn/ui → browser validation |
+| `/ry-explore` | `ry-explore` (subtask) | Deep multi-source research via Context7 / DeepWiki / Grep / web |
+| `/ry-sec-review` | `plan` | Defensive Mythos-style security review |
+| `/ry-rules-review` | `plan` | Audit implementation against rldyour rules (report-only) |
 
 ## Reviewer Subagents
 
-Invoke via `@agent_name` in messages:
+All reviewer tracks are `mode: subagent`, `hidden: true`, `edit: deny`, with `bash` allowlist limited to read-only git verbs. Invoke directly via `@<name>` or transitively via `/ry-start`/`/ry-review`.
 
 | Agent | Color | Focus |
 |---|---|---|
-| `@flow-architecture-review` | blue | Boundaries, dependencies, public API, data flow |
-| `@flow-quality-review` | green | Correctness, edge cases, error handling |
-| `@flow-consistency-review` | purple | Naming, style, project conventions |
-| `@flow-integration-review` | orange | Cross-module contracts, schemas, configs |
-| `@flow-verification-review` | pink | Tests, quality gates, browser/server evidence |
-| `@flow-security-review` | red | OWASP, auth/authz, injection, secrets |
-| `@flow-memory-sync` | yellow | Fact-only Serena memory synchronization |
-| `@ry-explore` | cyan | Deep multi-source research (Opus, 1M context) |
+| `@flow-architecture-review` | `#3b82f6` | Boundaries, dependency direction, public API, data flow |
+| `@flow-quality-review` | `success` | Correctness, edge cases, error handling, resource lifecycle |
+| `@flow-consistency-review` | `#a855f7` | Naming, style, imports, project conventions |
+| `@flow-integration-review` | `warning` | Cross-module contracts, schemas, configs, backward compatibility |
+| `@flow-verification-review` | `#ec4899` | Tests, quality gates, browser/server evidence |
+| `@flow-security-review` | `error` | OWASP Top 10, auth/authz, injection, secrets (defensive-only) |
+| `@flow-memory-sync` | `#eab308` | Fact-only Serena memory synchronization |
+| `@ry-explore` | `info` | Deep multi-source research (Opus 4.7, 1M context) |
+| `@customize-opencode` | `accent` | Safely edit `opencode.json` with validation, backup, rollback |
+
+## MCP Servers
+
+Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `uvx` for Python, `dart` for Dart SDK — never `npx`.
+
+| Server | Type | Version | Purpose |
+|---|---|---|---|
+| serena | local (uvx) | 1.3.0 | Semantic code navigation, analysis, editing |
+| sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
+| playwright | local (bunx) | 0.0.75 | Browser automation, UI validation |
+| chrome-devtools | local (bunx) | 0.25.0 | Chrome DevTools diagnostics |
+| semgrep | local (uvx) | 1.162.0 | Static analysis and security |
+| shadcn | local (bunx) | 4.7.0 | shadcn/ui registry access |
+| dart-flutter | local (dart) | — | Dart/Flutter project support |
+| context7 | remote | — | Current library documentation |
+| deepwiki | remote | — | Repository documentation |
+| grep | remote | — | Search across public GitHub repos |
+| figma | remote | — | Figma design context |
+| github | remote | — | GitHub Copilot MCP (requires PAT) |
+| openai-docs | remote | — | Official OpenAI/Codex documentation |
+
+## Models
+
+Defaults assume Anthropic; switch any field to another provider via `provider/model-id` format.
+
+| Slot | Model |
+|---|---|
+| `model` (primary) | `anthropic/claude-sonnet-4-6` |
+| `small_model` | `anthropic/claude-haiku-4-5-20251001` |
+| `default_agent` | `build` |
+| `agent.ry-explore.model` | `anthropic/claude-opus-4-7` (xhigh reasoning, 1M context) |
+
+Run `opencode models anthropic` to list every accepted ID. All current IDs are validated by `opencode debug config`.
+
+## Validation
+
+```bash
+bash scripts/validate_config.sh        # JSON shape + skill/agent/command frontmatter + VERSION semver
+bash scripts/doctor_opencode.sh        # full diagnostics: MCP, LSP binaries, agent/skill/command discovery, git
+bash scripts/check_lsps.sh             # 16 language servers + project prereqs
+opencode debug config                  # native resolved config (authoritative)
+opencode debug agent <name>            # validate individual agent
+opencode models anthropic              # list available models for the active provider
+```
+
+CI mirrors the core checks via `.github/workflows/validate.yml` on every push/PR to `main`.
+
+## Convention
+
+- User-facing communication: **Russian** by default.
+- Repository artifacts (docs, prompts, scripts, commits, memories): **English**.
+- Identifiers: ASCII, kebab-case.
+- Commits: Conventional Commits v1.0.0; atomic per logical unit.
+- Versioning: SemVer; CHANGELOG follows Keep a Changelog 1.1.0.
+- Agent-only files (`.serena/`, `.opencode/agents`, `.opencode/skills`, `.opencode/commands`, `.opencode/plugins`, `AGENTS.md`) are published via the `fullrepo` orphan branch managed by `scripts/fullrepo_sync.sh`.
 
 ## License
 
