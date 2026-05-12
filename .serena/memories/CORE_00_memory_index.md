@@ -1,6 +1,6 @@
 # CORE_00 Memory Index
 
-Last commit: 22fb8ab
+Last commit: 41628a4
 
 ## Purpose
 
@@ -25,8 +25,9 @@ Master registry of `.serena/memories/` for rldyour-opencode. Every memory in thi
 - **Type**: OpenCode AI coding agent configuration marketplace.
 - **Version**: `VERSION` → `0.7.0`. All 7 entries in `CHANGELOG.md` dated `2026-05-12`.
 - **License**: MIT (`LICENSE`).
-- **HEAD**: `22fb8ab` — "chore(release): 0.8.0".
-- **VERSION**: `0.8.0` (bumped from 0.7.0; CHANGELOG.md has full 0.8.0 entry dated 2026-05-13).
+- **HEAD**: `41628a4` — "chore(release): 0.8.1 + sync AGENTS/README/release docs".
+- **VERSION**: `0.8.1` (bumped from 0.8.0; CHANGELOG.md has 0.8.0 and 0.8.1 entries, both dated 2026-05-13).
+- **Post-0.8.0 cleanups (commits `22fb8ab` → `41628a4`)**: `159fd99` (27-case pytest + DuplicateYamlKey + CI pytest + thinking→docs/decisions), `81704a8` (check_deps_freshness.sh + _extract_pins.py), `d879988` (AGENTS.md hooks list verified vs `.d.ts` v1.14.48 + README placeholders), `e73a04f` (reviewer fixes on validator surface: removed _unused_colors, conftest.py, pinned pytest), `756e7e5` (regex bug fix in _yaml_top_key, mktemp removal, cut -d: -f1 typo, UV_FROM_RE dot support, +12 extract_pins tests = 39 total), `41628a4` (release 0.8.1 + AGENTS Source Of Truth/Validation sync, docs/release-process pytest step, CHANGELOG 0.8.1).
 - **Validated against**: `opencode v1.14.48` (`opencode debug config` resolves cleanly; `bash scripts/validate_config.sh` exits 0; `opencode debug agent <name>` passes for all 9 agents).
 - **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, `9d954db`, `c4d8d9c`, `ca6f518`, plus subsequent edits after `22fb8ab`.
 - **Last ry-start lifecycle (0.8.0)**: commits `a5d50f8` (validator rewrite), `37d6861` (AGENTS.md skill+plugin events), `f961349` (README catalog refresh), `05e5a75` (ry-bootstrap dynamic MCP), `104a13d` (docs/ marketplace guides), `3c442a4` (customize-opencode body fix), `f79c24b` (SSoT command-block gate + YAML block-scalar + utf-8-sig), `c13c87e` (plugin dedup + Bun.file warn), `b89663e` (CI delegates to validate_config.sh), `5b6261c` (script log helpers), `3a91183` (AGENTS.md color spec + docs SoT + package.json honesty), `22fb8ab` (release 0.8.0).
