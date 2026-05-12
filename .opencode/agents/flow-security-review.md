@@ -5,7 +5,7 @@ model: anthropic/claude-sonnet-4-6
 temperature: 0.1
 steps: 42
 hidden: true
-color: red
+color: error
 permission:
   edit: deny
   bash:

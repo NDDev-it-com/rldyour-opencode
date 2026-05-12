@@ -5,7 +5,7 @@ mode: subagent
 model: anthropic/claude-opus-4-7
 temperature: 0.2
 steps: 90
-color: cyan
+color: info
 permission:
   edit: deny
   bash:
