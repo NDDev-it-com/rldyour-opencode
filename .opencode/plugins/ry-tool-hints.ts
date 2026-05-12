@@ -26,8 +26,10 @@ const HINTS: Record<string, string> = {
     "Use only when measuring performance; avoid for routine checks.",
 
   // Research (Explore domain)
-  "mcp__context7__get-library-docs":
-    "Preferred over `websearch` for current library API documentation.",
+  "mcp__context7__resolve-library-id":
+    "Call this FIRST when you have a library name but no Context7 ID — pairs with `query-docs`.",
+  "mcp__context7__query-docs":
+    "Preferred over `websearch` for current library API documentation. Requires the Context7 ID from `resolve-library-id`.",
   "mcp__deepwiki__ask_question":
     "Use for public-repo architecture questions when library docs are insufficient.",
   "mcp__grep__searchGitHub":
