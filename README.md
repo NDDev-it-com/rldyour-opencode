@@ -35,9 +35,10 @@ A self-contained OpenCode project configuration that provides:
 
 3. Set up API keys (only required env vars; rest are optional):
    ```bash
-   export ANTHROPIC_API_KEY=your-key                # primary model auth (or use /providers in TUI)
-   export CONTEXT7_API_KEY=your-key                 # optional, higher Context7 rate
-   export GITHUB_PERSONAL_ACCESS_TOKEN=your-token   # required for GitHub MCP
+   # placeholder values — replace with real credentials in your shell/.env
+   export ANTHROPIC_API_KEY=YOUR_PLACEHOLDER_KEY          # primary model auth (or use /providers in TUI)
+   export CONTEXT7_API_KEY=YOUR_PLACEHOLDER_KEY           # optional, higher Context7 rate
+   export GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_PLACEHOLDER_TOKEN  # required for GitHub MCP
    ```
 
 4. Run OpenCode in your project:
@@ -65,7 +66,9 @@ A self-contained OpenCode project configuration that provides:
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
 | Reference docs (skill/agent contracts) | `references/*.md` | 15 |
 | Operator guides | `docs/*.md` | 3 |
-| Diagnostic scripts (10 bash + 1 python helper) | `scripts/` | 11 |
+| Architecture decision archive | `docs/decisions/*.md` | 4 |
+| Diagnostic scripts (bash + python helpers) | `scripts/` | 13 |
+| Validator unit tests | `scripts/tests/*.py` | 1 (27 cases) |
 
 ## Commands
 

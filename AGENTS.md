@@ -105,8 +105,16 @@ Rules:
 
 ### Plugins
 - Place in `.opencode/plugins/` (project-level) or `~/.config/opencode/plugins/` (global). npm packages listed in `opencode.json.plugin` install via Bun at startup; this repo's `plugin: []` is intentional — only local TypeScript plugins are used.
-- Plugin file exports a named `Plugin` from `@opencode-ai/plugin`. Plugin factory receives `{ project, client, $, directory, worktree }` and returns an object keyed by event names.
-- Events available in OpenCode v1.14 (subset of upstream): `event` (with `event.type` filter for `session.created`, `session.idle`, `session.compacted`, `session.deleted`, `session.diff`, `session.error`, `session.status`, `session.updated`, `command.executed`, `installation.updated`, `server.connected`, `todo.updated`, `file.edited`, `file.watcher.updated`, `message.removed`, `message.updated`, `message.part.removed`, `message.part.updated`, `lsp.client.diagnostics`, `lsp.updated`), `tool.execute.before`, `tool.execute.after`, `shell.env`, `permission.asked`, `permission.replied`, `experimental.session.compacting`, `tui.prompt.append`, `tui.command.execute`, `tui.toast.show`.
+- Plugin file exports a named `Plugin` from `@opencode-ai/plugin`. Plugin factory receives `PluginInput = { client, project, directory, worktree, experimental_workspace, serverUrl, $ }` and returns a `Hooks` object.
+- Server-side hook keys available in `@opencode-ai/plugin` v1.14.48 (verified against `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts`):
+  - Lifecycle / observation: `event` (catch-all with `event.type` discriminator from the SDK `Event` union — covers session, file, message, todo, lsp, command, installation, server etc.), `config`.
+  - Tool registration / inspection: `tool` (register custom tools), `tool.definition`, `tool.execute.before`, `tool.execute.after`.
+  - Shell and permission: `shell.env`, `permission.ask`.
+  - Chat pipeline: `chat.message`, `chat.params`, `chat.headers`.
+  - Command: `command.execute.before`.
+  - Auth / provider extension: `auth`, `provider`.
+  - Experimental: `experimental.chat.messages.transform`, `experimental.chat.system.transform`, `experimental.session.compacting`, `experimental.compaction.autocontinue`, `experimental.text.complete`.
+- TUI-side hooks (`tui.prompt.append`, `tui.command.execute`, `tui.toast.show`) live under `@opencode-ai/plugin/tui.d.ts` and require a different plugin shape (`PluginModule.tui`). They are NOT used in this repo's server plugins.
 - Dependencies live in `.opencode/package.json` — OpenCode runs `bun install` at startup and rewrites the `@opencode-ai/plugin` pin to match its own runtime version. Committing the current pin is expected; the file may drift after a runtime upgrade. Do not manually downgrade — that fights the runtime and produces version-mismatch warnings.
 - rldyour plugins (5):
   - `ry-bootstrap.ts` — `session.created` banner + `experimental.session.compacting` context push (MCP list read dynamically from `opencode.json` via `Bun.file()`).
