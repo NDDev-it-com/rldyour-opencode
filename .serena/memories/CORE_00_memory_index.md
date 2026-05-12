@@ -1,6 +1,6 @@
 # CORE_00 Memory Index
 
-Last commit: 3c442a4
+Last commit: 22fb8ab
 
 ## Purpose
 
@@ -25,10 +25,11 @@ Master registry of `.serena/memories/` for rldyour-opencode. Every memory in thi
 - **Type**: OpenCode AI coding agent configuration marketplace.
 - **Version**: `VERSION` → `0.7.0`. All 7 entries in `CHANGELOG.md` dated `2026-05-12`.
 - **License**: MIT (`LICENSE`).
-- **HEAD**: `3c442a4` — "docs(agent): correct customize-opencode body for single source of truth".
-- **Validated against**: `opencode v1.14.48` (`opencode debug config` resolves cleanly; `bash scripts/validate_config.sh` exits 0).
-- **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, `9d954db`, `c4d8d9c`, plus subsequent edits after `3c442a4`.
-- **Last ry-start lifecycle**: commits `a5d50f8` (validator rewrite), `37d6861` (AGENTS.md skill+plugin events), `f961349` (README catalog refresh), `05e5a75` (ry-bootstrap dynamic MCP), `104a13d` (docs/ marketplace guides), `3c442a4` (customize-opencode body fix).
+- **HEAD**: `22fb8ab` — "chore(release): 0.8.0".
+- **VERSION**: `0.8.0` (bumped from 0.7.0; CHANGELOG.md has full 0.8.0 entry dated 2026-05-13).
+- **Validated against**: `opencode v1.14.48` (`opencode debug config` resolves cleanly; `bash scripts/validate_config.sh` exits 0; `opencode debug agent <name>` passes for all 9 agents).
+- **Sync commits (Serena)**: `41950f5`, `a5bd8cf`, `9d954db`, `c4d8d9c`, `ca6f518`, plus subsequent edits after `22fb8ab`.
+- **Last ry-start lifecycle (0.8.0)**: commits `a5d50f8` (validator rewrite), `37d6861` (AGENTS.md skill+plugin events), `f961349` (README catalog refresh), `05e5a75` (ry-bootstrap dynamic MCP), `104a13d` (docs/ marketplace guides), `3c442a4` (customize-opencode body fix), `f79c24b` (SSoT command-block gate + YAML block-scalar + utf-8-sig), `c13c87e` (plugin dedup + Bun.file warn), `b89663e` (CI delegates to validate_config.sh), `5b6261c` (script log helpers), `3a91183` (AGENTS.md color spec + docs SoT + package.json honesty), `22fb8ab` (release 0.8.0).
 - **Branch**: `main`. Upstream: not configured (no `origin`). Worktrees: 1.
 
 ## Anti-Hallucination Contract
