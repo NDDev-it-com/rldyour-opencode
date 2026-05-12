@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Validation helpers for rldyour-opencode.
 
 All Python validation logic for scripts/validate_config.sh lives here.
@@ -19,7 +20,7 @@ def validate_opencode_json(path: Path) -> int:
     """Validate top-level opencode.json shape."""
     errors = 0
     try:
-        cfg = json.loads(path.read_text(encoding="utf-8"))
+        cfg = json.loads(path.read_text(encoding="utf-8-sig"))
     except json.JSONDecodeError as exc:
         print(f"[ERR] {path}: JSON decode error: {exc}")
         return 1
@@ -41,10 +42,16 @@ def validate_opencode_json(path: Path) -> int:
             print(f"[ERR] Agent {name!r}: invalid edit permission: {edit!r}")
             errors += 1
 
-    for name, cmd in (cfg.get("command") or {}).items():
-        if "description" not in cmd:
-            print(f"[ERR] Command {name!r}: missing description")
-            errors += 1
+    # Single source of truth contract (AGENTS.md § Source Of Truth):
+    # commands must live in .opencode/commands/*.md exclusively. The
+    # legacy opencode.json `command` block is forbidden here because
+    # it creates a second source of truth.
+    if cfg.get("command"):
+        print(
+            "[ERR] opencode.json must not contain a 'command' block — "
+            "use .opencode/commands/*.md (AGENTS.md § Source Of Truth)"
+        )
+        errors += 1
 
     return errors
 
@@ -58,21 +65,44 @@ def _extract_frontmatter(text: str) -> str | None:
 
 
 def _yaml_top_key(fm: str, key: str) -> str | None:
-    """Return value of a top-level scalar `key: value` line, or None.
+    """Return value of a top-level scalar or block-scalar `key:` line.
 
-    Handles single/double-quoted values. Multi-line YAML values (block
-    scalars, anchors, complex flow) are not parsed.
+    Handles:
+    - inline scalars (`key: value`)
+    - single/double-quoted values (`key: "value"`, `key: 'value'`)
+    - YAML block scalars (`key: |` or `key: >`, then indented lines).
+
+    Returns the concatenated text content for block scalars. Returns
+    None when the key is missing.
     """
-    pattern = re.compile(rf"^{re.escape(key)}:\s*(.+?)\s*$", re.MULTILINE)
-    m = pattern.search(fm)
+    inline = re.compile(rf"^{re.escape(key)}:\s*(.*?)\s*$", re.MULTILINE)
+    m = inline.search(fm)
     if not m:
         return None
-    value = m.group(1)
-    if (value.startswith('"') and value.endswith('"')) or (
-        value.startswith("'") and value.endswith("'")
+
+    raw = m.group(1)
+    if raw in ("|", ">", "|-", ">-", "|+", ">+"):
+        # Block scalar: gather subsequent indented lines until a non-indented line.
+        start = m.end()
+        lines: list[str] = []
+        for line in fm[start:].splitlines()[1:]:
+            if not line.strip():
+                lines.append("")
+                continue
+            if line[0] in (" ", "\t"):
+                lines.append(line.lstrip())
+            else:
+                break
+        text = " ".join(part for part in lines if part).strip()
+        return text or None
+
+    if raw == "":
+        return None
+    if (raw.startswith('"') and raw.endswith('"')) or (
+        raw.startswith("'") and raw.endswith("'")
     ):
-        value = value[1:-1]
-    return value
+        raw = raw[1:-1]
+    return raw
 
 
 def validate_skill(skill_dir: Path) -> int:
@@ -89,7 +119,7 @@ def validate_skill(skill_dir: Path) -> int:
         print(f"[ERR] {name}: name is not kebab-case or exceeds 64 chars")
         errors += 1
 
-    text = skill_md.read_text(encoding="utf-8")
+    text = skill_md.read_text(encoding="utf-8-sig")
     fm = _extract_frontmatter(text)
     if fm is None:
         print(f"[ERR] {name}: missing frontmatter delimiter")
@@ -119,7 +149,7 @@ def validate_skill(skill_dir: Path) -> int:
 def validate_agent(agent_md: Path) -> int:
     """Validate one agent markdown file."""
     name = agent_md.stem
-    text = agent_md.read_text(encoding="utf-8")
+    text = agent_md.read_text(encoding="utf-8-sig")
     fm = _extract_frontmatter(text)
 
     if fm is None:
@@ -151,7 +181,7 @@ def validate_agent(agent_md: Path) -> int:
 def validate_command(cmd_md: Path) -> int:
     """Validate one command markdown file."""
     name = cmd_md.stem
-    text = cmd_md.read_text(encoding="utf-8")
+    text = cmd_md.read_text(encoding="utf-8-sig")
     fm = _extract_frontmatter(text)
 
     if fm is None:
@@ -171,7 +201,7 @@ def validate_version(path: Path) -> int:
     if not path.is_file():
         print(f"[ERR] VERSION file not found at {path}")
         return 1
-    raw = path.read_text(encoding="utf-8").strip()
+    raw = path.read_text(encoding="utf-8-sig").strip()
     if not re.match(r"^[0-9]+\.[0-9]+\.[0-9]+$", raw):
         print(f"[ERR] VERSION {raw!r} not semver MAJOR.MINOR.PATCH")
         return 1
