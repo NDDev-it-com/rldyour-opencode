@@ -21,6 +21,8 @@ NC='\033[0m'
 log_step() { echo -e "\n${YELLOW}=== $1 ===${NC}"; }
 log_ok()   { echo -e "${GREEN}[OK]${NC} $1"; }
 log_err()  { echo -e "${RED}[ERR]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_info() { echo -e "${YELLOW}[INFO]${NC} $1"; }
 
 if [ ! -f "$HELPER" ]; then
     log_err "Missing Python helper: ${HELPER}"
@@ -54,10 +56,10 @@ if [ -d "$SKILLS_DIR" ]; then
             ERRORS=$((ERRORS + 1))
         fi
     else
-        echo "No skill directories found"
+        log_info "No skill directories found"
     fi
 else
-    echo "No .opencode/skills directory"
+    log_warn "No .opencode/skills directory"
 fi
 
 log_step "Agents"
@@ -71,10 +73,10 @@ if [ -d "$AGENTS_DIR" ]; then
             ERRORS=$((ERRORS + 1))
         fi
     else
-        echo "No agent files found"
+        log_info "No agent files found"
     fi
 else
-    echo "No .opencode/agents directory"
+    log_warn "No .opencode/agents directory"
 fi
 
 log_step "Commands"
@@ -88,10 +90,10 @@ if [ -d "$COMMANDS_DIR" ]; then
             ERRORS=$((ERRORS + 1))
         fi
     else
-        echo "No command files found"
+        log_info "No command files found"
     fi
 else
-    echo "No .opencode/commands directory"
+    log_warn "No .opencode/commands directory"
 fi
 
 log_step "Summary"
