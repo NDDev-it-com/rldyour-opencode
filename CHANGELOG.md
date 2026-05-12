@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-05-13
+
+OpenCode plugin-surface expansion. Adopt three previously-unused hook types so the marketplace exercises the full v1.14.48 plugin API instead of just session/tool/shell observation.
+
+### Added
+
+- **`.opencode/plugins/ry-tools.ts`** — 5 custom tools registered via the `tool` plugin hook so the LLM can drive diagnostic scripts directly:
+  - `rldyour_validate_config` — runs `bash scripts/validate_config.sh`.
+  - `rldyour_check_deps` — runs `bash scripts/check_deps_freshness.sh --json`.
+  - `rldyour_lsp_health` — runs `bash scripts/check_lsps.sh`.
+  - `rldyour_git_audit` — runs `bash scripts/git_sync_audit.sh`.
+  - `rldyour_fullrepo_status` — runs `bash scripts/fullrepo_sync.sh status-json`.
+  Each tool stamps `ctx.metadata({ title, metadata: { exitCode } })` so the TUI shows pass/fail at a glance.
+- **`.opencode/plugins/ry-command-audit.ts`** — `command.execute.before` plugin appends one credential-sanitized line per slash command invocation to `.serena/.command_audit.log` (runtime marker; never committed; 256 KiB rolling cap with reset).
+- **`.opencode/plugins/ry-tool-hints.ts`** — `tool.definition` plugin appends a one-sentence routing hint to known MCP tool descriptions (Serena `find_symbol`, Chrome DevTools console, Context7 docs, Semgrep scan, Sequential Thinking, etc.). Encodes the AGENTS.md tool-priority matrix inline to the LLM.
+- **`scripts/tests/test_skill_routing.py`** — 129 parametrized pytest cases (32 skills × 4 routing checks + 1 uniqueness): description length 80-1024, presence of Russian routing phrase (`Используй для` / `Use for`), presence of English routing block (`EN triggers:` or English-leading head), skill name kebab-case. Borrowed from codex marketplace's deterministic-routing-policy pattern, adapted to OpenCode's description-based auto-routing.
+- **`references/opencode-plugin-patterns.md`** — full reference for the `@opencode-ai/plugin` v1.14.48 hook surface (server-side + TUI), patterns adopted in this repo, explicit list of unused-but-known hooks, and CLI extension points the marketplace can drive (`opencode run / debug / serve / web / acp / github / pr / stats / export / import`).
+
+### Changed
+
+- Skill descriptions for `flow-post-task-sync`, `instruction-docs-sync`, `ry-deploy`, `ry-init`, `ry-newp`, `ry-review`, `ry-start` extended with explicit `Используй для:` (RU triggers) and `EN triggers:` (EN keyword block) so OpenCode auto-routing matches both languages reliably. Verified by the new `test_skill_routing.py` suite.
+- AGENTS.md Plugins section now documents all 8 plugins with exact hook subscriptions and links to `references/opencode-plugin-patterns.md`.
+- README catalog tables updated: 8 plugins (was 5), 16 reference docs (was 15), 3 pytest suites with 168 cases (was 1 with 27).
+
 ## [0.8.1] - 2026-05-13
 
 Post-0.8.0 hardening based on parallel reviewer findings (architecture / quality / consistency / integration / verification / security tracks).
