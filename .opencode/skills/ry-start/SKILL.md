@@ -1,6 +1,6 @@
 ---
 name: ry-start
-description: "Реализуй задачу полностью: init, research, plan, implement, verify, review, commit, sync. Use for ry-start, implement, build, fix, реализуй, доработай, исправь, сделай качественно."
+description: "Полный lifecycle задачи: init, research, plan, implement, verify, review, commit, sync. Используй для: реализуй задачу, доработай, исправь качественно, сделай фичу, end-to-end, доведи до конца. EN triggers: ry-start, full SDLC, implement task, ship feature, build feature, complete lifecycle, end-to-end task, reviewer pipeline."
 ---
 
 # ry-start

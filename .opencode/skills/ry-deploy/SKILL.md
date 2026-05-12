@@ -1,6 +1,6 @@
 ---
 name: ry-deploy
-description: "Деплой: sync, checks, logs, фикс, финализация. Use for ry-deploy, deploy server, задеплой, деплой на сервер, прод, production deploy."
+description: "Полный цикл деплоя: sync, checks, logs, фикс, финализация. Используй для: задеплой, деплой на сервер, прод, выкати в продакшен. EN triggers: ry-deploy, deploy server, production deploy, ship to prod, rollout, deploy lifecycle, deploy verification, fix-forward."
 ---
 
 # ry-deploy

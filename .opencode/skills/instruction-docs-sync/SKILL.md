@@ -1,6 +1,6 @@
 ---
 name: instruction-docs-sync
-description: "Синхронизируй AGENTS.md из проверенных фактов проекта. Use for instruction-docs-sync, project docs, AGENTS.md, инструкции проекта, документация, sync instructions."
+description: "Синхронизация AGENTS.md и .claude/CLAUDE.md из проверенных фактов проекта. Используй для: обнови инструкции проекта, AGENTS.md, документация, sync instructions. EN triggers: instruction-docs-sync, project docs sync, refresh AGENTS.md, update project instructions, CLAUDE.md sync, durable docs update."
 ---
 
 # Instruction Docs Sync
