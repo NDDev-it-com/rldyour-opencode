@@ -1,0 +1,50 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+credentials.json
+*.pem
+*.key
+*.secret
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+
+# OpenCode plugin dependencies
+.opencode/node_modules/
+
+# Serena runtime markers
+.serena/cache/
+.serena/project.local.yml
+
+# Browser artifacts
+browser/
+
+# OpenCode local config (user-specific)
+.opencode/local.json
+
+# AI workflow directories (managed via fullrepo branch)
+.claude/
+.cursor/
+.windsurf/
+.roo/
+.aider*
+.agents/

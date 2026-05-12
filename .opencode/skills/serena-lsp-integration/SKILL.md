@@ -1,0 +1,50 @@
+---
+name: serena-lsp-integration
+description: "Конфигурация Serena MCP под languages проекта — LSP keys, .serena/project.yml, ls_specific_settings. Используй для: настрой Serena LSP, индексация, семантический анализ, project.yml серены. EN triggers: configure Serena, Serena LSP keys, project.yml, semantic index, ls_specific_settings, set up Serena project, Serena onboarding."
+---
+
+# Serena LSP Integration
+
+## Purpose
+
+Keep Serena MCP usage aligned with real language-server support. Use Serena for semantic inspection and editing where supported, and fall back honestly where a file type is not Serena-native.
+
+## Workflow
+
+1. Inspect project evidence: manifests, build files, lockfiles, and source files.
+2. Read `references/serena-lsp-integration.md` when exact Serena keys or limitations matter.
+3. Map supported languages to Serena keys: `python`, `typescript`, `rust`, `dart`, `go`, `cpp`, `yaml`, `bash`, `json`, `toml`, `markdown`.
+4. Treat C and C++ as `cpp`; treat JavaScript as `typescript`.
+5. Treat HTML, CSS, Docker, and QML as external LSP areas unless current Serena docs prove native support.
+6. Check health and prerequisites through `lsp-health-check` before expecting reliable semantic behavior.
+7. Recommend `serena project index` after language configuration changes.
+
+Additionally, consider OpenCode's built-in LSP support: `opencode.json` with `"lsp": true` provides auto-starting LSP servers for 30+ languages. For custom per-server configuration, use the `lsp` object in `opencode.json`.
+
+## Configuration Policy
+
+Do not silently modify `.serena/project.yml`. Explain or apply changes only when the user explicitly asks for setup. Full project initialization belongs to the flow commands.
+
+Use `.serena/project.local.yml` for machine-local executable paths. Use committed `.serena/project.yml` only for portable project settings.
+
+## Serena Tool Priority
+
+For supported code files, use the existing Serena-first workflow:
+
+1. `check_onboarding_performed`
+2. `list_memories`
+3. relevant `read_memory`
+4. `get_symbols_overview`
+5. targeted `find_symbol`
+6. `find_referencing_symbols`
+7. `search_for_pattern` only for broad text sweeps or unsupported file types
+
+For unsupported files, state the limitation and use direct reads, search, external validation, or browser/design/security skills as appropriate.
+
+## Anti-patterns
+
+- Automatically editing `.serena/project.yml` without explicit setup request.
+- Claiming Serena-native support for HTML/CSS/Docker/QML without upstream confirmation.
+- Hardcoding machine-local LSP paths (`/opt/homebrew/...`) in committed `.serena/project.yml` (use `.serena/project.local.yml`).
+- Skipping `serena project index` after changing language configuration.
+- Using `search_for_pattern` for symbol-level questions when `find_symbol` is available.
