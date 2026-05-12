@@ -1,0 +1,18 @@
+---
+description: "Synchronize memories, docs, git, and fullrepo"
+agent: build
+---
+
+Synchronize project state after meaningful work:
+
+1. Serena memory freshness first: invoke @flow-memory-sync to verify and update .serena/memories/ against current code at HEAD.
+2. Project instruction docs second: update AGENTS.md when durable project facts changed. Verify instruction docs reflect current code state.
+3. Quality checks and manual evidence third: run applicable lint, typecheck, and test commands for the touched scope.
+4. Atomic commits fourth: commit source changes by logical feature/fix/refactor units. Commit Serena/docs sync separately when it improves history clarity. Use Conventional Commits.
+5. GitHub sync fifth: push to upstream when configured. If upstream is missing, ask before setting it.
+6. Fullrepo branch sync sixth: ensure agent-only files (AGENTS.md, .serena/*, .opencode/ agents/skills/commands) are published to the fullrepo branch and excluded from normal branch history via .git/info/exclude.
+7. Branch/worktree cleanup last: remove merged worktrees and branches only after verifying they are merged into main and pushed if needed.
+
+Never commit secrets, runtime markers, browser artifacts, local env files, or accidental generated junk.
+
+Reference: references/post-task-sync.md, references/project-instructions-and-adrs.md

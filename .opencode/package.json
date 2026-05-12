@@ -1,0 +1,9 @@
+{
+  "name": "rldyour-opencode-plugins",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.0.0"
+  }
+}

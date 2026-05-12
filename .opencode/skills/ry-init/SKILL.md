@@ -1,0 +1,52 @@
+---
+name: ry-init
+description: "Инициализируй контекст проекта: read-only scoped discovery с Serena, fullrepo bootstrap, архитектура, отчёт. Use for ry-init, init scope, initialize context, project onboarding."
+---
+
+# ry-init
+
+## Purpose
+
+Build a verified mental model of the requested project scope before implementation. If the scope is a sphere such as backend or mobile UI, inspect the entire sphere and all integration points needed to understand how it works end to end.
+
+`ry-init` is read-only for project knowledge by default. It may restore or bootstrap agent-only context from `fullrepo`, but it must not create, edit, or delete Serena memories unless the user explicitly asks to update/synchronize memories or an active stale-memory hook requires synchronization.
+
+## Workflow
+
+1. Run git sync audit when available. Inspect dirty work, old branches, and worktrees. If code is correct and consistent, synchronize it into `main`, push, and remove merged branches/worktrees. If risky, explain the issue in Russian and ask the user with concrete options.
+2. Bootstrap project agent-only context with `fullrepo` sync scripts or manual restore, then verify `.git/info/exclude` contains the rldyour fullrepo block. This restores existing `fullrepo` context, publishes local agent-only files when no `fullrepo` exists, and removes tracked agent-only files from the current branch index when migration is needed.
+3. Read `references/init-context-pack.md` and use it as the required context-pack contract.
+4. Use `serena-code-workflow`: check onboarding, list memories, read relevant memories, and use Serena semantic tools (`mcp__serena__find_symbol`, `mcp__serena__get_symbols_overview`, `mcp__serena__find_referencing_symbols`) before raw file reads.
+5. Map the requested scope deeply enough to understand modules, layers, symbols, DB fields, schemas, APIs, generated artifacts, configs, tests, and integration paths.
+6. Use `lsp-routing` or `lsp-health-check` when language server support affects understanding. OpenCode has 30+ built-in LSP servers that auto-start when file extensions are detected.
+7. Use `tech-research` or `web-research` only for unclear technology, architecture, or current best-practice questions. Prefer Context7 MCP (`mcp__context7__resolve-library-id`, `mcp__context7__get-library-docs`) for official versioned docs, DeepWiki MCP for public repo architecture, and Grep MCP for real production usage patterns.
+8. Use Sequential Thinking MCP (`mcp__sequential-thinking__*`) for non-trivial architectural decisions.
+9. Synthesize a Russian report with exact source-of-truth paths, current behavior, data/contracts, integration points, quality gates, risks, gaps, and what OpenCode can now safely change.
+10. Do not run `serena-memory-sync` automatically. If initialization discovers useful durable facts that are missing from memories, report them under `Memory candidates (not written)` with exact source paths and ask before writing. Only run `serena-memory-sync` during `ry-init` when the user explicitly requested memory sync/update or a stale-memory hook requires it.
+
+## Scope Rules
+
+- Empty scope means whole project.
+- Sphere scope means the whole sphere plus integration points.
+- Feature scope means trace all layers touched by that feature.
+- Ambiguous scope means ask the user with 2-3 options.
+- Do not stop at file lists. The initialized context must explain how relevant code works end to end.
+- For database-backed or API work, include fields, schemas, migrations, payloads, and caller/client paths.
+- For UI/client work, include routes/screens/components, state, API calls, design-system constraints, browser-visible behavior, and tests.
+- If agent-only files such as `AGENTS.md`, `.serena/*`, `.opencode/agents/*`, `.opencode/skills/*`, `.opencode/commands/*`, `.claude/*`, `.cursor/rules/*`, or `.agents/*` are needed for context, restore `fullrepo` before treating them as missing.
+- Runtime snapshots, server log summaries, health-check timestamps, current container status, and one-off audit observations are report material, not Serena memory material, unless they reveal a stable code/config contract.
+
+## Output
+
+Report in Russian:
+
+- Scope initialized.
+- Git/GitHub/worktree state.
+- Architecture and data flow.
+- Key files and symbols.
+- Data models, DB fields, schemas, API contracts, config/env keys, and generated artifacts.
+- Integration points.
+- Tests, LSP/check commands, browser/security/design evidence when relevant.
+- Known risks and gaps.
+- Memory candidates (not written), only when useful durable facts were found and memory sync was not explicitly requested.
+- Ready-for tasks.
