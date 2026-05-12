@@ -6,7 +6,40 @@
   "share": "manual",
   "snapshot": true,
   "shell": "/bin/zsh",
-  "lsp": true,
+  "lsp": {
+    "ruff": {
+      "command": ["ruff", "server"],
+      "extensions": [".py", ".pyi"]
+    },
+    "vscode-html": {
+      "command": ["vscode-html-language-server", "--stdio"],
+      "extensions": [".html", ".htm"]
+    },
+    "vscode-css": {
+      "command": ["vscode-css-language-server", "--stdio"],
+      "extensions": [".css", ".scss", ".sass", ".less"]
+    },
+    "vscode-json": {
+      "command": ["vscode-json-language-server", "--stdio"],
+      "extensions": [".json", ".jsonc"]
+    },
+    "docker": {
+      "command": ["docker-language-server", "start", "--stdio"],
+      "extensions": [".dockerfile"]
+    },
+    "taplo": {
+      "command": ["taplo", "lsp", "stdio"],
+      "extensions": [".toml"]
+    },
+    "marksman": {
+      "command": ["marksman", "server"],
+      "extensions": [".md", ".mdx", ".markdown"]
+    },
+    "qmlls": {
+      "command": ["qmlls"],
+      "extensions": [".qml"]
+    }
+  },
   "permission": {
     "edit": "allow",
     "bash": "allow",

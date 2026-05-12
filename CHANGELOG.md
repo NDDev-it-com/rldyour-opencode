@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-05-12
+
+### Changed
+
+- LSP configuration changed from `"lsp": true` to `"lsp": {}` (object = built-ins enabled + custom overrides).
+- Added 8 custom LSP servers to cover all languages from reference implementations:
+  - `ruff` (Python linter companion to pyright)
+  - `vscode-html` (HTML)
+  - `vscode-css` (CSS/SCSS/SASS/Less)
+  - `vscode-json` (JSON/JSONC)
+  - `docker` (Dockerfile)
+  - `taplo` (TOML)
+  - `marksman` (Markdown)
+  - `qmlls` (Qt QML, optional)
+- Total LSP coverage: 35+ built-in + 8 custom = 43+ language servers.
+- AGENTS.md LSP section expanded with runtime rules and custom server table.
+
 ## [0.3.0] - 2026-05-12
 
 ### Changed
