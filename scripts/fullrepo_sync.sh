@@ -18,10 +18,28 @@ AGENT_ONLY_PATTERNS=(
 RUNTIME_EXCLUDE_PATTERNS=(
   ".serena/cache/"
   ".serena/project.local.yml"
+  ".serena/.flow_sync_marker"
+  ".serena/.flow_post_task_state.json"
+  ".serena/.sync_marker"
+  ".serena/.serena_sync_state.json"
+  ".serena/.auto_sync_head"
+  ".serena/.active_workflow_intent.json"
+  ".serena/.dirty_stop_ack"
+  ".serena/.gitignore"
   ".opencode/local.json"
   ".opencode/node_modules/"
   "browser/"
   "node_modules/"
+)
+
+# Directory-name globs stripped recursively after the per-path removals
+# above. Catches caches that may appear anywhere in the agent-only tree.
+RUNTIME_EXCLUDE_DIRNAMES=(
+  "__pycache__"
+  ".pytest_cache"
+  ".cache"
+  ".venv"
+  "node_modules"
 )
 
 FULLREPO_BRANCH="fullrepo"
@@ -54,7 +72,7 @@ is_dirty() {
   # Whitelisted runtime markers must not flip the working tree to "dirty";
   # they are regenerated every session and never committed.
   local marker_re='\.serena/\.(flow_(sync_marker|post_task_state\.json)|sync_marker|serena_sync_state\.json|auto_sync_head|active_workflow_intent\.json|dirty_stop_ack|gitignore)$'
-  [ -n "$(git status --porcelain 2>/dev/null | grep -vE "$marker_re")" ]
+  git status --porcelain 2>/dev/null | grep -vqE "$marker_re"
 }
 
 ahead_count() {
@@ -137,41 +155,77 @@ cmd_restore() {
 }
 
 cmd_publish() {
-  local root
+  local root original_branch
   root=$(git_root) || { echo "Error: not in a git repo" >&2; exit 1; }
+  original_branch=$(current_branch)
 
-  echo "[fullrepo] Publishing agent-only files to $FULLREPO_BRANCH..."
+  if [ "$original_branch" = "HEAD" ] || [ -z "$original_branch" ]; then
+    echo "[fullrepo] Error: must run publish from a named branch (current is detached)" >&2
+    exit 1
+  fi
+
+  echo "[fullrepo] Publishing agent-only files to $FULLREPO_BRANCH (from $original_branch)..."
 
   local tmp_dir
   tmp_dir=$(mktemp -d)
-  git worktree add "$tmp_dir" "origin/$FULLREPO_BRANCH" --detach 2>/dev/null || {
-    echo "[fullrepo] Creating new $FULLREPO_BRANCH..."
-    git checkout --orphan "$FULLREPO_BRANCH" 2>/dev/null
-    git rm -rf . 2>/dev/null || true
-    git commit --allow-empty -m "chore: initialize fullrepo branch" 2>/dev/null
-    git checkout "$(current_branch)" 2>/dev/null
-    git worktree add "$tmp_dir" "$FULLREPO_BRANCH" --detach 2>/dev/null
-  }
 
-  rm -rf "$tmp_dir"/*
+  # Always use a temporary worktree so the main worktree is never touched.
+  # Cleanup is registered with trap so we never leave the main checkout
+  # stranded on a half-built orphan branch.
+  trap '_publish_cleanup "$tmp_dir" "$root" "$original_branch"' EXIT
 
+  if git ls-remote --exit-code origin "$FULLREPO_BRANCH" >/dev/null 2>&1; then
+    # Remote orphan exists — start from its tip
+    git worktree add "$tmp_dir" "origin/$FULLREPO_BRANCH" --detach 2>/dev/null
+  else
+    echo "[fullrepo] No origin/$FULLREPO_BRANCH yet — creating empty orphan in temp worktree"
+    # Use detached HEAD in a tmp worktree, then make it a new orphan branch.
+    # This NEVER touches main worktree's HEAD.
+    git worktree add --detach "$tmp_dir" HEAD 2>/dev/null
+    (
+      cd "$tmp_dir"
+      git checkout --orphan "_fullrepo_init" >/dev/null 2>&1
+      git rm -rf . >/dev/null 2>&1 || true
+    )
+  fi
+
+  # Wipe tmp worktree contents (including hidden, but never the .git pointer)
+  find "$tmp_dir" -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
+
+  # Copy agent-only patterns. Strip trailing slash so cp -r preserves the
+  # directory name itself (cp "$root/.serena/" "$tmp/" flattens contents;
+  # cp "$root/.serena" "$tmp/" produces "$tmp/.serena/").
   for pattern in "${AGENT_ONLY_PATTERNS[@]}"; do
-    if [ -e "$root/$pattern" ]; then
-      echo "  Adding $pattern"
-      cp -r "$root/$pattern" "$tmp_dir/" 2>/dev/null || true
+    local clean="${pattern%/}"
+    if [ -e "$root/$clean" ]; then
+      echo "  Adding $clean"
+      cp -r "$root/$clean" "$tmp_dir/" 2>/dev/null || true
     fi
   done
 
-  # Remove runtime artifacts from snapshot
+  # Remove runtime artefacts by path (per-entry). Guard against an empty
+  # pattern which would otherwise expand to `rm -rf "$tmp_dir/"` and wipe
+  # the entire staging area.
   for rp in "${RUNTIME_EXCLUDE_PATTERNS[@]}"; do
-    rm -rf "$tmp_dir/$rp" 2>/dev/null || true
+    local clean="${rp%/}"
+    if [ -n "$clean" ]; then
+      rm -rf "${tmp_dir:?}/$clean" 2>/dev/null || true
+    fi
   done
 
-  # Secret detection
+  # Remove runtime artefacts by directory name (anywhere in tree)
+  for name in "${RUNTIME_EXCLUDE_DIRNAMES[@]}"; do
+    find "$tmp_dir" -depth -name "$name" -type d -exec rm -rf {} + 2>/dev/null || true
+  done
+
+  # Also strip Python bytecode files anywhere
+  find "$tmp_dir" -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete 2>/dev/null || true
+
+  # Secret detection (literal env-var-style assignments outside placeholder context)
   local secrets_found=0
   while IFS= read -r line; do
     if echo "$line" | grep -qiE '(PRIVATE_KEY|SECRET_KEY|PASSWORD|TOKEN|API_KEY)\s*=\s*[^"]*\S'; then
-      if ! echo "$line" | grep -qiE '(example|template|sample|placeholder|xxx|todo)'; then
+      if ! echo "$line" | grep -qiE '(example|template|sample|placeholder|xxx|todo|YOUR_)'; then
         echo "[fullrepo] WARNING: Potential secret in $(echo "$line" | cut -d: -f1)" >&2
         secrets_found=1
       fi
@@ -180,24 +234,44 @@ cmd_publish() {
 
   if [ "$secrets_found" -eq 1 ]; then
     echo "[fullrepo] ERROR: Secrets detected in agent-only content. Remove them before publishing." >&2
-    git worktree remove "$tmp_dir" 2>/dev/null
-    rm -rf "$tmp_dir"
     exit 1
   fi
 
-  cd "$tmp_dir"
-  git add -A 2>/dev/null
-  if git diff --cached --quiet 2>/dev/null; then
-    echo "[fullrepo] No changes to publish."
-  else
-    git commit -m "chore: sync fullrepo at $(date -u +%Y-%m-%dT%H:%M:%SZ)" 2>/dev/null
-    git push origin "HEAD:refs/heads/$FULLREPO_BRANCH" --force-with-lease 2>/dev/null
-    echo "[fullrepo] Published to origin/$FULLREPO_BRANCH."
-  fi
+  (
+    cd "$tmp_dir"
+    git add -A 2>/dev/null
+    if git diff --cached --quiet 2>/dev/null; then
+      echo "[fullrepo] No changes to publish."
+    else
+      git commit -m "chore: sync fullrepo at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >/dev/null 2>&1
+      if git push origin "HEAD:refs/heads/$FULLREPO_BRANCH" --force-with-lease 2>&1; then
+        echo "[fullrepo] Published to origin/$FULLREPO_BRANCH."
+      else
+        echo "[fullrepo] Push failed — see error above." >&2
+        exit 1
+      fi
+    fi
+  )
+}
 
-  cd "$root"
-  git worktree remove "$tmp_dir" 2>/dev/null
-  rm -rf "$tmp_dir"
+_publish_cleanup() {
+  local tmp_dir="$1" root="$2" original_branch="$3"
+  # Restore main worktree to the original named branch if a stale half-publish
+  # ever left us on an orphan ref (defensive — the new cmd_publish flow
+  # uses only the tmp worktree, but old half-completed runs may still need this).
+  if [ -d "$root" ]; then
+    cd "$root" 2>/dev/null || true
+    local now
+    now=$(git branch --show-current 2>/dev/null || echo "")
+    if [ -n "$original_branch" ] && [ "$now" != "$original_branch" ]; then
+      git checkout "$original_branch" >/dev/null 2>&1 || true
+    fi
+  fi
+  if [ -n "${tmp_dir:-}" ] && [ -d "$tmp_dir" ]; then
+    git worktree remove --force "$tmp_dir" >/dev/null 2>&1 || true
+    rm -rf "$tmp_dir" 2>/dev/null || true
+  fi
+  trap - EXIT
 }
 
 cmd_status() {
@@ -222,7 +296,6 @@ cmd_status() {
   git branch -r 2>/dev/null | grep -q "origin/$FULLREPO_BRANCH" && fullrepo_remote="yes"
   echo "Fullrepo branch: local=$fullrepo_local remote=$fullrepo_remote"
 
-  local serena_fresh="unknown"
   if [ -d "$root/.serena/memories" ]; then
     local mem_count
     mem_count=$(find "$root/.serena/memories" -name "*.md" | wc -l | tr -d ' ')
