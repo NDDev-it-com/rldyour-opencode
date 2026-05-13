@@ -1,6 +1,6 @@
 # CORE_00 Memory Index
 
-Last commit: e6f1470
+Last commit: 4aa3b81
 
 ## Purpose
 
