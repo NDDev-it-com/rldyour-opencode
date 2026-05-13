@@ -14,6 +14,8 @@ permission:
     git log*: allow
     git show*: allow
     git status*: allow
+  task: ask
+  external_directory: deny
   webfetch: allow
   websearch: allow
   lsp: allow
