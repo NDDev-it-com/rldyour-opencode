@@ -58,9 +58,27 @@ export const RyPermissionPolicy: Plugin = async ({ client }) => {
       const cmd = commandFromPermission(input)
 
       // Force push without lease — data-loss risk on shared branches.
-      if (/\bgit\s+push\b/i.test(cmd) && /\b--force\b/.test(cmd) && !/\b--force-with-lease\b/.test(cmd)) {
+      //
+      // Regex boundary note: `\b` does NOT match between two non-word
+      // characters (space and `-`). The naive `\b--force\b` therefore
+      // never fires on `git push --force` because the leading `\b`
+      // tries to assert at the space-dash transition. Use a negated
+      // alphanum-or-hyphen lookbehind/lookahead instead — that lets
+      // `--force` match while excluding `--force-with-lease` (next
+      // char is `-`, which is in the class).
+      const FLAG_BOUNDARY_PRE = "(?<![A-Za-z0-9-])"
+      const FLAG_BOUNDARY_POST = "(?![A-Za-z0-9-])"
+      const longForce = new RegExp(`${FLAG_BOUNDARY_PRE}--force${FLAG_BOUNDARY_POST}`, "i")
+      const lease = new RegExp(`${FLAG_BOUNDARY_PRE}--force-with-lease${FLAG_BOUNDARY_POST}`, "i")
+      const noVerify = new RegExp(`${FLAG_BOUNDARY_PRE}--no-verify${FLAG_BOUNDARY_POST}`, "i")
+
+      const isPush = /\bgit\s+push\b/i.test(cmd)
+      const hasLongForce = longForce.test(cmd)
+      const hasShortForce = /(?:^|\s)-f(?:\s|$)/.test(cmd)
+      const hasLease = lease.test(cmd)
+      if (isPush && (hasLongForce || hasShortForce) && !hasLease) {
         output.status = "deny"
-        const message = "Denied git push --force without --force-with-lease (data-loss risk on shared branches)."
+        const message = "Denied git push --force / -f without --force-with-lease (data-loss risk on shared branches)."
         await toast(message)
         await log("error", `${message} cmd=${cmd.slice(0, 200)}`)
         return
@@ -86,7 +104,12 @@ export const RyPermissionPolicy: Plugin = async ({ client }) => {
 
       // git push to product branch with --no-verify — bypasses pre-push
       // hooks the owner installed to keep release branches clean.
-      if (/\bgit\s+push\b/i.test(cmd) && /\b--no-verify\b/.test(cmd) && /\bmain|master|release|production\b/i.test(cmd)) {
+      // The branch-name alternation is grouped so the trailing `\b`
+      // applies to every option; the previous flat form matched
+      // substrings like `mainline` / `productionish` (false positive).
+      // `noVerify` uses the same flag-boundary trick as `longForce` above.
+      const branchAlt = /\b(main|master|release|production)\b/i
+      if (isPush && noVerify.test(cmd) && branchAlt.test(cmd)) {
         output.status = "deny"
         const message = "Denied git push --no-verify on a product branch (pre-push hook bypass)."
         await toast(message)
