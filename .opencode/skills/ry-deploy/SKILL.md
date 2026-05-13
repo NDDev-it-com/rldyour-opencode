@@ -12,11 +12,7 @@ Synchronize local repository, GitHub, and server, then deploy safely with eviden
 ## Workflow
 
 1. Read deploy contract from `AGENTS.md`, then `.serena/deploy/*.md` if present. The deploy contract defines server addresses, sync methods, migration commands, health checks, and rollback procedures.
-2. Run readiness checks before any push:
-   - `bash scripts/deploy_readiness.sh <target>` — single-shot composite (working tree clean of real changes, on `main`, in sync with upstream, Serena memories present, project-native test/lint commands detected).
-   - `bash scripts/git_sync_audit.sh` — exact dirty file list (whitelist-aware), worktree count, merged-branch cleanup candidates.
-   - `bash scripts/validate_config.sh` + `python3 -m pytest scripts/tests/` — same gates CI runs.
-   Stop on any FAIL and surface the exact blocker before continuing.
+2. Run deploy readiness checks when available. Verify local git state, open PRs, checks, Serena memories, docs, and GitHub sync.
 3. Inspect server baseline: git status, current commit, disk, logs before restart, process manager.
 4. Sync code to server.
 5. Run migrations only when readiness is clear and the deploy contract defines a migration command.
