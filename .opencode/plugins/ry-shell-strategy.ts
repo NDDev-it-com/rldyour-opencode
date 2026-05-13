@@ -45,7 +45,21 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
       if (input.tool !== "bash") return
       const command: string = output.args?.command ?? ""
 
-      if (/\bgit\s+push\b/i.test(command) && !/\b--no-verify\b/.test(command)) {
+      // Flag-boundary helpers: `\b` does NOT match between two non-word
+      // chars (space and `-`), so the naive `\b--FLAG\b` form silently
+      // fails. Use a negated alphanum-or-hyphen lookbehind/lookahead so
+      // `--force` matches but `--force-with-lease` does not. Same logic
+      // for `--no-verify`. Mirrors ry-permission-policy.ts.
+      const FLAG_BOUNDARY_PRE = "(?<![A-Za-z0-9-])"
+      const FLAG_BOUNDARY_POST = "(?![A-Za-z0-9-])"
+      const longForce = new RegExp(`${FLAG_BOUNDARY_PRE}--force${FLAG_BOUNDARY_POST}`, "i")
+      const lease = new RegExp(`${FLAG_BOUNDARY_PRE}--force-with-lease${FLAG_BOUNDARY_POST}`, "i")
+      const noVerify = new RegExp(`${FLAG_BOUNDARY_PRE}--no-verify${FLAG_BOUNDARY_POST}`, "i")
+      const shortForce = /(?:^|\s)-f(?:\s|$)/
+
+      const isPush = /\bgit\s+push\b/i.test(command)
+
+      if (isPush && !noVerify.test(command)) {
         await toast("warning", "git push: run quality gates and /ry-sync first")
         await log(
           "info",
@@ -53,8 +67,8 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
         )
       }
 
-      if (/\bgit\s+push\s+--force\b/i.test(command) && !/\b--force-with-lease\b/.test(command)) {
-        const msg = "Blocked git push --force without --force-with-lease (data-loss risk)."
+      if (isPush && (longForce.test(command) || shortForce.test(command)) && !lease.test(command)) {
+        const msg = "Blocked git push --force / -f without --force-with-lease (data-loss risk)."
         await toast("error", msg)
         throw new Error(`[rldyour] ${msg} Use --force-with-lease for safer force pushes.`)
       }
