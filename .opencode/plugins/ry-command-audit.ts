@@ -10,6 +10,22 @@ declare const Bun: {
 
 const MAX_LOG_BYTES = 256 * 1024 // 256 KiB; rotates with reset when exceeded.
 
+// Concurrency note (Quality review F-4): the read-modify-write sequence
+// below is not atomic. OpenCode runs plugin hooks on a single Bun event
+// loop, so within one process two `command.execute.before` callbacks are
+// serialised by the runtime and cannot interleave. The only path that
+// would lose an audit line is two *separate* OpenCode processes writing
+// to the same project tree concurrently — an unsupported configuration.
+// Documenting the invariant rather than adding a lock (cheaper, sufficient).
+//
+// Order note (Quality review F-3): sanitize() runs on the full raw args
+// string BEFORE the 280-char slice — this guarantees a credential at any
+// offset is redacted before the line is truncated. If we sliced first,
+// a credential appearing past byte 280 would be silently dropped, which
+// is fine, but a credential straddling the cut would leak its prefix.
+// Sanitize-first preserves the invariant "no credential ever reaches the
+// log, regardless of position".
+
 function sanitizeArgs(raw: string): string {
   // Args may contain user-pasted text. Strip anything that looks like a
   // credential pattern before logging; truncate to keep audit lines small.
