@@ -51,7 +51,10 @@ current_branch() {
 }
 
 is_dirty() {
-  [ -n "$(git status --porcelain 2>/dev/null)" ]
+  # Whitelisted runtime markers must not flip the working tree to "dirty";
+  # they are regenerated every session and never committed.
+  local marker_re='\.serena/\.(flow_(sync_marker|post_task_state\.json)|sync_marker|serena_sync_state\.json|auto_sync_head|active_workflow_intent\.json|dirty_stop_ack|gitignore)$'
+  [ -n "$(git status --porcelain 2>/dev/null | grep -vE "$marker_re")" ]
 }
 
 ahead_count() {
@@ -214,9 +217,10 @@ cmd_status() {
   echo "Working tree: $dirty"
   echo "Ahead: $ahead  Behind: $behind"
 
-  local fullrepo_exists="no"
-  git branch -r | grep -q "origin/$FULLREPO_BRANCH" 2>/dev/null && fullrepo_exists="yes"
-  echo "Fullrepo branch: $fullrepo_exists"
+  local fullrepo_local="no" fullrepo_remote="no"
+  git show-ref --verify --quiet "refs/heads/$FULLREPO_BRANCH" && fullrepo_local="yes"
+  git branch -r 2>/dev/null | grep -q "origin/$FULLREPO_BRANCH" && fullrepo_remote="yes"
+  echo "Fullrepo branch: local=$fullrepo_local remote=$fullrepo_remote"
 
   local serena_fresh="unknown"
   if [ -d "$root/.serena/memories" ]; then
@@ -232,12 +236,13 @@ cmd_status_json() {
   local root
   root=$(git_root) || { echo '{"error":"not in a git repo"}' >&2; exit 1; }
 
-  local branch dirty ahead behind fullrepo_exists mem_count
+  local branch dirty ahead behind fullrepo_local fullrepo_remote mem_count
   branch=$(current_branch)
   is_dirty && dirty="dirty" || dirty="clean"
   ahead=$(ahead_count)
   behind=$(behind_count)
-  git branch -r | grep -q "origin/$FULLREPO_BRANCH" 2>/dev/null && fullrepo_exists="true" || fullrepo_exists="false"
+  git show-ref --verify --quiet "refs/heads/$FULLREPO_BRANCH" && fullrepo_local="true" || fullrepo_local="false"
+  git branch -r 2>/dev/null | grep -q "origin/$FULLREPO_BRANCH" && fullrepo_remote="true" || fullrepo_remote="false"
   mem_count=$(find "$root/.serena/memories" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
   cat <<EOF
@@ -246,7 +251,8 @@ cmd_status_json() {
   "dirty": "$dirty",
   "ahead": $ahead,
   "behind": $behind,
-  "fullrepo_exists": $fullrepo_exists,
+  "fullrepo_local": $fullrepo_local,
+  "fullrepo_remote": $fullrepo_remote,
   "serena_memory_count": $mem_count
 }
 EOF
