@@ -71,7 +71,7 @@ A self-contained OpenCode project configuration that provides:
 | Operator guides | `docs/*.md` | 3 |
 | Architecture decision archive | `docs/decisions/*.md` | 4 |
 | Diagnostic scripts (bash + python helpers) | `scripts/` | 13 |
-| Pytest suites | `scripts/tests/*.py` | 3 (168 cases: 27 validator + 12 extract_pins + 129 skill routing) |
+| Pytest suites | `scripts/tests/*.py` | 6 (194 cases: 27 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 6 plugin surface + 4 opencode integration) |
 
 ## Commands
 
