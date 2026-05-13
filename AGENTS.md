@@ -69,6 +69,18 @@ Rules:
 - Subagents defined ONLY in `.opencode/agents/*.md` — never duplicated in `opencode.json`.
 - Primary agents (build, plan) with just permissions can stay in `opencode.json`.
 
+#### OpenCode built-in agents (do not redefine, do not invoke as if ours)
+
+OpenCode v1.14 ships these primary + subagent built-ins; they are always present at runtime regardless of `.opencode/agents/`:
+
+- `build` (primary, default) — all tools enabled.
+- `plan` (primary) — restricted, `edit`/`bash` default to ask.
+- `general` (subagent) — full tool access for multi-step tasks.
+- `explore` (subagent, read-only) — codebase exploration.
+- `scout` (subagent, read-only; added in OpenCode v1.14.42) — external docs lookup and dependency-source inspection. Complementary to our `@ry-explore` (which leans on Context7/DeepWiki/Grep MCP via Opus 4.7).
+
+Our `.opencode/agents/customize-opencode.md` is a **custom subagent**, distinct from the **built-in `customize-opencode` skill** added in OpenCode v1.14.46 (an internal config-safety skill triggered when an agent edits `opencode.json`). Agent and skill share a namespace prefix but are separate runtime entities; verified non-conflicting by `scripts/tests/test_opencode_resolve.py::test_each_agent_resolves`.
+
 ### Commands
 - Place in `.opencode/commands/<name>.md`.
 - Frontmatter: `description`, `agent`, `model`, `subtask` (optional, forces subagent invocation).
