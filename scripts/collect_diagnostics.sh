@@ -37,15 +37,39 @@ mkdir -p "${BUNDLE}"
 
 log() { echo "[collect] $*" >&2; }
 
+SANITIZER="${PROJECT_ROOT}/scripts/_sanitize_diag.py"
+
+# Strip credential-shaped substrings from a file in place. Best-effort:
+# missing sanitizer or python3 just logs a warning and leaves the file
+# as-is — better to have a triage bundle with secrets visible to the
+# owner than no bundle at all when collecting on a fresh checkout.
+sanitize_file() {
+  local target="$1"
+  [ -f "${target}" ] || return 0
+  if [ ! -f "${SANITIZER}" ]; then
+    log "WARN sanitizer missing at ${SANITIZER}; ${target} not redacted"
+    return 0
+  fi
+  if ! command -v python3 >/dev/null 2>&1; then
+    log "WARN python3 not on PATH; ${target} not redacted"
+    return 0
+  fi
+  python3 "${SANITIZER}" "${target}" --in-place 2>/dev/null \
+    || log "WARN sanitizer failed on ${target}; left as-is"
+}
+
 # Helper: run a command and tee stdout+stderr into a file, never fail.
+# Output file is sanitised before return so secrets never persist.
 run_cmd() {
   local name="$1"; shift
   local out="${BUNDLE}/${name}"
   log "${name}"
   if "$@" >"${out}" 2>&1; then
+    sanitize_file "${out}"
     return 0
   else
     echo "[collect] command exited non-zero: $*" >>"${out}"
+    sanitize_file "${out}"
     return 0
   fi
 }
@@ -56,7 +80,10 @@ run_cmd git-log.txt           git log --oneline -30
 run_cmd git-remote.txt        git remote -v
 run_cmd git-worktrees.txt     git worktree list
 
-# Project version + manifests.
+# Project version + manifests. opencode.json itself contains only env-var
+# *references* (`{env:NAME}`) so it is safe to copy verbatim — `opencode debug
+# config` is the surface where real tokens get substituted, and that path
+# is routed through sanitize_file via run_cmd below.
 cp -f VERSION       "${BUNDLE}/VERSION"          2>/dev/null || true
 cp -f CHANGELOG.md  "${BUNDLE}/CHANGELOG.md"     2>/dev/null || true
 cp -f opencode.json "${BUNDLE}/opencode.json"    2>/dev/null || true
