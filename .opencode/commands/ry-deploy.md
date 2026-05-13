@@ -1,5 +1,5 @@
 ---
-description: "Deploy with sync, checks, and finalization"
+description: "Деплой с sync/checks/логами/fix-forward/финализацией. Deploy with local↔GitHub↔server sync, log verification, fix-forward, and docs/git finalization."
 agent: build
 ---
 

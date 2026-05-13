@@ -1,5 +1,5 @@
 ---
-description: "Full task lifecycle: init, research, plan, implement, verify, review, sync"
+description: "Полный lifecycle задачи: init → research → plan → implement → quality gates → reviewer subagents → post-task sync. Full task lifecycle from prompt to reviewed and synced state."
 agent: build
 ---
 
