@@ -4,43 +4,51 @@ import type { Plugin } from "@opencode-ai/plugin"
 // one-sentence routing nudge sourced from AGENTS.md § Tool Priority and
 // the domain-boundary matrix. Keep hints stable and short — they enter
 // every prompt that includes the tool definition.
+//
+// Tool ID format: OpenCode v1.14.48 constructs MCP tool IDs at runtime
+// as `sanitize(serverName) + "_" + sanitize(toolName)` where sanitize()
+// replaces every char not matching [a-zA-Z0-9_-] with "_". Dashes are
+// preserved. Examples: `serena_find_symbol`, `chrome-devtools_list_console_messages`,
+// `context7_resolve-library-id`. The legacy `mcp__server__tool` format from
+// Claude Code does NOT match here — using it would silently disable every hint.
+// Source: packages/opencode/src/mcp/index.ts in sst/opencode (build line uses underscore).
 const HINTS: Record<string, string> = {
   // Serena (semantic code intelligence — Serena domain only)
-  "mcp__serena__find_symbol":
+  "serena_find_symbol":
     "Prefer over raw `grep` when locating a known symbol; LSP-aware and faster.",
-  "mcp__serena__get_symbols_overview":
+  "serena_get_symbols_overview":
     "Use BEFORE reading a whole file — cheaper file structure overview.",
-  "mcp__serena__find_referencing_symbols":
+  "serena_find_referencing_symbols":
     "Use to trace caller impact before any refactor.",
-  "mcp__serena__search_for_pattern":
+  "serena_search_for_pattern":
     "Use only for cross-cutting text sweeps; for symbol lookup prefer `find_symbol`.",
-  "mcp__serena__read_memory":
+  "serena_read_memory":
     "Read Serena memories only when the task references prior decisions or project facts.",
 
   // Browser (Browser domain only)
-  "mcp__playwright__browser_navigate":
+  "playwright_browser_navigate":
     "Use for end-to-end UI validation and golden-path verification.",
-  "mcp__chrome-devtools__list_console_messages":
+  "chrome-devtools_list_console_messages":
     "Use for runtime browser diagnostics (errors, warnings), not UI validation.",
-  "mcp__chrome-devtools__performance_start_trace":
+  "chrome-devtools_performance_start_trace":
     "Use only when measuring performance; avoid for routine checks.",
 
   // Research (Explore domain)
-  "mcp__context7__resolve-library-id":
+  "context7_resolve-library-id":
     "Call this FIRST when you have a library name but no Context7 ID — pairs with `query-docs`.",
-  "mcp__context7__query-docs":
+  "context7_query-docs":
     "Preferred over `websearch` for current library API documentation. Requires the Context7 ID from `resolve-library-id`.",
-  "mcp__deepwiki__ask_question":
+  "deepwiki_ask_question":
     "Use for public-repo architecture questions when library docs are insufficient.",
-  "mcp__grep__searchGitHub":
+  "grep_searchGitHub":
     "Use for real production usage patterns across public GitHub repos.",
 
   // Security (Security domain only)
-  "mcp__semgrep__semgrep_scan":
+  "semgrep_semgrep_scan":
     "Static analysis for defensive security review — outputs require manual validation.",
 
   // Planning
-  "mcp__sequential-thinking__sequentialthinking":
+  "sequential-thinking_sequentialthinking":
     "Use for non-trivial architectural or design decisions before editing.",
 }
 
