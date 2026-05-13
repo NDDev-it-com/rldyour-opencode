@@ -24,14 +24,7 @@ Implement a task to a high-quality, scalable, synchronized state. Speed is secon
 11. Run quality gates using project scripts, OpenCode LSP (auto-starts for detected file extensions), and detected stack checks. Use `verification-quality-gates` skill.
 12. Trigger browser validation for UI/browser-visible work unless auth blocks it; if auth blocks, report the limitation and use available evidence. Use `browser-tool-routing` and `browser-validation` skills.
 13. Trigger security review for security-sensitive changes or explicit user request. Use `owasp-top-10-implementation` and `ry-sec-review` skills.
-14. Run the review phase. Invoke up to six parallel reviewer subagents in a single Task fan-out (each with a self-contained prompt — they do not share context):
-    - `@flow-architecture-review` — boundaries, dependency direction, public API shape, data flow.
-    - `@flow-quality-review` — correctness, edge cases, error handling, resource lifecycle.
-    - `@flow-consistency-review` — naming, style, imports, project conventions.
-    - `@flow-integration-review` — cross-module contracts, schemas, configs, backward compatibility.
-    - `@flow-verification-review` — tests, quality gates, browser/server evidence.
-    - `@flow-security-review` — OWASP, auth/authz, injection, secrets (only when the touched scope is security-sensitive or the owner asks explicitly; this track runs `steps: 42` instead of `36` because it does a variant-hunt sweep on confirmed findings).
-    Consolidate findings via Severity × Disposition (see `references/reviewer-protocol.md`); fix `must-fix` + `should-fix` items; rerun only the reviewer tracks that reported issues.
+14. Run review phase with subagents for architecture, quality, consistency, integration, verification, and security when applicable. Use `@ry-review` or invoke reviewer subagents defined in `.opencode/agents/`.
 15. Run `flow-post-task-sync` before final response.
 
 ## Automatic Helper Routing
