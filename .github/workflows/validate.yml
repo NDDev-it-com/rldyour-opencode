@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
 
+# Least-privilege token (OSSF Scorecard "Token-Permissions" check).
+# Validation jobs only need read access to the repository contents.
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest

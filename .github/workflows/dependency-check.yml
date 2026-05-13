@@ -1,0 +1,31 @@
+name: Dependency Freshness
+
+on:
+  # Weekly cron: Monday 06:00 UTC.
+  schedule:
+    - cron: "0 6 * * 1"
+  # Manual dispatch for owner-initiated checks.
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions pinned to commit SHA — see validate.yml header for rationale.
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.13"
+
+      - name: Run dependency freshness report
+        run: |
+          bash scripts/check_deps_freshness.sh --json | tee dep-report.json
+          echo "## Pinned dependency report" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat dep-report.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
