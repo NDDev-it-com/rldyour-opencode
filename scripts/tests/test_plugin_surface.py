@@ -26,6 +26,8 @@ EXPECTED_PLUGINS = {
     "ry-tools.ts",
     "ry-command-audit.ts",
     "ry-tool-hints.ts",
+    "ry-permission-policy.ts",
+    "ry-system-context.ts",
 }
 
 EXPECTED_RY_TOOL_IDS = {
