@@ -8,13 +8,18 @@ failures=0
 echo "=== rldyour deploy readiness: $target ==="
 echo ""
 
-# Git clean
-dirty=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+# Git clean (exclude whitelisted runtime markers — see .git/info/exclude
+# whitelist entries like .serena/.flow_*, .sync_marker, etc. These are
+# regenerated every session and must never block deploy readiness).
+RUNTIME_MARKER_RE='\.serena/\.(flow_(sync_marker|post_task_state\.json)|sync_marker|serena_sync_state\.json|auto_sync_head|active_workflow_intent\.json|dirty_stop_ack|gitignore)$'
+dirty=$(git status --porcelain 2>/dev/null \
+  | grep -vE "$RUNTIME_MARKER_RE" \
+  | wc -l | tr -d ' ')
 if [ "$dirty" -gt 0 ]; then
-  echo "FAIL: $dirty dirty files in working tree"
+  echo "FAIL: $dirty dirty files in working tree (excluding runtime markers)"
   failures=$((failures + 1))
 else
-  echo "OK: working tree clean"
+  echo "OK: working tree clean (runtime markers ignored)"
 fi
 
 # On main branch

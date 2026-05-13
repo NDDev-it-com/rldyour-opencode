@@ -9,6 +9,8 @@ cd "$project_path" 2>/dev/null || true
 echo "=== rldyour project check detection ==="
 echo ""
 
+DETECTIONS=0
+
 detect_check() {
   local name="$1"
   local config_file="$2"
@@ -20,10 +22,12 @@ detect_check() {
       local pkg="${cmd%% *}"
       if command -v "$pkg" >/dev/null 2>&1; then
         echo "  $name: $cmd (detected from $config_file)"
+        DETECTIONS=$((DETECTIONS + 1))
         return
       fi
     done
     echo "  $name: config found ($config_file) but runner not available"
+    DETECTIONS=$((DETECTIONS + 1))
   fi
 }
 
@@ -54,4 +58,12 @@ detect_check "lint" "pubspec.yaml" "dart analyze"
 detect_check "build" "Dockerfile" "docker build ."
 
 echo ""
-echo "Note: Run detected commands manually or via /ry-start quality gates."
+if [ "$DETECTIONS" -eq 0 ]; then
+  echo "No language stack manifests found in this directory."
+  echo "Marketplace / docs-only repositories should rely on:"
+  echo "  - bash scripts/validate_config.sh"
+  echo "  - python3 -m pytest scripts/tests/"
+  echo "  - opencode debug config"
+else
+  echo "Note: Run detected commands manually or via /ry-start quality gates."
+fi
