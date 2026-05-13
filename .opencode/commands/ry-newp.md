@@ -1,5 +1,5 @@
 ---
-description: "Plan a new project with skeptical questions and research"
+description: "Проектирование нового проекта: скептические вопросы → research → архитектура docs → optional scaffold. Plan a new project with skeptical questions and research."
 agent: build
 ---
 

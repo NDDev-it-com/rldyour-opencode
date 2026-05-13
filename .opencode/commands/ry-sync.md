@@ -1,5 +1,5 @@
 ---
-description: "Synchronize memories, docs, git, and fullrepo"
+description: "Синхронизация Serena memories, AGENTS.md/CLAUDE.md, git и fullrepo после meaningful работы. Synchronize memories, docs, git state and fullrepo branch."
 agent: build
 ---
 
