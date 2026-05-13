@@ -14,6 +14,8 @@ permission:
     git log*: allow
     git show*: allow
     git rev-parse*: allow
+  task: deny
+  external_directory: deny
   glob: allow
   grep: allow
   read: allow

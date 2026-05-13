@@ -13,6 +13,8 @@ permission:
     git diff: allow
     git log*: allow
     git show*: allow
+  task: deny
+  external_directory: deny
   webfetch: allow
   websearch: allow
   glob: allow
