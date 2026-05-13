@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2026-05-13
+
+Hardening pass closing every defer item flagged by the 0.9.0 reviewer round, plus the previously-external decision to ship a real Claude Code project memory file.
+
+### Added
+
+- `.claude/CLAUDE.md` — Claude Code project memory written as a self-contained guide (not a thin pointer to AGENTS.md per `project-instructions-policy` anti-pattern). Tells a Claude-Code-resident developer that this repo is an OpenCode marketplace, where canonical knowledge lives, what NOT to do (treat OpenCode skills/agents/commands as Claude Code primitives), which validation gates apply, and how to reach AGENTS.md, references, decisions.
+- `scripts/tests/test_plugin_surface.py` (6 cases) — defensive checks that catch regressions: plugin set on disk equals AGENTS.md count; `ry-tools` registers exactly the 5 advertised tool IDs; `ry-tool-hints` HINTS keys reference real `opencode.json.mcp` server keys; legacy `mcp__context7__get-library-docs` alias cannot be re-introduced; dead `project as { path? }` cast cannot reappear in any plugin.
+- `scripts/tests/test_opencode_resolve.py` (4 cases, skipped when `opencode` CLI absent) — end-to-end integration: `opencode debug config` resolves cleanly; `opencode debug info` lists all 8 plugins; resolved skill count equals directory count; every `.opencode/agents/*.md` resolves under `opencode debug agent`. Catches schema-validation regressions that pass static checks but fail live OpenCode.
+- Inline concurrency + sanitize-order notes in `ry-command-audit.ts` documenting the deliberate non-atomic read-modify-write (single Bun event loop serialises within process) and the deliberate sanitize-before-slice order (guarantees no credential reaches the log regardless of position).
+
+### Changed
+
+- `.github/workflows/validate.yml` — `actions/checkout@v4` and `actions/setup-python@v5` pinned to commit SHA (`34e114876b0b11c390a56381ad16ebd13914f8d5` and `a26af69be951a213d495a4c3e4e4022e16d87065` respectively). Defends CI against tag-hijack on the action repositories. Verified via `gh api repos/actions/<name>/git/refs/tags/<tag>`.
+
+### Test coverage
+
+- Total pytest cases: **194** (was 184). Breakdown: 27 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 6 plugin_surface + 4 opencode_resolve.
+
 ## [0.9.0] - 2026-05-13
 
 OpenCode plugin-surface expansion. Adopt three previously-unused hook types so the marketplace exercises the full v1.14.48 plugin API instead of just session/tool/shell observation.
