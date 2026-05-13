@@ -1,5 +1,14 @@
 # Migration Mapping: Codex/Claude Code → OpenCode
 
+> **Note (2026-05-13, supersession banner).** Example model IDs in code blocks
+> below (`claude-sonnet-4-20250514`, `claude-haiku-4-20250514`,
+> `claude-opus-4-20250514`) are historical and produce `ConfigInvalidError`
+> against OpenCode v1.14.30+. Use the current registry IDs:
+> `claude-sonnet-4-6`, `claude-haiku-4-5-20251001`, `claude-opus-4-7`.
+> The ADR text itself is preserved unchanged — only the example IDs are
+> obsolete. See `CHANGELOG.md` 0.5.0 and `.serena/memories/CORE_02_opencode_config.md`
+> for migration context.
+
 ## Commit History Analysis
 
 ### Codex (rldyour-codex) — 108 commits
