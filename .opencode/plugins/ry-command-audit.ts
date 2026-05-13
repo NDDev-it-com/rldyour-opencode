@@ -49,7 +49,7 @@ function sanitizeArgs(raw: string): string {
   return stripped.slice(0, 280)
 }
 
-export const RyCommandAudit: Plugin = async ({ directory }) => {
+export const RyCommandAudit: Plugin = async ({ client, directory }) => {
   // PluginInput.directory is always defined per @opencode-ai/plugin v1.14
   // type contract (string, not nullable). The previous `project.path`
   // fallback was dead code — Project type does not expose `path`.
@@ -72,9 +72,12 @@ export const RyCommandAudit: Plugin = async ({ directory }) => {
           : existing + line
         await Bun.write(auditPath, next)
       } catch (err) {
-        console.warn(
-          `[rldyour] ry-command-audit: append failed (${err instanceof Error ? err.message : String(err)})`,
-        )
+        const message = `ry-command-audit append failed: ${err instanceof Error ? err.message : String(err)}`
+        try {
+          await client.app.log({ body: { service: "ry-command-audit", level: "warn", message } })
+        } catch {
+          // server log unavailable; carry on — the audit miss is best-effort
+        }
       }
     },
   }
