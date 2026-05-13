@@ -172,7 +172,7 @@ cmd_publish() {
   # Always use a temporary worktree so the main worktree is never touched.
   # Cleanup is registered with trap so we never leave the main checkout
   # stranded on a half-built orphan branch.
-  trap '_publish_cleanup "$tmp_dir" "$root" "$original_branch"' EXIT
+  trap '_publish_cleanup "${tmp_dir:-}" "${root:-}" "${original_branch:-}"' EXIT
 
   if git ls-remote --exit-code origin "$FULLREPO_BRANCH" >/dev/null 2>&1; then
     # Remote orphan exists — start from its tip
@@ -239,7 +239,13 @@ cmd_publish() {
 
   (
     cd "$tmp_dir"
-    git add -A 2>/dev/null
+    # CRITICAL: use `git add -f` because the tmp worktree shares the parent
+    # repo's `.git/`, and that repo's `.git/info/exclude` block ignores the
+    # exact agent-only paths we are trying to publish (AGENTS.md, .serena/,
+    # .claude/, …). Without `-f` those files are silently skipped, leaving
+    # only `.opencode/`, `docs/`, `references/`, `scripts/` in the pushed
+    # tree — verified failure mode on the first publish attempt.
+    git add -f -A 2>/dev/null
     if git diff --cached --quiet 2>/dev/null; then
       echo "[fullrepo] No changes to publish."
     else
@@ -255,11 +261,14 @@ cmd_publish() {
 }
 
 _publish_cleanup() {
-  local tmp_dir="$1" root="$2" original_branch="$3"
+  # Defensive: every arg may be empty under `set -u` if the trap fires
+  # before its variables were bound (e.g. mktemp failed).
+  local tmp_dir="${1:-}" root="${2:-}" original_branch="${3:-}"
+
   # Restore main worktree to the original named branch if a stale half-publish
-  # ever left us on an orphan ref (defensive — the new cmd_publish flow
-  # uses only the tmp worktree, but old half-completed runs may still need this).
-  if [ -d "$root" ]; then
+  # ever left us on an orphan ref (defensive — the new cmd_publish flow uses
+  # only the tmp worktree, but old half-completed runs may still need this).
+  if [ -n "$root" ] && [ -d "$root" ]; then
     cd "$root" 2>/dev/null || true
     local now
     now=$(git branch --show-current 2>/dev/null || echo "")
@@ -267,7 +276,7 @@ _publish_cleanup() {
       git checkout "$original_branch" >/dev/null 2>&1 || true
     fi
   fi
-  if [ -n "${tmp_dir:-}" ] && [ -d "$tmp_dir" ]; then
+  if [ -n "$tmp_dir" ] && [ -d "$tmp_dir" ]; then
     git worktree remove --force "$tmp_dir" >/dev/null 2>&1 || true
     rm -rf "$tmp_dir" 2>/dev/null || true
   fi
