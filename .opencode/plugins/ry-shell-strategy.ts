@@ -7,6 +7,15 @@ import type { Plugin } from "@opencode-ai/plugin"
 // user, so warnings that the user must see are escalated to toasts.
 // Each notify call is wrapped in try/catch — best-effort UX: messaging
 // failures must never block tool execution.
+//
+// Defense-in-depth: this plugin's `tool.execute.before` throw is the
+// UNCONDITIONAL enforcement layer for git push hardening. It fires
+// regardless of whether the bash permission is "allow" or "ask".
+// `ry-permission-policy.ts` provides the secondary layer at
+// `permission.ask`, which catches the same patterns before the user
+// dialog appears — only relevant when bash is statically "ask"
+// (plan agent + reviewer subagents). Both layers intentionally co-own
+// the same invariant; removing either creates a coverage gap.
 
 export const RyShellStrategy: Plugin = async ({ client }) => {
   async function log(level: "info" | "warn" | "error", message: string): Promise<void> {

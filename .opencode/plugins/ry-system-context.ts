@@ -40,15 +40,22 @@ export const RySystemContext: Plugin = async ({ client, directory }) => {
     }
   }
 
+  // Performance: `branch` and `headShort` are session-stable in any normal
+  // workflow (a checkout creates a new OpenCode session via /ry-init).
+  // Cache them once at factory init so the hot path (`experimental.chat
+  // .system.transform` fires per chat completion turn) only spawns the
+  // turn-volatile `git status --porcelain` probe — saves 2 subprocess
+  // spawns per turn × N turns per session.
+  const cachedBranch = (await readGitOutput(directory, ["rev-parse", "--abbrev-ref", "HEAD"])) || "unknown"
+  const cachedHeadShort = (await readGitOutput(directory, ["rev-parse", "--short=7", "HEAD"])) || "unknown"
+
   return {
     "experimental.chat.system.transform": async (_input, output) => {
       const today = new Date().toISOString().slice(0, 10)
-      const branch = (await readGitOutput(directory, ["rev-parse", "--abbrev-ref", "HEAD"])) || "unknown"
-      const headShort = (await readGitOutput(directory, ["rev-parse", "--short=7", "HEAD"])) || "unknown"
       const status = await readGitOutput(directory, ["status", "--porcelain"])
       const dirty = status.length > 0 ? `dirty (${status.split("\n").length} files)` : "clean"
 
-      const line = `[rldyour runtime] date=${today} branch=${branch} head=${headShort} worktree=${dirty}`
+      const line = `[rldyour runtime] date=${today} branch=${cachedBranch} head=${cachedHeadShort} worktree=${dirty}`
       output.system.push(line)
 
       // Log once per session start ground truth so the audit trail records
