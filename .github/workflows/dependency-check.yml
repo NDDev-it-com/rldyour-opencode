@@ -25,7 +25,29 @@ jobs:
       - name: Run dependency freshness report
         run: |
           bash scripts/check_deps_freshness.sh --json | tee dep-report.json
-          echo "## Pinned dependency report" >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          cat dep-report.json >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Pinned dependency report"
+            echo '```json'
+            cat dep-report.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # MCP capability smoke probe. Remote MCP outage / URL drift would
+      # otherwise be invisible until a live OpenCode session noticed.
+      # continue-on-error keeps a transient remote outage from blocking
+      # the weekly cron — the JSON envelope still lands in the summary
+      # for review. Local MCP probes always succeed in CI (the bunx /
+      # uvx / dart launchers are not installed on the runner so they
+      # report `skip`, which the smoke script treats as non-failing).
+      - name: Smoke MCP capabilities (remote reachability)
+        id: smoke_mcp
+        continue-on-error: true
+        timeout-minutes: 3
+        run: |
+          python3 scripts/smoke_mcp_capabilities.py --json | tee mcp-smoke.json
+          {
+            echo "## MCP smoke probe"
+            echo '```json'
+            cat mcp-smoke.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
