@@ -79,6 +79,18 @@
         "lsp": "allow",
         "skill": "allow"
       }
+    },
+    "title": {
+      "model": "anthropic/claude-haiku-4-5-20251001",
+      "temperature": 0.2
+    },
+    "summary": {
+      "model": "anthropic/claude-haiku-4-5-20251001",
+      "temperature": 0.2
+    },
+    "compaction": {
+      "model": "anthropic/claude-sonnet-4-6",
+      "temperature": 0.2
     }
   },
   "mcp": {
@@ -173,7 +185,10 @@
   "instructions": ["AGENTS.md"],
   "compaction": {
     "auto": true,
-    "prune": true
+    "prune": true,
+    "tail_turns": 12,
+    "preserve_recent_tokens": 8000,
+    "reserved": 4000
   },
   "plugin": [],
   "watcher": {

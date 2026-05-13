@@ -39,7 +39,7 @@ detect_check "typecheck" "pyproject.toml" "pyright" "mypy"
 # TypeScript/JavaScript
 detect_check "test" "package.json" "npm test" "pnpm test" "yarn test"
 detect_check "lint" "package.json" "npm run lint" "pnpm lint" "yarn lint" "eslint ."
-detect_check "typecheck" "tsconfig.json" "npx tsc --noEmit" "pnpm tsc --noEmit"
+detect_check "typecheck" "tsconfig.json" "bunx tsc --noEmit" "pnpm tsc --noEmit"
 
 # Rust
 detect_check "test" "Cargo.toml" "cargo test"
