@@ -38,6 +38,9 @@ node_modules/
 # Browser artifacts
 browser/
 
+# Diagnostic bundles (scripts/collect_diagnostics.sh output)
+diagnostics/
+
 # OpenCode local config (user-specific)
 .opencode/local.json
 
