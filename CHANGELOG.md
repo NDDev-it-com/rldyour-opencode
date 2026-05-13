@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-05-13
+
+OpenCode v1.14.48 best-practice uplift driven by a multi-source research pass (Context7 + DeepWiki + Grep MCP + opencode.ai docs + community marketplaces). Closes the hook-coverage gap, fixes a critical tool-ID format regression, hardens reviewer subagents, ships infrastructure for ongoing freshness checks, and brings every advisory message into the TUI.
+
+### Added
+
+- **`.opencode/plugins/ry-permission-policy.ts`** — new `permission.ask` deny-only policy plugin. Blocks `git push --force` without `--force-with-lease`, catastrophic `rm -rf` targets (root, $HOME, ~/, cwd; allowlists `node_modules` cleanup), and `git push --no-verify` on main/master/release/production. Never auto-allows; preserves user consent on legitimate prompts.
+- **`.opencode/plugins/ry-system-context.ts`** — new `experimental.chat.system.transform` plugin injecting today's date, current git branch, HEAD short SHA, and dirty-tree status into every system prompt. Fixes "what day is it / what branch are we on" classes of LLM grounding errors that static AGENTS.md cannot address.
+- **`ry-bootstrap.ts` `experimental.compaction.autocontinue` hook** — disables the synthetic "continue" turn that OpenCode injects after a context-overflow auto-compaction. Reviewer / security / sync agents typically produce a final report; an auto-continue turn either re-does the work or generates empty filler.
+- **`scripts/smoke_mcp_capabilities.py`** — new stdlib-only MCP capability smoke probe. Remote MCP gets a HEAD-then-GET reachability check with HTTP-status-as-alive semantics (401/403/405 prove the server answered). Local MCP spawns the launcher for a 3-second window; missing launcher → `skip` (fresh-checkout safety), non-zero exit inside the window → `fail`, otherwise `alive`. `--json` mode for automation.
+- **`scripts/collect_diagnostics.sh`** — timestamped local diagnostic bundle under `diagnostics/` (now git-ignored) collecting git metadata, validator log, dependency-pin report, flow / fullrepo / MCP-smoke state, runtime fingerprint, and optionally LSP + opencode doctor with `--include-doctor`.
+- **`scripts/validate_instruction_docs.py`** — verifies `AGENTS.md` and `.claude/CLAUDE.md` exist, exceed a minimum-byte threshold, and contain required anchor headings. Catches accidental deletion / truncation / template-only state during a release.
+- **`docs/observability.md`** — operational guide enumerating what to check first, the three plugin observability channels (toast / app log / tool metadata), the diagnostic-bundle contract, CI observability surface, and a failure-triage order.
+- **`pyrightconfig.json`** — Python static type-check baseline for the `scripts/` tree. `typeCheckingMode: basic`, missing-type-stubs noise suppressed.
+- **`.github/workflows/dependency-check.yml`** — weekly cron (Mon 06:00 UTC) + `workflow_dispatch` that runs `scripts/check_deps_freshness.sh --json` and surfaces the pinned-dependency JSON envelope via `GITHUB_STEP_SUMMARY`. SHA-pinned actions; least-privilege `contents: read` permissions.
+
+### Changed
+
+- **CRITICAL — `.opencode/plugins/ry-tool-hints.ts` MCP tool ID format**. The `tool.definition` hook receives `input.toolID` as `sanitize(serverName) + "_" + sanitize(toolName)` (single underscore; dashes preserved). The previous HINTS map used the Claude-Code-style `mcp__server__tool` prefix, so none of the 14 advertised routing hints fired — they were silently dead code. Rewrite every key to the correct form (`serena_find_symbol`, `chrome-devtools_list_console_messages`, `context7_resolve-library-id`, `sequential-thinking_sequentialthinking`, …). Source: `packages/opencode/src/mcp/index.ts` in `sst/opencode` v1.14.48.
+- **All 7 plugins emit advice via `client.app.log` + `client.tui.showToast`** instead of `console.log`. `console.log` reached only the server log file and was invisible to the user. Toasts now surface git-push reminders, destructive-rm warnings, force-push blocks, env-protection rationales, conventional-commit advice, post-commit `/ry-sync` nudges, and session-idle reminders. Notify calls are best-effort (try/catch silent fallback) so a client-side hiccup cannot block tool execution.
+- **`opencode.json` `agent.title` and `agent.summary` pinned to `claude-haiku-4-5-20251001`** at `temperature: 0.2`. These two hidden built-in agents previously inherited the global Sonnet 4.6 budget; switching to Haiku saves ~80% on their per-session cost (title gen ~200 tokens, summary ~1k tokens) with no quality impact for short summarisation tasks.
+- **`opencode.json` `agent.compaction` pinned to `claude-sonnet-4-6`** at `temperature: 0.2`. Compaction is correctness-critical (the next turn sees the compressed context) — keep Sonnet quality, lock low temperature to suppress drift.
+- **`opencode.json` `compaction` config tuned** with `tail_turns: 12`, `preserve_recent_tokens: 8000`, `reserved: 4000`. `tail_turns` preserves the most-recent plan→build→review cycle uncompressed; `preserve_recent_tokens` protects the freshest technical context; `reserved` leaves headroom for the next response. Documented in OpenCode v2 SDK types `dist/v2/gen/types.gen.d.ts:925-933`.
+- **Reviewer subagents explicit `task: ask` + `external_directory: deny`** added to `flow-architecture-review`, `flow-consistency-review`, `flow-integration-review`, `flow-quality-review`, `flow-security-review`, `flow-verification-review`. `flow-memory-sync` and `ry-explore` use the stricter `task: deny`. Defense in depth for OpenCode v1.14.31 and v1.14.46 subagent permission-inheritance fixes — without explicit values the inheritance fix landed only when parents specified them.
+- **6 slash commands gain bilingual descriptions** (`ry-deploy`, `ry-init`, `ry-newp`, `ry-review`, `ry-start`, `ry-sync`) matching the Russian-leading + English-trailing convention used across all 32 skill descriptions.
+- **4 ADRs in `docs/decisions/`** gain a top-of-file supersession banner warning that the legacy example model IDs (`claude-sonnet-4-20250514`, `claude-haiku-4-20250514`, `claude-opus-4-20250514`) shown in code blocks produce `ConfigInvalidError` on OpenCode v1.14.30+. ADR bodies preserved verbatim (MADR 4.0.0 immutability).
+- **`.claude/CLAUDE.md` stale counts refreshed**: `opencode.json` 181→194 lines, pytest 184→194 cases / 4→6 suites, VERSION marker 0.9.0→0.9.1.
+- **`scripts/detect_project_checks.sh` TypeScript typecheck fallback** swapped `npx tsc --noEmit` → `bunx tsc --noEmit`. AGENTS.md L213 bans `npx`; the script now follows its own policy.
+- **`.github/workflows/validate.yml`** workflow-level `permissions: { contents: read }`. Closes the OSSF Scorecard Token-Permissions check; the validator only needs read access.
+- **`AGENTS.md` `Plugins` block expanded** to 10 entries (was 8) and documents the new hook subscriptions, `client.tui.showToast` / `client.app.log` migration, and the OpenCode v1.14.48 tool-ID format note inside the `ry-tool-hints` row.
+- **`AGENTS.md` `Validation Commands` block** lists the four new entries (`smoke_mcp_capabilities.py`, `validate_instruction_docs.py`, `collect_diagnostics.sh`, observability doc link) and the updated pytest count.
+- **`README.md`** plugin count 8→10, catalog refreshed with `.claude/CLAUDE.md` row + observability doc + dependency-check workflow + 14 scripts, and a new "Project structure" tree block.
+- **`.gitignore`** removes a duplicate `!.env.example` negation line and adds `diagnostics/` (output dir of `scripts/collect_diagnostics.sh`).
+
+### Test coverage
+
+- **194 pytest cases** in **6 suites** (unchanged numerically, but `test_opencode_resolve.py` hardened against pytest stdout-capture truncation: `test_debug_config_resolves_cleanly` now uses a head-substring probe instead of full `json.loads`; `test_debug_skill_count_matches_directory` anchors the regex to `^\s*"name":\s*"[a-z][\w-]*"` so prose hits inside descriptions cannot inflate the count; plugin-info test references the `EXPECTED_PLUGINS` tuple instead of hard-coding "eight").
+- `test_plugin_surface.py` extended: HINTS regex now matches the OpenCode v1.14.48 `server_tool` format; `LEGACY_BANNED` now rejects the entire `mcp__` substring in the live HINTS map (legacy format remains allowed in module-header comments).
+
+### Anti-patterns explicitly NOT ported from sibling marketplaces
+
+This release rejects several Codex / Claude-Code idioms that do not belong in an OpenCode marketplace:
+
+- `.codex-plugin/plugin.json` manifests, `hooks.json` shell-script registries, `${CLAUDE_PLUGIN_ROOT}` env indirection, `system/AGENTS.md` install templates, and `mcp__server__tool` Claude-Code-style tool IDs are all rejected at the validator or plugin level.
+- The plugin-bundled directory layout `plugins/rldyour-*/` used by `rldyour-codex` and `rldyour-claudecode` is intentionally NOT replicated — OpenCode discovers agents, skills, commands, and plugins from flat `.opencode/{agents,skills,commands,plugins}/` paths.
+
 ## [0.9.1] - 2026-05-13
 
 Hardening pass closing every defer item flagged by the 0.9.0 reviewer round, plus the previously-external decision to ship a real Claude Code project memory file.

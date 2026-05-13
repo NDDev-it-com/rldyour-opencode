@@ -14,11 +14,12 @@ A self-contained OpenCode project configuration that provides:
   - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
   - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
 - **13 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, Semgrep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
-- **8 TypeScript plugins** for session lifecycle and LLM augmentation:
-  - lifecycle: `ry-bootstrap`, `ry-env-protection`, `ry-shell-strategy`, `ry-sync-reminder`, `ry-flow-hooks`
-  - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
+- **10 TypeScript plugins** for session lifecycle, LLM augmentation, and dynamic policy:
+  - lifecycle: `ry-bootstrap` (session banner + compaction context + autocontinue), `ry-env-protection` (block sensitive reads with toast), `ry-shell-strategy` (shell env + git push guardrails), `ry-sync-reminder` (idle toast), `ry-flow-hooks` (commit advice + post-commit nudge)
+  - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
+  - Dynamic policy: `ry-permission-policy` (deny-only `permission.ask` for force-push without lease, catastrophic `rm`, --no-verify on product branches), `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt)
 - **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
-- **Granular permissions** per agent (reviewer subagents are read-only with git-only bash allowlist).
+- **Granular permissions** per agent (reviewer subagents are read-only with git-only bash allowlist; `task` and `external_directory` explicitly denied).
 
 ## Quick Start
 
@@ -58,20 +59,50 @@ A self-contained OpenCode project configuration that provides:
 
 | Layer | Where | Count |
 |---|---|---|
-| Master config | `opencode.json` | 1 (181 lines) |
+| Master config | `opencode.json` | 1 |
 | Cross-tool instructions | `AGENTS.md` | 1 |
+| Claude Code project memory (agent-only) | `.claude/CLAUDE.md` | 1 |
 | Subagents | `.opencode/agents/*.md` | 9 |
 | Skills | `.opencode/skills/<name>/SKILL.md` | 32 |
 | Slash commands | `.opencode/commands/*.md` | 10 |
-| Plugins | `.opencode/plugins/*.ts` | 8 |
+| Plugins | `.opencode/plugins/*.ts` | 10 |
 | Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
 | MCP servers | `opencode.json` → `mcp` | 13 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
 | Reference docs (skill/agent contracts) | `references/*.md` | 16 |
-| Operator guides | `docs/*.md` | 3 |
+| Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
 | Architecture decision archive | `docs/decisions/*.md` | 4 |
-| Diagnostic scripts (bash + python helpers) | `scripts/` | 13 |
+| Diagnostic scripts (bash + python) | `scripts/` | 14 |
 | Pytest suites | `scripts/tests/*.py` | 6 (194 cases: 27 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 6 plugin surface + 4 opencode integration) |
+| CI workflows | `.github/workflows/*.yml` | 2 (`validate`, `dependency-check`) |
+
+### Project structure
+
+```
+rldyour-opencode/
+├── AGENTS.md                   # cross-tool root instructions
+├── opencode.json               # master OpenCode config (model, MCP, LSP, agent, watcher, compaction)
+├── VERSION, CHANGELOG.md
+├── README.md, LICENSE, .env.example
+├── pyrightconfig.json          # Python static type config for scripts/
+├── .claude/CLAUDE.md           # Claude-Code-specific project memory (agent-only)
+├── .opencode/
+│   ├── agents/   *.md          # 9 subagents (6 reviewer, memory-sync, ry-explore, customize-opencode)
+│   ├── skills/   <name>/SKILL.md  # 32 skills across 10 domains
+│   ├── commands/ *.md          # 10 slash commands
+│   ├── plugins/  *.ts          # 10 Bun-runtime plugins
+│   └── package.json            # @opencode-ai/plugin pin
+├── .serena/
+│   ├── memories/  *.md         # 8 verified knowledge files
+│   └── project.yml             # Serena project config
+├── references/   *.md          # 16 durable contracts (consumed by skills/agents)
+├── docs/
+│   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
+│   └── decisions/  001..004.md # 4 MADR-style ADRs
+├── scripts/                    # 14 bash + python diagnostic / validation / smoke scripts
+│   └── tests/  *.py            # 6 pytest suites — 194 cases
+└── .github/workflows/          # validate.yml + dependency-check.yml (least-privilege, SHA-pinned)
+```
 
 ## Commands
 
@@ -141,16 +172,21 @@ Run `opencode models anthropic` to list every accepted ID. All current IDs are v
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter + VERSION semver
-uvx --from "pytest==9.0.2" pytest scripts/tests/           # validator + extract_pins unit tests (39 cases)
+uvx --from "pytest==9.0.2" pytest scripts/tests/           # 194 cases in 6 suites
 bash scripts/check_deps_freshness.sh                       # list pinned MCP dependencies (npm/PyPI/Dart)
+python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
+python3 scripts/validate_instruction_docs.py               # verify AGENTS.md + .claude/CLAUDE.md anchor headings
 bash scripts/doctor_opencode.sh                            # full diagnostics: MCP, LSP binaries, agent/skill/command discovery, git
 bash scripts/check_lsps.sh                                 # 16 language servers + project prereqs
+bash scripts/collect_diagnostics.sh --include-doctor       # local timestamped diagnostic bundle for triage
 opencode debug config                                      # native resolved config (authoritative)
 opencode debug agent <name>                                # validate individual agent
 opencode models anthropic                                  # list available models for the active provider
 ```
 
-CI mirrors the core checks via `.github/workflows/validate.yml` on every push/PR to `main`.
+CI mirrors the core checks via `.github/workflows/validate.yml` on every push/PR to `main`. `.github/workflows/dependency-check.yml` runs weekly to surface MCP pin freshness via `GITHUB_STEP_SUMMARY`.
+
+See `docs/observability.md` for full triage flow.
 
 ## Convention
 
