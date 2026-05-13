@@ -1,5 +1,5 @@
 ---
-description: "Initialize scoped project context (read-only)"
+description: "Scoped read-only инициализация контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context (read-only)."
 agent: build
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: "Deep review with research and reviewer tracks"
+description: "Report-only глубокое ревью diff/PR/scope с reviewer tracks (architecture/quality/consistency/integration/verification/security). Deep review with parallel reviewer tracks."
 agent: plan
 ---
 
