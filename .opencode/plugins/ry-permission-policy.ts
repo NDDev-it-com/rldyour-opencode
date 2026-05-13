@@ -5,8 +5,19 @@ import type { Plugin } from "@opencode-ai/plugin"
 // "allow" / "deny" the runtime never calls this hook. The marketplace
 // keeps the global build permissions at "allow" but the plan / reviewer
 // subagents bump bash and edit to "ask"; this plugin tightens those by
-// blocking categorically dangerous patterns before the user prompt even
-// appears, so an accidental "allow" click cannot silently run them.
+// blocking categorically dangerous patterns BEFORE the interactive
+// permission dialog appears, so an accidental "allow" click cannot
+// silently approve them.
+//
+// Defense-in-depth note: `ry-shell-strategy.ts` already throws on the
+// same force-push pattern via `tool.execute.before`, which fires
+// regardless of permission config. That throw is the unconditional
+// enforcement layer. This plugin is the secondary guard for the
+// `permission.ask` promotion path (plan agent + reviewer subagents).
+// The two layers intentionally co-own the invariant so that:
+//   - the global `"allow"` case is still blocked by ry-shell-strategy
+//   - the `"ask"` case is blocked BEFORE the user dialog by this plugin
+// Removing either layer would create a coverage gap.
 //
 // IMPORTANT: this plugin only DENIES. It never auto-allows. The user's
 // interactive consent on legitimate "ask" prompts is preserved verbatim —
