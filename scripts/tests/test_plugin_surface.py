@@ -63,15 +63,22 @@ def test_ry_tools_registers_expected_ids() -> None:
 
 
 def test_ry_tool_hints_references_real_mcp_servers() -> None:
-    """Every `mcp__<server>__<tool>` key in HINTS must use a server that
-    exists in opencode.json.mcp. Catches drift when an MCP server is
-    renamed or removed."""
+    """Every HINTS key must use the OpenCode v1.14.48 MCP tool ID format
+    `<server>_<tool>` (single underscore) and reference a server that exists
+    in opencode.json.mcp. Catches drift when an MCP server is renamed,
+    removed, or when the legacy `mcp__server__tool` Claude Code prefix is
+    re-introduced (the underscore-double form does NOT match OpenCode's
+    sanitize(serverName) + "_" + sanitize(toolName) build line)."""
     cfg = json.loads(OPENCODE_JSON.read_text(encoding="utf-8-sig"))
     mcp_servers = set((cfg.get("mcp") or {}).keys())
 
     hints_src = (PLUGINS_DIR / "ry-tool-hints.ts").read_text(encoding="utf-8")
-    keys = re.findall(r'"mcp__([a-zA-Z0-9_\-]+)__[^"]+"', hints_src)
+    # Non-greedy [\w-]+? + literal "_" matches the first underscore boundary,
+    # which is always the server/tool separator (none of our MCP server names
+    # contain underscores; v1.14.48 sanitize() does not introduce them either).
+    keys = re.findall(r'^\s*"([\w-]+?)_[^"]+":\s', hints_src, re.MULTILINE)
 
+    assert keys, "ry-tool-hints.ts has no HINTS keys (or regex drifted)"
     unknown = {k for k in keys if k not in mcp_servers}
     assert not unknown, (
         f"ry-tool-hints.ts references MCP server(s) not in opencode.json: {unknown}"
@@ -79,15 +86,23 @@ def test_ry_tool_hints_references_real_mcp_servers() -> None:
 
 
 def test_ry_tool_hints_no_legacy_aliases() -> None:
-    """Defensive: catch the previous bug where the Context7 hint used a
-    non-existent tool name. Add explicit blacklist as bugs are fixed so
-    they cannot regress."""
+    """Defensive: catch the previous Context7 misalias AND the entire
+    Claude-Code-style `mcp__server__tool` key shape. OpenCode v1.14.48
+    builds tool IDs as `server_tool` (single underscore). Any `mcp__`
+    substring inside HINTS keys would silently disable that hint, so
+    block the prefix entirely from `ry-tool-hints.ts`."""
     LEGACY_BANNED = {
         "mcp__context7__get-library-docs",  # never existed; real names are query-docs / resolve-library-id
+        "mcp__",  # entire Claude-Code prefix is invalid for OpenCode tool IDs (see test docstring)
     }
     hints_src = (PLUGINS_DIR / "ry-tool-hints.ts").read_text(encoding="utf-8")
+    # Strip JS/TS comments before scanning — the file documents the legacy
+    # format in its module header on purpose. Only check the live HINTS map.
+    code_only = re.sub(r"^\s*//.*$", "", hints_src, flags=re.MULTILINE)
     for banned in LEGACY_BANNED:
-        assert banned not in hints_src, f"ry-tool-hints.ts contains legacy alias {banned!r}"
+        assert banned not in code_only, (
+            f"ry-tool-hints.ts contains legacy Claude-Code-style key {banned!r}"
+        )
 
 
 def test_no_dead_project_path_cast_in_plugins() -> None:
