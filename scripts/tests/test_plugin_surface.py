@@ -117,3 +117,70 @@ def test_no_dead_project_path_cast_in_plugins() -> None:
         assert "as { path?: string }" not in src, (
             f"{ts.name} re-introduced the dead `project as {{ path? }}` cast"
         )
+
+
+def test_ry_tool_hints_dispatch_path_wired() -> None:
+    """Structural verification that the `tool.definition` hook in
+    ry-tool-hints.ts actually mutates `output.description` when a
+    matching toolID arrives. The key-format tests above prove the
+    HINTS map is well-formed; this test proves the dispatch path
+    reaches the assignment so the regression class "hook fires but
+    writes nowhere" is impossible.
+    """
+    src = (PLUGINS_DIR / "ry-tool-hints.ts").read_text(encoding="utf-8")
+    assert '"tool.definition"' in src, "ry-tool-hints.ts must subscribe to tool.definition"
+    assert "HINTS[input.toolID]" in src, (
+        "ry-tool-hints.ts must look up the hint by input.toolID"
+    )
+    assert "output.description" in src, (
+        "ry-tool-hints.ts must write the hint into output.description"
+    )
+    # Guard: the assignment must be the only mutation; we do NOT want a
+    # future contributor to mutate output.parameters (LLM tool schema)
+    # since the marketplace contract is hint-only.
+    assert "output.parameters" not in src, (
+        "ry-tool-hints.ts must not mutate output.parameters — hints only"
+    )
+
+
+def test_ry_system_context_injects_runtime_fields() -> None:
+    """Structural verification that ry-system-context.ts builds the
+    `[rldyour runtime] ...` line with the four expected runtime fields
+    (date, branch, head, worktree) and falls back to the literal
+    string "unknown" when a git probe returns empty.
+    """
+    src = (PLUGINS_DIR / "ry-system-context.ts").read_text(encoding="utf-8")
+    assert '"experimental.chat.system.transform"' in src, (
+        "ry-system-context.ts must subscribe to experimental.chat.system.transform"
+    )
+    for field in ("date=", "branch=", "head=", "worktree="):
+        assert field in src, f"ry-system-context.ts runtime line missing {field!r}"
+    assert '|| "unknown"' in src, (
+        "ry-system-context.ts must fall back to \"unknown\" on git probe failure"
+    )
+    assert "output.system.push(" in src, (
+        "ry-system-context.ts must push the runtime line into output.system"
+    )
+
+
+def test_no_console_log_in_plugin_production_code() -> None:
+    """Defensive: 0.10.0 migrated every plugin from `console.log` (server-
+    log-only; invisible to the user) to `client.app.log` + `client.tui
+    .showToast`. A regression that re-introduces `console.log/warn/error`
+    in production code would silently mute the advisory channel again.
+
+    Comments are stripped before scanning so the migration notes inside
+    module headers can still mention `console.log` verbatim. Block
+    comments (`/* ... */`) are also stripped to cover both styles.
+    """
+    BANNED = ("console.log", "console.warn", "console.error", "console.info")
+    for ts in PLUGINS_DIR.glob("*.ts"):
+        src = ts.read_text(encoding="utf-8")
+        no_line_comments = re.sub(r"^\s*//.*$", "", src, flags=re.MULTILINE)
+        code_only = re.sub(r"/\*.*?\*/", "", no_line_comments, flags=re.DOTALL)
+        offenders = [token for token in BANNED if token in code_only]
+        assert not offenders, (
+            f"{ts.name} contains production-code console call(s) {offenders!r}; "
+            f"use client.app.log + client.tui.showToast (see references/"
+            f"opencode-plugin-patterns.md § Observability pattern)"
+        )
