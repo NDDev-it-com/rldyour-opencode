@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.1] - 2026-05-14
+
+Hardening pass closing every deferred item from the 0.10.0 reviewer round (Architecture H-1..L-3, Verification C-1, H-1..H-3, M-1..M-5). Repairs a silent-broken regex class that affected the security-critical permission-ask and tool-execute layers, redacts secrets from diagnostic bundles, sharpens MCP smoke semantics, and lifts pytest coverage by 65 cases.
+
+### Fixed
+
+- **CRITICAL — flag-boundary regex repair (`ry-permission-policy.ts`, `ry-shell-strategy.ts`)**. The regex `\b--force\b` and its siblings `\b--force-with-lease\b` / `\b--no-verify\b` silently match nothing on real input: `\b` does not assert at a position where both adjacent characters are non-word (space then `-`). As a result the `permission.ask` layer never denied a force-push (always defaulted to "ask") and the `tool.execute.before` layer in `ry-shell-strategy.ts` threw on the SAFE `--force-with-lease` form because the whitelist regex never matched. Replace with a flag-boundary lookbehind/lookahead pair `(?<![A-Za-z0-9-])--force(?![A-Za-z0-9-])` that matches `--force` but not `--force-with-lease`, plus `/i` flag so `--FORCE` is also caught.
+- **`ry-permission-policy.ts` product-branch alternation**. The flat form `\bmain|master|release|production\b` parsed as four alternatives with mismatched word boundaries, so `mainline` / `mainframe` / `productionish` were false-positively denied. Group as `\b(main|master|release|production)\b` so the boundaries apply uniformly.
+- **`ry-permission-policy.ts` force-push short form**. Add `-f` short form (`(?:^|\s)-f(?:\s|$)`) alongside `--force`. Previously only `--force` was caught.
+- **`scripts/collect_diagnostics.sh` secrets-in-bundle**. `opencode debug config` substitutes real env tokens (CONTEXT7_API_KEY `ctx7sk-*`, GITHUB_PERSONAL_ACCESS_TOKEN `gho_*` / `ghp_*`, ANTHROPIC_API_KEY `sk-ant-*`) into its JSON output. The diagnostics bundle copied that verbatim, leaving secrets on disk in `diagnostics/` (git-ignored but local-readable). Route every `run_cmd` output through a new `scripts/_sanitize_diag.py` stripper covering the vendor prefix set used by the marketplace; bundle is now secret-free by construction.
+- **`scripts/smoke_mcp_capabilities.py` false-alive on fast clean exit**. `probe_local` classified `exit_code=0` inside the probe window as `alive`; a launcher that prints `--help` or a version banner and exits 0 would therefore pass the smoke. Tighten to "only `TimeoutExpired` (still running) proves alive; clean fast exit is `indeterminate`; non-zero exit is `fail`." Local result against the current 13-server marketplace: 6 indeterminate (chrome-devtools, dart-flutter, playwright, sequential-thinking, serena, shadcn — all exit 0 on stdin EOF), 0 failed.
+
+### Added
+
+- **`scripts/_sanitize_diag.py`** — credential-pattern stripper. Mirrors `.opencode/plugins/ry-command-audit.ts::sanitizeArgs` plus a Context7 entry for `ctx7sk-` and an Anthropic entry for `sk-ant-`. Does NOT enable the fallback opaque-32-char redactor (false-positive on commit SHAs and dependency-pin strings present in diagnostic bundles). Pattern order is more-specific-first; the generic `sk-` pattern uses a negative-lookbehind word boundary so order regressions cannot leak inside a longer compound prefix (e.g. `ctx7sk-`).
+- **`scripts/tests/test_permission_policy_regexes.py`** (44 cases) — Python mirror of every regex in `ry-permission-policy.ts` with positive + negative + edge cases (force-push `--force` / `--FORCE` / `--force=true` / `-f`; safe `--force-with-lease`; rm -rf `/` / `$HOME` / `~` / `~/` / `.`; rm node_modules cleanup allowlist; safe `~/specific-subdir` and `./scoped/path`; --no-verify on main/master/release/production; --no-verify on feature/mainline/mainframe/productionish). Includes a lockstep guard that fails if the TS source and Python mirror diverge.
+- **`scripts/tests/test_smoke_mcp.py`** (11 cases) — self-tests for `smoke_mcp_capabilities.py`: probe_remote HEAD success, HTTP-error-still-alive (401/403/405), HEAD-then-GET fallback, total network failure → fail; probe_local skip on missing launcher, alive on timeout, indeterminate on `true`, fail on `false`; main() exit codes 0 / 1 and --json envelope shape.
+- **`scripts/tests/test_validate_instruction_docs.py`** (7 cases) — self-tests for `validate_instruction_docs.py`: missing file / too-short file / missing heading / all-good check_doc paths; main() exit codes; --json envelope shape using `tmp_path` so the real `AGENTS.md` and `.claude/CLAUDE.md` are untouched.
+- **`scripts/tests/test_plugin_surface.py`** — 3 new structural tests (Verification M-3 + H-1 + H-3): `test_no_console_log_in_plugin_production_code` enforces the 0.10.0 migration to `client.app.log` + `client.tui.showToast`; `test_ry_tool_hints_dispatch_path_wired` proves the `tool.definition` hook reaches `output.description`; `test_ry_system_context_injects_runtime_fields` proves the runtime line carries date/branch/head/worktree with `"unknown"` fallback.
+- **`.github/workflows/dependency-check.yml` smoke step** — runs `smoke_mcp_capabilities.py --json` in the weekly cron and publishes the envelope to `GITHUB_STEP_SUMMARY`. `continue-on-error: true` keeps a transient network failure from blocking the workflow; the summary still surfaces the outage for review.
+
+### Changed
+
+- **`scripts/tests/test_opencode_resolve.py`** hardened against pytest stdout-capture truncation (Verification C-1). `test_debug_skill_count_matches_directory` deterministically failed in isolation under default pytest capture (the 143 KiB `opencode debug skill` JSON gets truncated mid-string before the regex scan). Replaced with `test_debug_skill_resolves_cleanly` — head-substring probes for `"name"` and `"description"` keys; let `test_plugin_surface.py::test_all_expected_plugins_exist` enforce the actual count on disk. `test_debug_config_resolves_cleanly` adds a `"default_agent"` probe and drops the `"compaction"` probe (the latter lives past 4 KiB after the LSP block).
+- **`scripts/smoke_mcp_capabilities.py` output**. New `indeterminate` status + `[?]` glyph + counter in both text and JSON output. Exit code stays 0 unless something genuinely failed.
+
+### Test coverage
+
+- Total pytest cases: **259** (was 194). Breakdown: 27 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 9 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs.
+
 ## [0.10.0] - 2026-05-13
 
 OpenCode v1.14.48 best-practice uplift driven by a multi-source research pass (Context7 + DeepWiki + Grep MCP + opencode.ai docs + community marketplaces). Closes the hook-coverage gap, fixes a critical tool-ID format regression, hardens reviewer subagents, ships infrastructure for ongoing freshness checks, and brings every advisory message into the TUI.

@@ -72,8 +72,8 @@ A self-contained OpenCode project configuration that provides:
 | Reference docs (skill/agent contracts) | `references/*.md` | 16 |
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
 | Architecture decision archive | `docs/decisions/*.md` | 4 |
-| Diagnostic scripts (bash + python) | `scripts/` | 14 |
-| Pytest suites | `scripts/tests/*.py` | 6 (194 cases: 27 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 6 plugin surface + 4 opencode integration) |
+| Diagnostic scripts (bash + python) | `scripts/` | 15 |
+| Pytest suites | `scripts/tests/*.py` | 9 (259 cases: 27 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 9 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs) |
 | CI workflows | `.github/workflows/*.yml` | 2 (`validate`, `dependency-check`) |
 
 ### Project structure
@@ -172,7 +172,7 @@ Run `opencode models anthropic` to list every accepted ID. All current IDs are v
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter + VERSION semver
-uvx --from "pytest==9.0.2" pytest scripts/tests/           # 194 cases in 6 suites
+uvx --from "pytest==9.0.2" pytest scripts/tests/           # 259 cases in 9 suites
 bash scripts/check_deps_freshness.sh                       # list pinned MCP dependencies (npm/PyPI/Dart)
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
 python3 scripts/validate_instruction_docs.py               # verify AGENTS.md + .claude/CLAUDE.md anchor headings
