@@ -13,39 +13,64 @@ declare const Bun: {
   file: (path: string) => { text: () => Promise<string> }
 }
 
-async function readMcpNames(projectDir: string): Promise<string[]> {
+async function readMcpNames(projectDir: string): Promise<{ names: string[]; warning?: string }> {
   try {
     const path = projectDir.endsWith("/") ? `${projectDir}opencode.json` : `${projectDir}/opencode.json`
     const raw = await Bun.file(path).text()
     const cfg = JSON.parse(raw) as { mcp?: Record<string, { enabled?: boolean }> }
     const mcp = cfg.mcp ?? {}
-    return Object.keys(mcp).filter((name) => mcp[name]?.enabled !== false).sort()
+    return { names: Object.keys(mcp).filter((name) => mcp[name]?.enabled !== false).sort() }
   } catch (err) {
-    console.warn(
-      `[rldyour] ry-bootstrap: could not read opencode.json (${err instanceof Error ? err.message : String(err)}). MCP list will be reported as unavailable.`,
-    )
-    return []
+    return {
+      names: [],
+      warning: `ry-bootstrap: could not read opencode.json (${err instanceof Error ? err.message : String(err)}). MCP list will be reported as unavailable.`,
+    }
   }
 }
 
-export const RyBootstrap: Plugin = async ({ project, directory }) => {
+export const RyBootstrap: Plugin = async ({ client, project, directory }) => {
   const proj = project as { name?: string; path?: string } | undefined
   const projectName = proj?.name ?? "unknown"
   const projectDir = proj?.path ?? directory ?? "."
 
+  async function log(level: "info" | "warn", message: string): Promise<void> {
+    try {
+      await client.app.log({ body: { service: "ry-bootstrap", level, message } })
+    } catch {
+      // server log unavailable; carry on
+    }
+  }
+
   return {
     event: async ({ event }) => {
       if (event.type === "session.created") {
-        console.log(`[rldyour] Session started for project: ${projectName}`)
-        console.log("[rldyour] Run /ry-init to bootstrap context, /ry-start for full task lifecycle.")
+        await log(
+          "info",
+          `session started for project: ${projectName}. Run /ry-init to bootstrap context, /ry-start for full task lifecycle.`,
+        )
+      }
+    },
+
+    // Disable the synthetic "continue" turn that OpenCode injects after a
+    // context-overflow auto-compaction. Reviewer / security / sync agents
+    // typically produce a final report; an auto-continue turn would either
+    // re-do the work or generate empty filler. Letting the user (or the
+    // orchestrating skill) choose the next prompt avoids both pitfalls.
+    "experimental.compaction.autocontinue": async (input, output) => {
+      if (input.overflow) {
+        output.enabled = false
+        await log("info", `compaction.autocontinue disabled for session ${input.sessionID.slice(0, 12)} (overflow)`)
       }
     },
 
     "experimental.session.compacting": async (_input, output) => {
-      const mcpNames = await readMcpNames(projectDir)
+      const { names, warning } = await readMcpNames(projectDir)
+      if (warning) {
+        await log("warn", warning)
+      }
       const mcpLine =
-        mcpNames.length > 0
-          ? `Available MCP servers: ${mcpNames.join(", ")}`
+        names.length > 0
+          ? `Available MCP servers: ${names.join(", ")}`
           : "Available MCP servers: (read opencode.json for current list)"
 
       output.context.push(`## rldyour Session Context (${projectName})
