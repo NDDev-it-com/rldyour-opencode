@@ -93,6 +93,21 @@ def probe_remote(name: str, url: str) -> dict[str, Any]:
 
 
 def probe_local(name: str, command: list[str]) -> dict[str, Any]:
+    """Spawn the launcher with stdin redirected to DEVNULL and observe
+    the process for LOCAL_PROBE_WINDOW_SECONDS.
+
+    A real MCP stdio server is supposed to read JSON-RPC frames from
+    stdin and reply on stdout — it should never cleanly exit before
+    the window elapses just because nothing is sending requests.
+    Therefore only `TimeoutExpired` (still running) counts as `alive`.
+    Any clean exit inside the window is reported as `indeterminate`
+    (the process printed `--help` or a version banner and exited; we
+    cannot prove the server actually started its read loop). A non-zero
+    exit is `fail`.
+
+    This semantic catches a class of failure that the previous
+    `exit_code == 0 → alive` rule missed: a broken local MCP launcher
+    that prints a help message and exits 0 would pass undetected."""
     started = time.monotonic()
     launcher = command[0] if command else ""
     if not launcher or shutil.which(launcher) is None:
@@ -134,13 +149,25 @@ def probe_local(name: str, command: list[str]) -> dict[str, Any]:
             "status": "alive",
             "elapsed_ms": int((time.monotonic() - started) * 1000),
         }
+    # Exited cleanly inside the window — distinguish broken (rc != 0)
+    # from indeterminate (rc == 0; printed help/version then exited).
     return {
         "name": name,
         "kind": "local",
         "command": command,
-        "status": "fail" if rc != 0 else "alive",
+        "status": "fail" if rc != 0 else "indeterminate",
         "exit_code": rc,
         "elapsed_ms": int((time.monotonic() - started) * 1000),
+        **(
+            {
+                "reason": (
+                    "process exited cleanly inside the probe window; a real "
+                    "MCP stdio server should keep reading stdin instead"
+                )
+            }
+            if rc == 0
+            else {}
+        ),
     }
 
 
@@ -182,14 +209,31 @@ def main() -> int:
             results.append({"name": name, "kind": kind or "?", "status": "fail", "error": "unknown type"})
 
     failed = [r for r in results if r["status"] == "fail"]
+    indeterminate = [r for r in results if r["status"] == "indeterminate"]
 
     if args.json:
-        json.dump({"results": results, "failed": len(failed), "total": len(results)}, sys.stdout, indent=2)
+        json.dump(
+            {
+                "results": results,
+                "failed": len(failed),
+                "indeterminate": len(indeterminate),
+                "total": len(results),
+            },
+            sys.stdout,
+            indent=2,
+        )
         sys.stdout.write("\n")
     else:
-        print(f"MCP smoke: {len(results)} servers checked, {len(failed)} failed")
+        suffix = f", {len(indeterminate)} indeterminate" if indeterminate else ""
+        print(f"MCP smoke: {len(results)} servers checked, {len(failed)} failed{suffix}")
+        tag_map = {
+            "alive": "[OK]",
+            "skip": "[SKIP]",
+            "fail": "[FAIL]",
+            "indeterminate": "[?]",
+        }
         for r in results:
-            tag = {"alive": "[OK]", "skip": "[SKIP]", "fail": "[FAIL]"}[r["status"]]
+            tag = tag_map.get(r["status"], "[?]")
             detail = ""
             if "http" in r:
                 detail = f" http={r['http']} latency={r.get('latency_ms')}ms"
