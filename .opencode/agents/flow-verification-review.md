@@ -1,7 +1,6 @@
 ---
 description: Orchestrated verification review: tests, quality gates, browser/server evidence. Read-only. Invoked by ry-start or ry-review.
 mode: subagent
-model: anthropic/claude-sonnet-4-6
 temperature: 0.1
 steps: 36
 hidden: true
@@ -57,4 +56,4 @@ Reply in Russian when user wrote in Russian.
 
 - Running destructive tests / mutating data / modifying files.
 - Generic "add more tests" without scope-specific test names or behavior to cover.
-- Reporting checks as missing without first verifying they don't exist (use Serena `mcp__serena__search_for_pattern`).
+- Reporting checks as missing without first verifying they don't exist (use Serena `serena_search_for_pattern`).

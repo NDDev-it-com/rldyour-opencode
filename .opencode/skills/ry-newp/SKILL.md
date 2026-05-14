@@ -14,7 +14,7 @@ Design a new project with enough rigor that implementation can start with clear 
 1. Gather all provided context: prompt, docs, chats, requirements, screenshots, business constraints.
 2. Ask skeptical Russian questions with options. Cover product scope, users, business logic, data, integrations, security, deployment, observability, tests, and constraints.
 3. Research current best technologies and architecture patterns with `ry-explore`. Prefer Context7 MCP for official versioned framework docs, DeepWiki MCP for reference repo architecture, Grep MCP for real production patterns, and `web-research` for current landscape.
-4. Use Sequential Thinking MCP (`mcp__sequential-thinking__*`) for non-trivial architecture and technology decisions.
+4. Use Sequential Thinking MCP (`sequential-thinking_*`) for non-trivial architecture and technology decisions.
 5. Write planning docs under `.serena/newproj/<project>/` using `references/flow-lifecycle.md` as the lifecycle contract reference.
 6. Ask for approval before creating any scaffold code.
 7. If scaffold is approved, create the minimal useful project structure, commit atomically with Conventional Commits, and initialize Serena memories with verified facts only.

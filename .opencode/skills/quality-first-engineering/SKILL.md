@@ -15,7 +15,7 @@ User-facing conversation stays Russian unless requested otherwise. Repository do
 
 - Code is the source of truth. Verify rules, memories, docs, and plans against actual code, diffs, tests, and runtime evidence.
 - Quality has priority over delivery speed. Do not choose a shortcut just because it is faster.
-- Use Sequential Thinking MCP (`mcp__sequential-thinking__*`) for non-trivial decisions when available, with at least 3 thoughts before committing to an approach.
+- Use Sequential Thinking MCP (`sequential-thinking_*`) for non-trivial decisions when available, with at least 3 thoughts before committing to an approach.
 - Prefer consistency with existing project patterns. If existing patterns are harmful, explain the risk and ask before widening scope.
 - Keep semantic entropy low: one concept should have one clear home, one naming style, one contract, and one implementation pattern unless there is a documented reason.
 - Reuse stable code where it already exists. Extract reusable code only after real repeated need is clear.

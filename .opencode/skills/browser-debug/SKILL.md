@@ -34,7 +34,7 @@ Use this skill when:
 
 ## Debug Workflow
 
-Use `mcp__chrome-devtools__*` tools (primary) and `mcp__playwright__*` tools (reproduction):
+Use `chrome-devtools_*` tools (primary) and `playwright_*` tools (reproduction):
 
 1. Reproduce with Playwright when possible: navigate, perform the minimal failing flow, capture screenshot and snapshot under `browser/`.
 2. Inspect with Chrome DevTools: console messages, network requests, DOM/runtime state, layout/computed styles, screenshots, performance trace, Lighthouse, or memory snapshot as relevant.
