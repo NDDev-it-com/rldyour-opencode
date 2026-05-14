@@ -49,9 +49,9 @@ Do not commit browser artifacts. Delete them after the task unless the user expl
 
 ## Validation Workflow
 
-1. Use Playwright MCP (`mcp__playwright__*`) for browser flow reproduction, screenshots, accessibility snapshots, and assertions.
-2. Use Chrome DevTools MCP (`mcp__chrome-devtools__*`) for console/network/runtime/layout/performance diagnosis when relevant.
-3. Compare against Figma context (`mcp__figma__*`) and screenshots.
+1. Use Playwright MCP (`playwright_*`) for browser flow reproduction, screenshots, accessibility snapshots, and assertions.
+2. Use Chrome DevTools MCP (`chrome-devtools_*`) for console/network/runtime/layout/performance diagnosis when relevant.
+3. Compare against Figma context (`figma_*`) and screenshots.
 4. For visual regression, use Playwright's built-in `toHaveScreenshot()` snapshot comparison when the project already adopted it; do not introduce Percy/Chromatic without explicit user request.
 5. Fix mismatches and re-run checks.
 6. Report remaining mismatches or blockers explicitly.

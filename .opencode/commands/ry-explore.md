@@ -8,7 +8,7 @@ subtask: true
 
 Run the full ry-explore workflow:
 
-1. **MCP-first phase** — Context7 (`mcp__context7__resolve-library-id` → `mcp__context7__get-library-docs`) → DeepWiki (`mcp__deepwiki__*`) → Grep (`mcp__grep__*`). Pull authoritative quotes, file paths, version numbers, section anchors.
+1. **MCP-first phase** — Context7 (`context7_resolve-library-id` → `context7_get-library-docs`) → DeepWiki (`deepwiki_*`) → Grep (`grep_*`). Pull authoritative quotes, file paths, version numbers, section anchors.
 2. **Web validation phase** — only if MCP gaps remain (current events, recent releases ≤6 months, security advisories, vendor announcements).
 3. **Cross-validation** — verify any critical or contested claim against ≥2 independent sources; surface contradictions explicitly, do not pick silently.
 4. **Synthesis** — produce a structured report with **Finding / Confidence / Details** sections per finding, plus a "Sources consulted" section at the end.

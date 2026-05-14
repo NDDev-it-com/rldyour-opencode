@@ -1,7 +1,6 @@
 ---
 description: Orchestrated consistency review: naming, style, imports, public API shape. Read-only. Invoked by ry-start or ry-review.
 mode: subagent
-model: anthropic/claude-sonnet-4-6
 temperature: 0.1
 steps: 36
 hidden: true
