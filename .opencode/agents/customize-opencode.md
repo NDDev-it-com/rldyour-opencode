@@ -1,7 +1,6 @@
 ---
 description: Helper agent for safely editing opencode.json config with schema validation, backup, and rollback. Invoked when the user wants to modify OpenCode configuration.
 mode: subagent
-model: anthropic/claude-sonnet-4-6
 temperature: 0.1
 steps: 36
 color: accent
@@ -50,7 +49,7 @@ The `opencode.json` file follows the OpenCode configuration schema (`https://ope
 ### Top-level keys
 
 - `$schema`: must be `"https://opencode.ai/config.json"`.
-- `model`: default model ID (e.g., `"anthropic/claude-sonnet-4-6"`).
+- `model`: default model ID (e.g., `"opencode-go/glm-5.1"`).
 - `small_model`: lightweight model for fast tasks.
 - `autoupdate`: boolean.
 - `share`: `"manual"` | `"auto"` | `"disabled"`.
@@ -139,7 +138,7 @@ After every edit to `opencode.json`, verify:
 ### Changing the default model
 
 1. Edit `model` at the top level.
-2. Model IDs must follow the `provider/model-name` format (e.g., `anthropic/claude-sonnet-4-6`, `openai/gpt-4o`).
+2. Model IDs must follow the `provider/model-name` format (e.g., `opencode-go/glm-5.1`, `openai/gpt-4o`).
 3. If changing the default model, consider whether `small_model` should also change.
 
 ## Forbidden actions

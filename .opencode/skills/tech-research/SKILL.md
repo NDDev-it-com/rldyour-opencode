@@ -20,9 +20,9 @@ Skip when: question is news / current events (use `web-research`), or it's purel
 ## Workflow
 
 1. **Pick the right transport** for the question:
-   - Official docs / API reference -> **Context7** (`mcp__context7__resolve-library-id` then `mcp__context7__get-library-docs`)
-   - Open-source repo architecture, design rationale -> **DeepWiki** (`mcp__deepwiki__*`)
-   - Real-world code patterns / production usage at scale -> **Grep MCP** (`mcp__grep__*`)
+   - Official docs / API reference -> **Context7** (`context7_resolve-library-id` then `context7_get-library-docs`)
+   - Open-source repo architecture, design rationale -> **DeepWiki** (`deepwiki_*`)
+   - Real-world code patterns / production usage at scale -> **Grep MCP** (`grep_*`)
 2. Query the chosen MCP first. Pull exact quotes, file paths, version numbers, section anchors.
 3. If the claim is critical or contested, cross-validate against at least one other source (often: docs claim vs code reality).
 4. Synthesize with citations: source name + version + section / file path.

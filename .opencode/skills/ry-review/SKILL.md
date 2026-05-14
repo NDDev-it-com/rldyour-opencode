@@ -13,7 +13,7 @@ Find real issues before merge or deploy. Default mode is report-only: do not edi
 
 1. Determine review target: current diff, branch vs main, PR, file scope, or prompt scope.
 2. Initialize missing context with `ry-init` if needed.
-3. Use Serena to map changed symbols and affected integration graph. Prefer `mcp__serena__find_symbol`, `mcp__serena__get_symbols_overview`, and `mcp__serena__find_referencing_symbols` before raw file reads.
+3. Use Serena to map changed symbols and affected integration graph. Prefer `serena_find_symbol`, `serena_get_symbols_overview`, and `serena_find_referencing_symbols` before raw file reads.
 4. Use `ry-explore` for current implementation best practices when the review depends on external technology behavior. Prefer Context7 MCP for official versioned docs, DeepWiki MCP for public repo architecture, and Grep MCP for real production usage patterns.
 5. Run reviewer tracks. Use subagents when the review request or `ry-start` review phase calls for parallel review. Reviewer subagents are defined in `.opencode/agents/` with `mode: subagent`, `hidden: true`, `permission: { edit: "deny" }`.
 6. Consolidate findings by severity and confidence. Validate uncertain findings with code evidence.
