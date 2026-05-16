@@ -41,12 +41,38 @@ if [ -f "$OPENCODE_JSON" ]; then
         log_info "Small model: ${small_model}"
     fi
 
-    lsp_enabled=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1])).get('lsp', False))" "$OPENCODE_JSON" 2>/dev/null)
-    if [ "$lsp_enabled" = "True" ]; then
-        log_ok "LSP enabled"
-    else
-        log_warn "LSP not enabled"
-    fi
+    # OpenCode v1.14.x/v1.15.x accepts `"lsp"` as boolean `true` (enable all
+    # built-ins) OR an object with per-server overrides (which also enables
+    # built-ins + the custom map). Treat both as "enabled". Print the number
+    # of custom servers when the object form is used so operators see the
+    # current LSP catalog size at a glance.
+    lsp_state=$(python3 -c "
+import json, sys
+cfg = json.load(open(sys.argv[1]))
+lsp = cfg.get('lsp')
+if lsp is True:
+    print('enabled-default')
+elif isinstance(lsp, dict):
+    print(f'enabled-custom:{len(lsp)}')
+elif lsp is False or lsp is None:
+    print('disabled')
+else:
+    print(f'unknown:{type(lsp).__name__}')
+" "$OPENCODE_JSON" 2>/dev/null || echo "parse-error")
+    case "$lsp_state" in
+        enabled-default)
+            log_ok "LSP enabled (built-ins only)"
+            ;;
+        enabled-custom:*)
+            log_ok "LSP enabled (${lsp_state#enabled-custom:} custom server(s) on top of built-ins)"
+            ;;
+        disabled)
+            log_warn "LSP disabled"
+            ;;
+        *)
+            log_warn "LSP config not recognized: ${lsp_state}"
+            ;;
+    esac
 else
     log_err "opencode.json not found"
 fi
@@ -248,10 +274,18 @@ if git -C "$PROJECT_ROOT" rev-parse --is-inside-work-tree &>/dev/null; then
         log_ok "Working tree clean"
     fi
     if [ -f "${PROJECT_ROOT}/.git/info/exclude" ]; then
-        if grep -q "rldyour-opencode agent-only files" "${PROJECT_ROOT}/.git/info/exclude" 2>/dev/null; then
-            log_ok "Agent-only exclude patterns installed"
+        # scripts/fullrepo_sync.py installs the canonical block marked by
+        # `>>> rldyour fullrepo agent-only files >>>` / matching `<<<` close
+        # marker. The legacy bootstrap_opencode.sh marker text
+        # (`rldyour-opencode agent-only files`) is accepted as a fallback so
+        # an older bootstrap still passes the doctor check.
+        exclude_file="${PROJECT_ROOT}/.git/info/exclude"
+        if grep -q ">>> rldyour fullrepo agent-only files >>>" "$exclude_file" 2>/dev/null; then
+            log_ok "Agent-only exclude patterns installed (fullrepo block)"
+        elif grep -q "rldyour-opencode agent-only files" "$exclude_file" 2>/dev/null; then
+            log_ok "Agent-only exclude patterns installed (legacy bootstrap block)"
         else
-            log_warn "Agent-only exclude patterns not installed (run bootstrap_opencode.sh)"
+            log_warn "Agent-only exclude patterns not installed (run scripts/fullrepo_sync.sh bootstrap-init)"
         fi
     fi
 else
