@@ -96,6 +96,40 @@ else
     log_warn "No .opencode/commands directory"
 fi
 
+log_step "Runtime resolution (opencode CLI)"
+# Non-blocking runtime smoke. When `opencode` is on PATH, exercise the
+# debug surface that ships with the v1.15.x CLI: the same code paths a
+# real session uses to load config, list skills, and resolve agents. We
+# do not assert on the resolved structure here — _validate_helpers.py
+# already validates the static shape. The smoke is "did the runtime
+# accept our config at all?" — strict-fail mode would block release
+# whenever a developer machine lacks the binary, so this stays warn-only.
+if command -v opencode >/dev/null 2>&1; then
+    if opencode debug config >/dev/null 2>&1; then
+        log_ok "opencode debug config resolved"
+    else
+        log_warn "opencode debug config FAILED (run opencode debug config for details)"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if opencode debug skill >/dev/null 2>&1; then
+        log_ok "opencode debug skill resolved"
+    else
+        log_warn "opencode debug skill FAILED"
+        ERRORS=$((ERRORS + 1))
+    fi
+    # `opencode debug agent build` is a cheap sanity probe against the
+    # default primary agent. If the project's `agent.build` permission
+    # block has a stale or PascalCase key, the resolver complains here.
+    if opencode debug agent build >/dev/null 2>&1; then
+        log_ok "opencode debug agent build resolved"
+    else
+        log_warn "opencode debug agent build FAILED"
+        ERRORS=$((ERRORS + 1))
+    fi
+else
+    log_info "opencode CLI not on PATH — skipping runtime resolution smoke"
+fi
+
 log_step "Summary"
 if [ "$ERRORS" -eq 0 ]; then
     log_ok "All validation checks passed"
