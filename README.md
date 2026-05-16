@@ -2,7 +2,7 @@
 
 Personal OpenCode configuration marketplace by `rldyourmnd`. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules — all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
 
-Validated against OpenCode v1.14.48 (May 2026).
+Validated against `@opencode-ai/plugin` 1.15.3 (May 2026); the OpenCode v1.14.48 → v1.15.3 plugin pin bump preserves the runtime hook surface and tool-ID naming, so existing agents/skills/commands stay behavior-compatible.
 
 ## What This Is
 
@@ -36,12 +36,18 @@ A self-contained OpenCode project configuration that provides:
    cp AGENTS.md /path/to/your/project/AGENTS.md
    ```
 
-3. Set up API keys (only required env vars; rest are optional):
+3. Authenticate the primary OpenCode provider via TUI (recommended) or env vars:
    ```bash
-   # placeholder values — replace with real credentials in your shell/.env
-   export ANTHROPIC_API_KEY=YOUR_PLACEHOLDER_KEY          # primary model auth (or use /providers in TUI)
-   export CONTEXT7_API_KEY=YOUR_PLACEHOLDER_KEY           # optional, higher Context7 rate
+   # primary provider for top-level model `opencode-go/glm-5.1` — log in interactively
+   opencode auth login          # or use /providers inside the TUI
+
+   # MCP env vars (placeholder values — replace with real credentials in your shell or .env)
    export GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_PLACEHOLDER_TOKEN  # required for GitHub MCP
+   export CONTEXT7_API_KEY=YOUR_PLACEHOLDER_KEY               # optional, higher Context7 rate
+
+   # Alternative OpenCode providers (optional — only when switching the top-level model)
+   # export ANTHROPIC_API_KEY=YOUR_PLACEHOLDER_KEY
+   # export OPENAI_API_KEY=YOUR_PLACEHOLDER_KEY
    ```
 
 4. Run OpenCode in your project:
@@ -72,7 +78,7 @@ A self-contained OpenCode project configuration that provides:
 | Reference docs (skill/agent contracts) | `references/*.md` | 16 |
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
 | Architecture decision archive | `docs/decisions/*.md` | 4 |
-| Diagnostic scripts (bash + python) | `scripts/` | 15 |
+| Diagnostic scripts (bash + python) | `scripts/` | 17 (15 wrappers + 3 helper modules: `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
 | Pytest suites | `scripts/tests/*.py` | 9 (259 cases: 27 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 9 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs) |
 | CI workflows | `.github/workflows/*.yml` | 2 (`validate`, `dependency-check`) |
 
@@ -93,14 +99,14 @@ rldyour-opencode/
 │   ├── plugins/  *.ts          # 10 Bun-runtime plugins
 │   └── package.json            # @opencode-ai/plugin pin
 ├── .serena/
-│   ├── memories/  *.md         # 8 verified knowledge files
+│   ├── memories/  *.md         # 14 verified knowledge files (AREA-NN-SLUG.md taxonomy)
 │   └── project.yml             # Serena project config
 ├── references/   *.md          # 16 durable contracts (consumed by skills/agents)
 ├── docs/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
 │   └── decisions/  001..004.md # 4 MADR-style ADRs
-├── scripts/                    # 14 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 6 pytest suites — 194 cases
+├── scripts/                    # 17 bash + python diagnostic / validation / smoke scripts
+│   └── tests/  *.py            # 9 pytest suites — 259 cases
 └── .github/workflows/          # validate.yml + dependency-check.yml (least-privilege, SHA-pinned)
 ```
 
