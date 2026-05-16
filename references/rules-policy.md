@@ -33,7 +33,7 @@ When serious technical debt is found outside the task scope:
 
 ## Sequential Thinking
 
-Use Sequential Thinking MCP (`mcp__sequential-thinking__*`) for non-trivial decisions when available. Minimum 3 thoughts:
+Use Sequential Thinking MCP (`sequential-thinking_sequentialthinking`) for non-trivial decisions when available. Minimum 3 thoughts:
 
 1. Understand the task and constraints.
 2. Evaluate options and risks.
