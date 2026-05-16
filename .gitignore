@@ -31,9 +31,19 @@ node_modules/
 # OpenCode plugin dependencies
 .opencode/node_modules/
 
-# Serena runtime markers
+# Serena runtime markers (must never be committed or published to fullrepo).
+# Matches the local-only set in scripts/fullrepo_sync.sh RUNTIME_EXCLUDE_PATTERNS
+# so normal-branch git and fullrepo publish stay aligned.
 .serena/cache/
 .serena/project.local.yml
+.serena/.gitignore
+.serena/.flow_*
+.serena/.sync_marker
+.serena/.serena_sync_state.json
+.serena/.auto_sync_head
+.serena/.active_workflow_intent.json
+.serena/.dirty_stop_ack
+.serena/.command_audit.log
 
 # Browser artifacts
 browser/
