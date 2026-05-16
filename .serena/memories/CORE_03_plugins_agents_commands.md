@@ -1,9 +1,9 @@
 # CORE_03 Plugins, Agents, and Commands
 
-Verified facts at HEAD 1f1510b.
+Verified facts at HEAD cda4c1d.
 Sources: `.opencode/plugins/*.ts`, `.opencode/agents/*.md`, `.opencode/commands/*.md` (all verified by direct file read).
 
-Last commit: 1f1510b
+Last commit: cda4c1d
 
 ## Plugins (10)
 
@@ -113,7 +113,7 @@ Notes:
 - `flow-security-review` has `steps: 42` (others 36); includes `webfetch/websearch: allow` and `glob/grep/read: allow`.
 - `flow-memory-sync` is the only review-track subagent with `edit: allow` — controls `.serena/memories/` writes. `task: deny`, `external_directory: deny`.
 - No agent has a hardcoded model override — all inherit the top-level `model` (currently `opencode-go/glm-5.1`). Agent blocks only set `mode`, `permission`, `temperature`, `steps`, `hidden`, `color`.
-- `customize-opencode` has `bash` allowlist: `cat *`, `node -e *`, `npx *`, `python3 *`, `jq *`.
+- `customize-opencode` has `bash` allowlist: `cat *`, `node -e *`, `bunx *`, `python3 *`, `jq *`.
 
 ## Commands (10)
 
@@ -159,7 +159,7 @@ Source: `AGENTS.md` L27-49
 | Config | — | customize-opencode | — |
 
 Cross-domain rules:
-- Only Serena domain invokes `mcp__serena__*`
+- Only Serena domain invokes `serena_find_symbol` / `serena_get_symbols_overview` / `serena_find_referencing_symbols`-style tool IDs (single underscore format)
 - Only Browser domain invokes Playwright/Chrome-DevTools MCP
 - Only Security domain invokes Semgrep MCP
 - Flow domain orchestrates others via skills and subagents

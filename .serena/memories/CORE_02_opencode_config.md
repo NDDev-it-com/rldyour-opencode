@@ -1,9 +1,9 @@
 # CORE_02 OpenCode Configuration
 
-Verified facts about `opencode.json` at HEAD 1f1510b.
+Verified facts about `opencode.json` at HEAD cda4c1d.
 Source: `opencode.json` (208 lines), parsed via direct read.
 
-Last commit: 1f1510b
+Last commit: cda4c1d
 
 ## Top-Level Keys
 
