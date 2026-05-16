@@ -238,6 +238,147 @@ def test_command_missing_description(tmp_path: Path) -> None:
     assert vh.validate_command(p) > 0
 
 
+# ---------- Permission keys (v1.15.x canonical set) ----------
+
+
+def test_canonical_permission_keys_has_expected_size() -> None:
+    """v1.15.3 canonical set has 17 keys (verified via built-in customize-opencode skill)."""
+    assert len(vh.CANONICAL_PERMISSION_KEYS) == 17
+
+
+def test_canonical_permission_keys_includes_v1_15_3_set() -> None:
+    """Mirror the canonical set from `opencode debug skill` built-in customize-opencode."""
+    expected = {
+        "read", "edit", "glob", "grep", "list", "bash", "task",
+        "external_directory", "todowrite", "question", "webfetch", "websearch",
+        "repo_clone", "repo_overview", "lsp", "doom_loop", "skill",
+    }
+    assert vh.CANONICAL_PERMISSION_KEYS == expected
+
+
+def test_canonical_permission_keys_excludes_codesearch() -> None:
+    """`codesearch` was removed between v1.14.48 and v1.15.3; do not reintroduce."""
+    assert "codesearch" not in vh.CANONICAL_PERMISSION_KEYS
+
+
+def test_opencode_json_accepts_canonical_top_level_permission(tmp_path: Path) -> None:
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text(
+        '{"model": "x", "permission": {"edit": "allow", "bash": "allow", "lsp": "allow"}}',
+        encoding="utf-8",
+    )
+    assert vh.validate_opencode_json(cfg) == 0
+
+
+def test_opencode_json_rejects_codesearch_permission_key(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text(
+        '{"model": "x", "permission": {"codesearch": "allow"}}',
+        encoding="utf-8",
+    )
+    assert vh.validate_opencode_json(cfg) == 1
+    captured = capsys.readouterr()
+    assert "codesearch" in captured.out
+    assert "unknown permission key" in captured.out
+
+
+def test_opencode_json_rejects_pascalcase_permission_key(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Mirrors sst/opencode#15507 — runtime silently accepts unknown keys; we don't."""
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text(
+        '{"model": "x", "permission": {"Edit": "allow"}}',
+        encoding="utf-8",
+    )
+    assert vh.validate_opencode_json(cfg) == 1
+    captured = capsys.readouterr()
+    assert "'Edit'" in captured.out
+
+
+def test_opencode_json_rejects_agent_unknown_permission_key(tmp_path: Path) -> None:
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text(
+        '{"model": "x", "agent": {"foo": {"permission": {"unknown_key": "allow"}}}}',
+        encoding="utf-8",
+    )
+    assert vh.validate_opencode_json(cfg) == 1
+
+
+def test_opencode_json_accepts_all_mode(tmp_path: Path) -> None:
+    """v1.15.x agent.mode accepts `all` (per built-in customize-opencode skill)."""
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text(
+        '{"model": "x", "agent": {"foo": {"mode": "all"}}}',
+        encoding="utf-8",
+    )
+    assert vh.validate_opencode_json(cfg) == 0
+
+
+def test_yaml_block_child_keys_simple() -> None:
+    fm = "permission:\n  edit: allow\n  bash: ask\n"
+    assert vh._yaml_block_child_keys(fm, "permission") == ["edit", "bash"]
+
+
+def test_yaml_block_child_keys_nested_skipped() -> None:
+    fm = """permission:
+  edit: allow
+  bash:
+    "git diff": allow
+    "*": ask
+  read: allow
+"""
+    # Nested keys under `bash` must NOT appear at the top of `permission`.
+    assert vh._yaml_block_child_keys(fm, "permission") == ["edit", "bash", "read"]
+
+
+def test_yaml_block_child_keys_missing_returns_empty() -> None:
+    fm = "description: x\nmode: subagent\n"
+    assert vh._yaml_block_child_keys(fm, "permission") == []
+
+
+def test_yaml_block_child_keys_quoted_key() -> None:
+    fm = 'permission:\n  "external_directory": allow\n  read: allow\n'
+    assert vh._yaml_block_child_keys(fm, "permission") == ["external_directory", "read"]
+
+
+def test_agent_rejects_codesearch_permission_in_frontmatter(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    p = _write_agent(
+        tmp_path,
+        "stale",
+        "---\ndescription: x\nmode: subagent\npermission:\n  codesearch: allow\n---\n",
+    )
+    assert vh.validate_agent(p) > 0
+    captured = capsys.readouterr()
+    assert "codesearch" in captured.out
+
+
+def test_agent_accepts_all_canonical_permission_keys_in_frontmatter(tmp_path: Path) -> None:
+    """Every key in CANONICAL_PERMISSION_KEYS must be accepted in a real agent file."""
+    body_lines = ["---", "description: x", "mode: subagent", "permission:"]
+    for key in sorted(vh.CANONICAL_PERMISSION_KEYS):
+        body_lines.append(f"  {key}: allow")
+    body_lines.append("---")
+    p = _write_agent(tmp_path, "fully-permissioned", "\n".join(body_lines) + "\n")
+    assert vh.validate_agent(p) == 0
+
+
+def test_agent_accepts_nested_bash_pattern_permission(tmp_path: Path) -> None:
+    """Real reviewer-agent shape: bash with nested glob patterns must pass."""
+    body = (
+        "---\n"
+        "description: x\n"
+        "mode: subagent\n"
+        "permission:\n"
+        "  edit: deny\n"
+        "  bash:\n"
+        '    "*": ask\n'
+        "    git diff: allow\n"
+        "  read: allow\n"
+        "---\n"
+    )
+    p = _write_agent(tmp_path, "reviewer-shape", body)
+    assert vh.validate_agent(p) == 0
+
+
 # ---------- CLI dispatch ----------
 
 
