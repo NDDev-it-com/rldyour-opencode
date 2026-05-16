@@ -31,17 +31,17 @@ if [ -f "$OPENCODE_JSON" ]; then
         log_err "opencode.json has JSON syntax errors"
     fi
 
-    model=$(python3 -c "import json; print(json.load(open(sys.argv[1])).get('model',''))" "$OPENCODE_JSON" 2>/dev/null)
+    model=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1])).get('model',''))" "$OPENCODE_JSON" 2>/dev/null)
     if [ -n "$model" ]; then
         log_info "Primary model: ${model}"
     fi
 
-    small_model=$(python3 -c "import json; print(json.load(open(sys.argv[1])).get('small_model',''))" "$OPENCODE_JSON" 2>/dev/null)
+    small_model=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1])).get('small_model',''))" "$OPENCODE_JSON" 2>/dev/null)
     if [ -n "$small_model" ]; then
         log_info "Small model: ${small_model}"
     fi
 
-    lsp_enabled=$(python3 -c "import json; print(json.load(open(sys.argv[1])).get('lsp', False))" "$OPENCODE_JSON" 2>/dev/null)
+    lsp_enabled=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1])).get('lsp', False))" "$OPENCODE_JSON" 2>/dev/null)
     if [ "$lsp_enabled" = "True" ]; then
         log_ok "LSP enabled"
     else
@@ -126,21 +126,23 @@ if [ -d "$AGENTS_DIR" ]; then
     for f in "$AGENTS_DIR"/*.md; do
         [ -f "$f" ] || continue
         name=$(basename "$f" .md)
-        desc=$(python3 -c "
+        if ! desc=$(python3 -c "
 import re, sys
 with open(sys.argv[1]) as fh:
     content = fh.read()
 m = re.match(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
 if m:
     fm = m.group(1)
-    dm = re.search(r'^description:\s*[\"']?(.+?)[\"']?\s*$', fm, re.MULTILINE)
+    dm = re.search(r'^description:\s*[\"\\']?(.+?)[\"\\']?\s*$', fm, re.MULTILINE)
     if dm:
         print(dm.group(1)[:80])
     else:
         print('(no description)')
 else:
     print('(no frontmatter)')
-" "$f" 2>/dev/null)
+" "$f" 2>/dev/null); then
+            desc="(parse error)"
+        fi
         log_info "Agent: ${name} — ${desc}"
         count=$((count + 1))
     done
@@ -166,7 +168,7 @@ with open(sys.argv[1]) as fh:
 m = re.match(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
 if m:
     fm = m.group(1)
-    nm = re.search(r'^name:\s*[\"']?(.+?)[\"']?\s*$', fm, re.MULTILINE)
+    nm = re.search(r'^name:\s*[\"\\']?(.+?)[\"\\']?\s*$', fm, re.MULTILINE)
     if nm:
         print(nm.group(1))
     else:
