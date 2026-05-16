@@ -1,6 +1,6 @@
 <!-- Memory Metadata
 Last updated: 2026-05-17
-Last commit: 45e5539 chore(serena): sync project knowledge after cda4c1d
+Last commit: dd149aa chore(opencode): align plugin pin with runtime 1.15.3
 Scope: AGENTS.md, .claude/CLAUDE.md, references/reviewer-protocol.md, references/project-instructions-and-adrs.md, docs/, docs/decisions/
 Area: DOCS
 -->
