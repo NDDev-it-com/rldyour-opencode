@@ -15,6 +15,68 @@ import re
 import sys
 from pathlib import Path
 
+# v1.15.3 canonical permission key set sourced from the built-in
+# `customize-opencode` skill (`opencode debug skill` -> the `<built-in>`
+# entry) and cross-validated against the v1.15.3 JSON Schema published
+# at https://opencode.ai/config.json. Unknown keys are silently accepted
+# by the runtime today (issue sst/opencode#15507), so this validator is
+# the project-side defense against PascalCase typos and stale keys
+# (notably `codesearch`, which was removed between v1.14.48 and v1.15.3).
+CANONICAL_PERMISSION_KEYS: frozenset[str] = frozenset(
+    {
+        "read",
+        "edit",
+        "glob",
+        "grep",
+        "list",
+        "bash",
+        "task",
+        "external_directory",
+        "todowrite",
+        "question",
+        "webfetch",
+        "websearch",
+        "repo_clone",
+        "repo_overview",
+        "lsp",
+        "doom_loop",
+        "skill",
+    }
+)
+
+
+def _check_permission_block(label: str, perm: object) -> int:
+    """Validate a single `permission` block.
+
+    A permission block is either:
+    - a string action (`"allow"` / `"ask"` / `"deny"`), or
+    - an object mapping known permission keys to actions or per-pattern
+      action objects.
+
+    Returns the number of errors found and prints `[ERR]` lines for each.
+    """
+    if isinstance(perm, str):
+        # String form: "allow" / "ask" / "deny". Validated as a value
+        # action elsewhere; here we only care about per-key validation
+        # which doesn't apply to the string form.
+        return 0
+    if perm is None:
+        return 0
+    if not isinstance(perm, dict):
+        print(f"[ERR] {label}: permission must be a string or object, got {type(perm).__name__}")
+        return 1
+
+    errors = 0
+    for key in perm:
+        if key not in CANONICAL_PERMISSION_KEYS:
+            sorted_canon = ", ".join(sorted(CANONICAL_PERMISSION_KEYS))
+            print(
+                f"[ERR] {label}: unknown permission key {key!r} "
+                f"(canonical set for v1.15.x: {sorted_canon})"
+            )
+            errors += 1
+    return errors
+
 
 def validate_opencode_json(path: Path) -> int:
     """Validate top-level opencode.json shape."""
@@ -31,16 +93,22 @@ def validate_opencode_json(path: Path) -> int:
     else:
         print(f"[OK] Top-level key present: model = {cfg['model']}")
 
+    # Top-level permission block.
+    errors += _check_permission_block("opencode.json.permission", cfg.get("permission"))
+
     for name, agent in (cfg.get("agent") or {}).items():
         mode = agent.get("mode")
-        if mode and mode not in ("primary", "subagent"):
+        if mode and mode not in ("primary", "subagent", "all"):
             print(f"[ERR] Agent {name!r}: invalid mode: {mode!r}")
             errors += 1
 
-        edit = (agent.get("permission") or {}).get("edit")
+        agent_perm = agent.get("permission")
+        edit = (agent_perm or {}).get("edit") if isinstance(agent_perm, dict) else None
         if isinstance(edit, str) and edit not in ("allow", "ask", "deny"):
             print(f"[ERR] Agent {name!r}: invalid edit permission: {edit!r}")
             errors += 1
+
+        errors += _check_permission_block(f"opencode.json.agent.{name}.permission", agent_perm)
 
     # Single source of truth contract (AGENTS.md § Source Of Truth):
     # commands must live in .opencode/commands/*.md exclusively. The
@@ -52,6 +120,12 @@ def validate_opencode_json(path: Path) -> int:
             "use .opencode/commands/*.md (AGENTS.md § Source Of Truth)"
         )
         errors += 1
+
+    if errors == 0 and (cfg.get("permission") or cfg.get("agent")):
+        print(
+            f"[OK] Permission keys conform to v1.15.x canonical set "
+            f"({len(CANONICAL_PERMISSION_KEYS)} keys)"
+        )
 
     return errors
 
@@ -115,6 +189,59 @@ def _yaml_top_key(fm: str, key: str) -> str | None:
     ):
         raw = raw[1:-1]
     return raw
+
+
+def _yaml_block_child_keys(fm: str, parent_key: str) -> list[str]:
+    """Return the list of direct child keys under a YAML block mapping.
+
+    Example:
+        permission:
+          edit: allow
+          bash:
+            "*": ask
+            git diff: allow
+
+    For `parent_key="permission"` returns `["edit", "bash"]` (not nested
+    keys like `git diff`). Returns empty list if the parent key is
+    missing or has no block children. Regex-only — does not require
+    a full YAML parser.
+
+    Implementation note: the parent line is matched with `permission:`
+    at column 0, then we scan subsequent lines and accept ones that are
+    indented by exactly the same amount and have a `:` separator after
+    the key. Deeper nesting and quoted-key lines are ignored.
+    """
+    parent_re = re.compile(rf"^{re.escape(parent_key)}:[^\S\n]*$", re.MULTILINE)
+    m = parent_re.search(fm)
+    if not m:
+        return []
+
+    start = m.end()
+    body = fm[start:].lstrip("\n")
+    lines = body.splitlines()
+
+    keys: list[str] = []
+    child_indent: int | None = None
+    for line in lines:
+        if not line.strip():
+            # blank line still allows the block to continue
+            continue
+        stripped = line.lstrip(" ")
+        indent = len(line) - len(stripped)
+        if indent == 0:
+            # back to the same level as `parent_key:` — block ended
+            break
+        if child_indent is None:
+            child_indent = indent
+        if indent != child_indent:
+            # deeper-nested line — belongs to a child block, skip
+            continue
+        # accept `key:` or `"key":` or `'key':` at exactly `child_indent`
+        key_match = re.match(r"""^(?:"([^"]+)"|'([^']+)'|([\w-]+))\s*:""", stripped)
+        if key_match:
+            key = key_match.group(1) or key_match.group(2) or key_match.group(3)
+            keys.append(key)
+    return keys
 
 
 def validate_skill(skill_dir: Path) -> int:
@@ -194,6 +321,21 @@ def validate_agent(agent_md: Path) -> int:
         valid_named = {"primary", "secondary", "accent", "success", "warning", "error", "info"}
         if color not in valid_named and not re.match(r"^#[0-9a-fA-F]{6}$", color):
             print(f"[ERR] agent {name}: invalid color {color!r}")
+            errors += 1
+
+    # Permission keys must come from the v1.15.x canonical set.
+    # Stale keys (notably `codesearch`, removed between v1.14.48 and
+    # v1.15.3) and PascalCase typos are accepted silently by the runtime
+    # (issue sst/opencode#15507), so project validation is the only line
+    # of defense.
+    perm_keys = _yaml_block_child_keys(fm, "permission")
+    for key in perm_keys:
+        if key not in CANONICAL_PERMISSION_KEYS:
+            sorted_canon = ", ".join(sorted(CANONICAL_PERMISSION_KEYS))
+            print(
+                f"[ERR] agent {name}: unknown permission key {key!r} "
+                f"(canonical set for v1.15.x: {sorted_canon})"
+            )
             errors += 1
 
     if errors == 0:
