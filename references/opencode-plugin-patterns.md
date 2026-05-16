@@ -1,6 +1,6 @@
 # OpenCode Plugin Patterns
 
-Reference for the advanced `@opencode-ai/plugin` hook surface used by this marketplace. Sourced from `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts` v1.14.48; cross-checked against https://opencode.ai/docs/plugins/.
+Reference for the advanced `@opencode-ai/plugin` hook surface used by this marketplace. Sourced from `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts` v1.15.3 (pin updated from v1.14.48 — the runtime hook surface and tool-ID format are unchanged across these minors); cross-checked against https://opencode.ai/docs/plugins/.
 
 ## Plugin context
 
@@ -122,7 +122,7 @@ Each tool returns the script's combined stdout/stderr and stamps `ctx.metadata({
 
 `tool.definition` appends one short routing hint per known MCP tool ID. Hints encode the AGENTS.md tool-priority matrix (e.g., "Use Serena `find_symbol` before raw grep") so the LLM has the routing rule in the tool description itself, not just the high-level AGENTS.md instructions.
 
-HINTS keys use the OpenCode v1.14.48 tool-ID format `<server>_<tool>` (single underscore; dashes preserved). Example: `serena_find_symbol`, `chrome-devtools_list_console_messages`, `context7_resolve-library-id`. The Claude-Code-style `mcp__server__tool` prefix silently disables every hint and is banned by `scripts/tests/test_plugin_surface.py::test_ry_tool_hints_no_legacy_aliases`.
+HINTS keys use the OpenCode `<server>_<tool>` tool-ID format (single underscore; dashes preserved; introduced in v1.14.48, unchanged through v1.15.3). Example: `serena_find_symbol`, `chrome-devtools_list_console_messages`, `context7_resolve-library-id`. The Claude-Code-style `mcp__server__tool` prefix silently disables every hint and is banned by `scripts/tests/test_plugin_surface.py::test_ry_tool_hints_no_legacy_aliases`.
 
 ### Permission policy (`.opencode/plugins/ry-permission-policy.ts`)
 
@@ -144,7 +144,7 @@ Never auto-allows; legitimate "ask" prompts keep user consent. Complements (not 
 
 ### Observability: `client.app.log` + `client.tui.showToast`
 
-All 10 plugins use the OpenCode v1.14.48 client API for user-visible and structured logging instead of `console.log` (which lands only in the server log file `~/.local/share/opencode/log/*.log` and is invisible to the user):
+All 10 plugins use the OpenCode v1.14.48+ (currently pinned at v1.15.3) client API for user-visible and structured logging instead of `console.log` (which lands only in the server log file `~/.local/share/opencode/log/*.log` and is invisible to the user):
 
 ```ts
 async function log(level: "info" | "warn" | "error", message: string) {
