@@ -1,6 +1,6 @@
 <!-- Memory Metadata
 Last updated: 2026-05-17
-Last commit: 45e5539 chore(serena): sync project knowledge after cda4c1d
+Last commit: dd149aa chore(opencode): align plugin pin with runtime 1.15.3
 Scope: scripts/, scripts/tests/, .github/workflows/, docs/release-process.md, docs/dependency-updates.md, docs/observability.md, VERSION, CHANGELOG.md
 Area: RELEASE
 -->
