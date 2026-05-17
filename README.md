@@ -79,7 +79,7 @@ A self-contained OpenCode project configuration that provides:
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
 | Architecture decision archive | `docs/decisions/*.md` | 4 |
 | Diagnostic scripts (bash + python) | `scripts/` | 17 (15 wrappers + 3 helper modules: `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
-| Pytest suites | `scripts/tests/*.py` | 9 (259 cases: 27 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 9 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs) |
+| Pytest suites | `scripts/tests/*.py` | 10 (282 cases: 42 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 9 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs + 8 doctor_opencode) |
 | CI workflows | `.github/workflows/*.yml` | 2 (`validate`, `dependency-check`) |
 
 ### Project structure
@@ -106,7 +106,7 @@ rldyour-opencode/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
 │   └── decisions/  001..004.md # 4 MADR-style ADRs
 ├── scripts/                    # 17 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 9 pytest suites — 259 cases
+│   └── tests/  *.py            # 10 pytest suites — 282 cases
 └── .github/workflows/          # validate.yml + dependency-check.yml (least-privilege, SHA-pinned)
 ```
 
@@ -163,22 +163,30 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 
 ## Models
 
-Defaults assume Anthropic; switch any field to another provider via `provider/model-id` format.
+The marketplace ships with `opencode-go/glm-5.1` as the top-level default — owner's working provider. Subagents inherit this model (no per-agent override at HEAD). Switch any field to a different provider via `provider/model-id` format.
 
-| Slot | Model |
-|---|---|
-| `model` (primary) | `anthropic/claude-sonnet-4-6` |
-| `small_model` | `anthropic/claude-haiku-4-5-20251001` |
-| `default_agent` | `build` |
-| `agent.ry-explore.model` | `anthropic/claude-opus-4-7` (xhigh reasoning, 1M context) |
+| Slot | Default in this repo | Common Anthropic alternative |
+|---|---|---|
+| `model` (primary) | `opencode-go/glm-5.1` | `anthropic/claude-sonnet-4-6` |
+| `small_model` | `opencode-go/glm-5.1` | `anthropic/claude-haiku-4-5-20251001` |
+| `default_agent` | `build` | `build` |
+| Reviewer / memory-sync / explore subagents | inherit top-level `model` | inherit top-level `model` |
 
-Run `opencode models anthropic` to list every accepted ID. All current IDs are validated by `opencode debug config`.
+To switch:
+
+```bash
+opencode auth login                            # authenticate with the new provider
+# edit opencode.json:  "model": "anthropic/claude-sonnet-4-6"
+opencode debug config | grep -E '"model":'     # confirm runtime resolved the change
+```
+
+Run `opencode models <provider>` to list every accepted ID. All current IDs are validated by `opencode debug config` (the same runtime smoke `scripts/validate_config.sh` invokes when the CLI is on PATH).
 
 ## Validation
 
 ```bash
-bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter + VERSION semver
-uvx --from "pytest==9.0.2" pytest scripts/tests/           # 259 cases in 9 suites
+bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
+uvx --from "pytest==9.0.2" --with "pyyaml==6.0.3" pytest scripts/tests/  # 282 cases in 10 suites
 bash scripts/check_deps_freshness.sh                       # list pinned MCP dependencies (npm/PyPI/Dart)
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
 python3 scripts/validate_instruction_docs.py               # verify AGENTS.md + .claude/CLAUDE.md anchor headings
