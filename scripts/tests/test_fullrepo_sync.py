@@ -222,6 +222,16 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
     assert parsed["local_fullrepo_matches_worktree"] is True
     assert parsed["remote_fullrepo_matches_worktree"] is True
 
+    worktrees = subprocess.run(
+        ["git", "worktree", "list", "--porcelain"],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    ).stdout.splitlines()
+    paths = [Path(line.split(" ", 1)[1]).resolve() for line in worktrees if line.startswith("worktree ")]
+    assert paths == [tmp_path.resolve()]
+
 
 # ---------- help / usage ----------
 

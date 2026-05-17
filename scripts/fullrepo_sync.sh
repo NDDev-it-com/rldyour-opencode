@@ -328,6 +328,11 @@ cmd_publish() {
       fi
     fi
   )
+
+  # Clean the staging worktree immediately on the success path. The EXIT trap
+  # remains as the failure-path safety net, but relying only on process EXIT
+  # left detached /tmp worktrees behind in live 0.11.4 release verification.
+  _publish_cleanup "$tmp_dir" "$root" "$original_branch"
 }
 
 _publish_cleanup() {
