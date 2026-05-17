@@ -1,0 +1,42 @@
+# Dependabot configuration for rldyour-opencode.
+#
+# Ecosystems:
+# - npm  : .opencode/package.json (plugin SDK pin + future plugin deps)
+# - github-actions: workflow action SHAs (keeps SHA pins fresh)
+# - pip  : workflow-side test/lint deps installed via `python -m pip install`
+#          (Dependabot itself does not scan inline `pip install` calls; tests
+#          live in workflows and are pinned explicitly per workflow file)
+#
+# Reviewer assignment is handled by CODEOWNERS at .github/CODEOWNERS.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/.opencode"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "deps"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "deps"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"
+      include: scope

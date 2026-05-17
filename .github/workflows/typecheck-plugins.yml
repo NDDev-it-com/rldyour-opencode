@@ -1,0 +1,49 @@
+name: Typecheck Plugins
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".opencode/plugins/**"
+      - ".opencode/tsconfig.json"
+      - ".opencode/package.json"
+      - ".opencode/package-lock.json"
+  pull_request:
+    paths:
+      - ".opencode/plugins/**"
+      - ".opencode/tsconfig.json"
+      - ".opencode/package.json"
+      - ".opencode/package-lock.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: typecheck-plugins-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Set up Node
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
+        with:
+          node-version: "22"
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5  # v2.0.2
+        with:
+          bun-version: "1.2.18"
+      - name: Install plugin deps
+        working-directory: .opencode
+        run: bun install --frozen-lockfile
+      - name: Run strict TypeScript typecheck
+        working-directory: .opencode
+        run: bunx --bun tsc --noEmit -p tsconfig.json
