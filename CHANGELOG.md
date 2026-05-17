@@ -27,6 +27,7 @@ Patch stabilization pass closing the deferred 0.11.0 reviewer findings that were
 - `.github/workflows/validate.yml` now restores only `AGENTS.md` and `.claude/CLAUDE.md` from `origin/fullrepo` for test-time cross-layer assertions, while leaving `scripts/` and `.opencode/` on the exact `main` / PR checkout being validated.
 - `scripts/fullrepo_sync.sh` adds `install-exclude` for CI and bootstrap flows that need the `.git/info/exclude` block without restoring the full agent-only tree.
 - `scripts/fullrepo_sync.sh status-json` now reports `serena_memory_count: 0` when `.serena/memories` is absent, matching normal clean GitHub runner checkouts instead of exiting under `set -euo pipefail`.
+- `.github/workflows/dependency-review.yml` now skips `actions/dependency-review-action` on private repositories and emits explicit notices, because GitHub Dependency Review requires Dependency Graph plus GitHub Advanced Security there; `dependency-check.yml` remains the portable pin/freshness gate.
 - `README.md`, `AGENTS.md`, `.claude/CLAUDE.md`, and Serena release memories refreshed from the 0.11.1 validation baseline.
 - Corrected the 0.11.0 changelog test-count line from stale intermediate numbers to the final `7c02482` collection state.
 

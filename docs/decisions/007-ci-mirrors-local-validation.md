@@ -45,7 +45,7 @@ Workflow set:
 | `lint.yml` | path-filtered | Linux + macOS | ruff against `scripts/` |
 | `codeql.yml` | push + PR + weekly | Linux | javascript-typescript + python analysis using `.github/codeql/codeql-config.yml` so hidden `.opencode/plugins` TypeScript is included; SARIF is kept as a workflow artifact instead of uploaded to code scanning |
 | `secret-scan.yml` | push + PR | Linux | gitleaks CLI release tarball with SHA256 verification, `.gitleaks.toml` fixture allowlist, and checkout fetch-depth: 0 |
-| `dependency-review.yml` | PR | Linux | actions/dependency-review-action, fail-on-severity: moderate |
+| `dependency-review.yml` | PR | Linux | actions/dependency-review-action, fail-on-severity: moderate on public / GHAS-enabled repositories; private repositories emit an explicit skip notice because Dependency Review is unavailable without GitHub Advanced Security |
 | `release.yml` | `v*.*.*` tag + dispatch | Linux | full validation + typecheck + tag-vs-VERSION check + SBOM generation + GitHub Release |
 | `sbom.yml` | release published + dispatch | Linux | standalone CycloneDX SBOM artifact |
 
@@ -67,6 +67,7 @@ Negative:
 - Some non-GitHub release pins (gitleaks CLI tarball, CycloneDX action) require periodic re-verification. Mitigation: keep explicit version/checksum comments in workflow docs and use dependabot's `github-actions` ecosystem watcher for action pins.
 - `.gitleaks.toml` is intentionally narrow: it allowlists only sanitizer regression fixture files that contain fake token/private-key strings by design; do not add broad token regex allowlists.
 - CodeQL SARIF upload to code scanning is intentionally disabled (`upload: never`) until GitHub Code Security is enabled for this private repository. The workflow still runs extraction and queries, then stores SARIF as an Actions artifact.
+- GitHub Dependency Review is skipped on this private repository until Dependency Graph plus GitHub Advanced Security are enabled. The portable dependency gate remains `dependency-check.yml` (`check_deps_freshness.sh` + MCP smoke).
 
 ## Compliance
 
@@ -80,4 +81,5 @@ Negative:
 - Wire OIDC-based npm provenance once the marketplace publishes to a registry (out of scope today; SBOM-only release is sufficient for the current distribution model).
 - Add Sigstore signed releases once the workflow set proves stable in production for one minor release.
 - Enable CodeQL code-scanning SARIF upload if GitHub Code Security is enabled for this repository; until then the SARIF artifact is the auditable output.
+- Enable hard-failing Dependency Review on private PRs if GitHub Advanced Security is enabled; until then the workflow must not produce false-red PR checks.
 - Evaluate adding a scheduled macOS smoke that exercises the LSP installer (`check_lsps.sh` + `install_lsps.sh`) against the actual `brew` toolchain.
