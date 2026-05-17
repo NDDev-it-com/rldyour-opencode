@@ -16,4 +16,8 @@ Deploy with local/GitHub/server sync, log checks, health verification, and memor
 9. DB rollback only when an explicit rollback contract and backup/restore point are verified.
 10. Finish with /ry-sync to finalize memories, docs, and git state.
 
+## CI/CD and Git Mutation Gate
+
+`/ry-deploy` performs server-side operations (pulls, migrations, restarts) which are inherently mutating, but it must NOT mutate GitHub Actions workflows, release pipelines, branch protection rules, environments, secrets, or any other GitHub repository governance surface unless the user explicitly requested that change in the current invocation. Server-side rollback, migration rollback, and recovery operations are allowed only when an explicit rollback contract and verified restore point exist. See AGENTS.md § CI/CD and Git Mutation Gate.
+
 Reference: references/deploy-contract.md, references/flow-lifecycle.md, references/post-task-sync.md
