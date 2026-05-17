@@ -38,7 +38,16 @@ concurrency:
 
 jobs:
   runtime:
-    runs-on: ubuntu-latest
+    # The OpenCode CLI is published as a cross-platform binary (Linux +
+    # macOS via Bun). Running both matrices catches Bun/macOS-specific
+    # regressions (e.g. setup-bun PATH layout, dlopen surface) that the
+    # Linux-only build would miss. Windows is intentionally out of scope
+    # — OpenCode plugin spawn relies on POSIX shell semantics.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
       - name: Checkout
