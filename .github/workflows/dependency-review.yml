@@ -1,0 +1,30 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    paths:
+      - ".opencode/package.json"
+      - ".opencode/package-lock.json"
+      - ".github/workflows/**"
+      - "scripts/**.py"
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: dependency-review-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Review dependencies
+        uses: actions/dependency-review-action@4081bf99e2866ebe428fc0477b69eb4fcda7220a  # v4.5.0
+        with:
+          fail-on-severity: moderate
+          comment-summary-in-pr: on-failure

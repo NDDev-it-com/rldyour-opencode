@@ -11,14 +11,30 @@ on:
 permissions:
   contents: read
 
+# Serialize parallel CI runs on the same ref. Stale PR pushes cancel
+# in-flight runs to free runner minutes for the latest revision.
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    strategy:
+      # Matrix the strict frontmatter validator + pytest corpus across both
+      # platforms the owner runs locally (Linux + macOS). The runner difference
+      # surfaces script portability defects (sed -i flags, mktemp semantics,
+      # readlink behaviour) before they hit a local checkout.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     steps:
       # Actions pinned to commit SHA (supply-chain hardening — defends against
       # tag hijack on the action repository). Update SHAs in lockstep when
       # bumping the major version; verify via `gh api repos/actions/<name>/git/refs/tags/<tag>`.
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
@@ -27,8 +43,8 @@ jobs:
       - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
         run: bash scripts/validate_config.sh
 
-      - name: Install pytest (pinned)
-        run: python3 -m pip install --upgrade pip "pytest==9.0.2"
+      - name: Install pytest + PyYAML (pinned)
+        run: python3 -m pip install --upgrade pip "pytest==9.0.2" "PyYAML==6.0.3"
 
       - name: Run validator unit tests
         run: python3 -m pytest scripts/tests/ -v
@@ -37,3 +53,34 @@ jobs:
         run: |
           total=$(find . -type f \( -name '*.md' -o -name '*.json' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' -o -name '*.ts' -o -name '*.py' -o -name 'VERSION' -o -name 'LICENSE' -o -name '.gitignore' \) ! -path './.git/*' ! -path './.github/*' | wc -l | tr -d ' ')
           echo "Total project files: $total"
+
+  shell-strict-mode:
+    # Tiny linter that asserts every scripts/*.sh begins with the env-bash
+    # shebang and `set -euo pipefail`. Runs once on Linux only — shebang
+    # contents are platform-independent.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.13"
+      - name: Verify shell strictness contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          bad = []
+          for p in sorted(Path("scripts").glob("*.sh")):
+              text = p.read_text(encoding="utf-8")
+              if not text.startswith("#!/usr/bin/env bash"):
+                  bad.append(f"{p}: missing #!/usr/bin/env bash shebang")
+              if "set -euo pipefail" not in text:
+                  bad.append(f"{p}: missing `set -euo pipefail`")
+          if bad:
+              for line in bad:
+                  print("[ERR]", line)
+              raise SystemExit(1)
+          print("[OK] all scripts/*.sh start with env-bash and enable strict mode")
+          PY
