@@ -27,7 +27,7 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 11. `git tag vX.Y.Z` (annotated, signed if configured).
 12. Push `main` and tags; CI (`.github/workflows/validate.yml`) must stay green — that workflow now runs both `validate_config.sh` and `pytest scripts/tests/`.
 
-## Publishing agent-only context
+## Publishing fullrepo context
 
 After the release commit lands on `main`, run:
 
@@ -35,7 +35,7 @@ After the release commit lands on `main`, run:
 bash scripts/fullrepo_sync.sh publish
 ```
 
-This force-with-lease pushes the agent-only snapshot to `origin/fullrepo`, stripping runtime markers (`.serena/cache/`, `.opencode/node_modules/`, etc.) and aborting if any secret pattern is detected.
+This force-with-lease pushes the complete portable snapshot to `origin/fullrepo`: the current `HEAD` tree plus ignored agent-only context (`AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, etc.). Runtime markers (`.serena/cache/`, `.serena/.flow_*`, `.opencode/node_modules/`, etc.) are stripped and publication aborts if a secret-looking value is detected.
 
 ## Hotfix branch (when `main` is locked)
 

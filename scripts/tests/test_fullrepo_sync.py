@@ -1,10 +1,4 @@
-"""Integration tests for scripts/fullrepo_sync.sh.
-
-The full publish path is not exercised here (it pushes to origin), but
-status / status-json / bootstrap-init exclude-marker behaviour is. The
-status-json shape is the only contract surface this suite asserts; the
-publish path is exercised by manual smoke from /ry-sync.
-"""
+"""Integration tests for scripts/fullrepo_sync.sh."""
 from __future__ import annotations
 
 import json
@@ -71,7 +65,9 @@ def _copy_script_to_tmp_repo(tmp_path: Path) -> Path:
     scripts_dir.mkdir()
     tmp_script = scripts_dir / "fullrepo_sync.sh"
     tmp_script.write_text(SCRIPT.read_text(encoding="utf-8"), encoding="utf-8")
-    subprocess.run(["git", "init"], check=True, capture_output=True, cwd=tmp_path)
+    subprocess.run(["git", "init", "--initial-branch=main"], check=True, capture_output=True, cwd=tmp_path)
+    subprocess.run(["git", "config", "user.email", "test@example.invalid"], check=True, cwd=tmp_path)
+    subprocess.run(["git", "config", "user.name", "Fullrepo Test"], check=True, cwd=tmp_path)
     return tmp_script
 
 
@@ -93,6 +89,8 @@ def test_status_json_emits_well_formed_json() -> None:
         ("fullrepo_local", bool),
         ("fullrepo_remote", bool),
         ("serena_memory_count", int),
+        ("local_fullrepo_matches_worktree", bool),
+        ("remote_fullrepo_matches_worktree", bool),
     ],
 )
 def test_status_json_field_types(field: str, expected_type: type) -> None:
@@ -130,15 +128,99 @@ def test_status_json_handles_missing_serena_memories(tmp_path: Path) -> None:
 
 def test_install_exclude_writes_canonical_marker(tmp_path: Path) -> None:
     tmp_script = _copy_script_to_tmp_repo(tmp_path)
+    exclude_file = tmp_path / ".git" / "info" / "exclude"
+    exclude_file.write_text(
+        "# rldyour-opencode agent-only\n"
+        "AGENTS.md\n"
+        ".opencode/\n"
+        ".serena/\n"
+        ".claude/\n"
+        "docs/\n"
+        "references/\n"
+        "scripts/\n",
+        encoding="utf-8",
+    )
     subprocess.run(
         ["bash", str(tmp_script), "install-exclude"],
         check=True,
         capture_output=True,
         cwd=tmp_path,
     )
-    exclude_text = (tmp_path / ".git" / "info" / "exclude").read_text(encoding="utf-8")
+    exclude_text = exclude_file.read_text(encoding="utf-8")
     assert "# >>> rldyour fullrepo agent-only files >>>" in exclude_text
     assert "# <<< rldyour fullrepo agent-only files <<<" in exclude_text
+    assert "# rldyour-opencode agent-only" not in exclude_text
+    assert "\n.opencode/\n" not in exclude_text
+    assert "\ndocs/\n" not in exclude_text
+    assert "\nreferences/\n" not in exclude_text
+    assert "\nscripts/\n" not in exclude_text
+
+
+def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> None:
+    """`fullrepo` must be a complete portable snapshot, not an agent-only
+    tree that omits root manifests such as opencode.json / VERSION."""
+    tmp_script = _copy_script_to_tmp_repo(tmp_path)
+    (tmp_path / "opencode.json").write_text('{"model":"opencode/test"}\n', encoding="utf-8")
+    (tmp_path / "VERSION").write_text("0.0.0\n", encoding="utf-8")
+    (tmp_path / "README.md").write_text("# Fixture\n", encoding="utf-8")
+    (tmp_path / ".github" / "workflows").mkdir(parents=True)
+    (tmp_path / ".github" / "workflows" / "validate.yml").write_text("name: validate\n", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "tracked.md").write_text("# Tracked docs\n", encoding="utf-8")
+    (tmp_path / "references").mkdir()
+    (tmp_path / "references" / "tracked.md").write_text("# Tracked refs\n", encoding="utf-8")
+    subprocess.run(["git", "add", "opencode.json", "VERSION", "README.md", ".github", "docs", "references", "scripts"], check=True, cwd=tmp_path)
+    subprocess.run(["git", "commit", "-m", "test: seed main"], check=True, capture_output=True, cwd=tmp_path)
+
+    origin = tmp_path.parent / f"{tmp_path.name}-origin.git"
+    subprocess.run(["git", "init", "--bare", str(origin)], check=True, capture_output=True, cwd=tmp_path)
+    subprocess.run(["git", "remote", "add", "origin", str(origin)], check=True, cwd=tmp_path)
+    subprocess.run(["git", "push", "-u", "origin", "main"], check=True, capture_output=True, cwd=tmp_path)
+
+    (tmp_path / "AGENTS.md").write_text("# Agent Instructions\n", encoding="utf-8")
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / ".claude" / "CLAUDE.md").write_text("# Claude Instructions\n", encoding="utf-8")
+    (tmp_path / ".serena" / "memories").mkdir(parents=True)
+    (tmp_path / ".serena" / "memories" / "CORE-01-INDEX.md").write_text("Last commit: fixture\n", encoding="utf-8")
+    (tmp_path / ".serena" / ".flow_sync_marker").write_text("runtime-marker\n", encoding="utf-8")
+    (tmp_path / "docs" / "local-only.md").write_text("must not publish from working tree\n", encoding="utf-8")
+    (tmp_path / "references" / "local-only.md").write_text("must not publish from working tree\n", encoding="utf-8")
+    (tmp_path / "scripts" / "local-only.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+    with (tmp_path / ".git" / "info" / "exclude").open("a", encoding="utf-8") as exclude:
+        exclude.write("\ndocs/local-only.md\nreferences/local-only.md\nscripts/local-only.sh\n")
+
+    subprocess.run(["bash", str(tmp_script), "publish"], check=True, capture_output=True, cwd=tmp_path)
+
+    tree = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", "origin/fullrepo"],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    ).stdout.splitlines()
+    assert "opencode.json" in tree
+    assert "VERSION" in tree
+    assert ".github/workflows/validate.yml" in tree
+    assert "docs/tracked.md" in tree
+    assert "references/tracked.md" in tree
+    assert "AGENTS.md" in tree
+    assert ".claude/CLAUDE.md" in tree
+    assert ".serena/memories/CORE-01-INDEX.md" in tree
+    assert ".serena/.flow_sync_marker" not in tree
+    assert "docs/local-only.md" not in tree
+    assert "references/local-only.md" not in tree
+    assert "scripts/local-only.sh" not in tree
+
+    status = subprocess.run(
+        ["bash", str(tmp_script), "status-json"],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    parsed = json.loads(status.stdout)
+    assert parsed["local_fullrepo_matches_worktree"] is True
+    assert parsed["remote_fullrepo_matches_worktree"] is True
 
 
 # ---------- help / usage ----------

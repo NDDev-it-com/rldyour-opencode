@@ -9,6 +9,7 @@ on:
     # Weekly Tuesday 04:29 UTC — outside business hours, decoupled from
     # the Monday dependency-check window.
     - cron: "29 4 * * 2"
+  workflow_dispatch: {}
 
 permissions:
   contents: read

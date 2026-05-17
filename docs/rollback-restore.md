@@ -19,13 +19,13 @@ Never `git reset --hard` on `main` to undo a bad change — use `git revert` so 
 
 ## Restoring agent-only files
 
-If `.serena/`, `.opencode/agents`, `.opencode/skills`, `.opencode/commands`, `.opencode/plugins`, or `AGENTS.md` are missing locally:
+If `.serena/`, `.claude/`, `AGENTS.md`, or another ignored agent-only path is missing locally:
 
 ```bash
 bash scripts/fullrepo_sync.sh bootstrap-init
 ```
 
-`bootstrap-init` installs the `.git/info/exclude` rldyour block and restores from `origin/fullrepo`. If `origin/fullrepo` does not exist yet, run `bash scripts/fullrepo_sync.sh publish` from a known-good clone first.
+`bootstrap-init` installs the `.git/info/exclude` rldyour block and restores the agent-only paths from `origin/fullrepo`. The `fullrepo` branch itself is a complete `HEAD + agent-only` snapshot, but restore intentionally copies back only the ignored project knowledge paths so the normal branch checkout stays authoritative for runtime files. If `origin/fullrepo` does not exist yet, run `bash scripts/fullrepo_sync.sh publish` from a known-good clone first.
 
 ## Restoring a published release
 
