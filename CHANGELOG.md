@@ -26,12 +26,12 @@ contract is consistent across all of `.opencode/{skills,commands,plugins}`.
   privileges beyond reading public workflow metadata. The pattern had
   been failing on every push since 0.11.x — finally green on `ce7e62d`.
 - **`scripts/fullrepo_sync.sh` secret-scan false positive.** The
-  in-script regex `(PRIVATE_KEY|SECRET_KEY|PASSWORD|TOKEN|API_KEY)\s*=
-  \s*[^"]*\S` matched the doc-style example `export
-  GITHUB_PERSONAL_ACCESS_TOKEN=...` in `CONTRIBUTING.md`. Rewrote the
-  setup-checklist step in prose so the operator guidance is equivalent
-  but the regex no longer trips. Same scanner stays in place — only the
-  doc form is normalised.
+  in-script secret-scan regex (canonical keyword followed by `=` plus
+  a non-empty value on the same line) matched a doc-style shell
+  example for the `GITHUB_PERSONAL_ACCESS_TOKEN` env var in
+  `CONTRIBUTING.md`. Rewrote the setup-checklist step in prose so the
+  operator guidance is equivalent but the regex no longer trips. Same
+  scanner stays in place — only the doc form is normalised.
 
 ### Added
 
