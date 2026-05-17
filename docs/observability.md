@@ -46,6 +46,7 @@ The script writes a timestamped directory under `diagnostics/` (git-ignored). Ty
 | `git-status.txt`, `git-log.txt`, `git-remote.txt`, `git-worktrees.txt` | Git metadata snapshot |
 | `validate.log` | `bash scripts/validate_config.sh` output |
 | `deps-pins.json` | `bash scripts/check_deps_freshness.sh --json` |
+| `action-pins.txt` | `python3 scripts/check_action_pins.py .github/workflows` |
 | `flow-state.json` | `bash scripts/flow_post_task_state.sh` |
 | `fullrepo-status.json` | `bash scripts/fullrepo_sync.sh status-json` |
 | `git-audit.txt` | `bash scripts/git_sync_audit.sh` |
@@ -63,7 +64,7 @@ The bundle never contains `.env*`, credentials, or anything from `~/.ssh` / `~/.
 - Per-step output to the standard GitHub Actions log.
 - A short summary in `GITHUB_STEP_SUMMARY` (file count of the marketplace).
 
-`.github/workflows/dependency-check.yml` runs weekly (Monday 06:00 UTC) and on `workflow_dispatch`. It writes the pinned-dependency JSON envelope to `GITHUB_STEP_SUMMARY` so the owner can review pin freshness without cloning.
+`.github/workflows/dependency-check.yml` runs weekly (Monday 06:00 UTC) and on `workflow_dispatch`. It writes the pinned-dependency JSON envelope to `GITHUB_STEP_SUMMARY`, checks GitHub Actions SHA/comment integrity with `scripts/check_action_pins.py --remote`, and records the registry freshness probe so the owner can review pin freshness without cloning.
 
 ## Failure triage order
 

@@ -15,17 +15,18 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 ## Release checklist
 
 1. `bash scripts/validate_config.sh` — exit 0.
-2. `python3 -m pytest scripts/tests/` — all unit tests green (validator + extract_pins).
+2. `uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" pytest scripts/tests/` — all unit tests green.
 3. `opencode debug config` — must resolve without error.
 4. `opencode debug skill | python3 -c "import json,sys;print(len(json.load(sys.stdin)))"` — equals the `.opencode/skills/` directory count.
 5. `bash scripts/check_lsps.sh` — at minimum every LSP defined in `opencode.json.lsp` must resolve to an executable.
-6. `bash scripts/check_deps_freshness.sh` — report all pinned MCP dependencies; cross-reference each against its registry before bumping.
-7. Update `CHANGELOG.md` with a new dated section; group entries under `Added` / `Changed` / `Fixed` / `Removed` per Keep a Changelog 1.1.0.
-8. Update `VERSION` to the new SemVer.
-9. Update `README.md` if catalog counts changed (skills / commands / MCP / plugins / scripts / tests).
-10. `git commit` with subject `chore(release): X.Y.Z` and the CHANGELOG block in the body.
-11. `git tag vX.Y.Z` (annotated, signed if configured).
-12. Push `main` and tags; CI (`.github/workflows/validate.yml`) must stay green — that workflow now runs both `validate_config.sh` and `pytest scripts/tests/`.
+6. `bash scripts/check_deps_freshness.sh --check-freshness` — report all pinned MCP dependencies and registry freshness.
+7. `python3 scripts/check_action_pins.py .github/workflows --remote` — verify every GitHub Actions SHA pin matches its inline semver tag comment.
+8. Update `CHANGELOG.md` with a new dated section; group entries under `Added` / `Changed` / `Fixed` / `Removed` per Keep a Changelog 1.1.0.
+9. Update `VERSION` to the new SemVer.
+10. Update `README.md` if catalog counts changed (skills / commands / MCP / plugins / scripts / tests).
+11. `git commit` with subject `chore(release): X.Y.Z` and the CHANGELOG block in the body.
+12. `git tag vX.Y.Z` (annotated, signed if configured).
+13. Push `main` and tags; CI (`.github/workflows/validate.yml`) must stay green — that workflow now runs both `validate_config.sh` and `pytest scripts/tests/`.
 
 ## Publishing fullrepo context
 

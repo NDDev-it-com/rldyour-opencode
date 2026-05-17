@@ -91,6 +91,7 @@ cp -f opencode.json "${BUNDLE}/opencode.json"    2>/dev/null || true
 # Validator + tests.
 run_cmd validate.log          bash scripts/validate_config.sh
 run_cmd deps-pins.json        bash scripts/check_deps_freshness.sh --json
+run_cmd action-pins.txt       python3 scripts/check_action_pins.py .github/workflows
 run_cmd flow-state.json       bash scripts/flow_post_task_state.sh
 run_cmd git-audit.txt         bash scripts/git_sync_audit.sh
 run_cmd fullrepo-status.json  bash scripts/fullrepo_sync.sh status-json
