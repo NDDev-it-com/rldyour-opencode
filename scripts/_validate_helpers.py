@@ -26,9 +26,9 @@ except ImportError as _exc:  # pragma: no cover - tooling boundary
     )
     raise SystemExit(2) from _exc
 
-# v1.15.3 canonical permission key set sourced from the built-in
+# v1.15.4 canonical permission key set sourced from the built-in
 # `customize-opencode` skill (`opencode debug skill` -> the `<built-in>`
-# entry) and cross-validated against the v1.15.3 JSON Schema published
+# entry) and cross-validated against the v1.15.4 JSON Schema published
 # at https://opencode.ai/config.json. Unknown keys are silently accepted
 # by the runtime today (issue sst/opencode#15507), so this validator is
 # the project-side defense against PascalCase typos and stale keys
