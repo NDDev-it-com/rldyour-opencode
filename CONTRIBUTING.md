@@ -81,6 +81,35 @@ Architectural decisions follow MADR 4.0.0 in `docs/decisions/NNN-slug.md`. Add a
 
 ADR bodies are immutable. Update guidance through a supersession banner at the top of the file, not by rewriting history.
 
+## Token and credential setup
+
+The remote `github` MCP server reads `GITHUB_PERSONAL_ACCESS_TOKEN` from
+the environment. Use a **fine-grained personal access token**, not a
+classic PAT. Setup checklist:
+
+1. Open GitHub → Settings → Developer settings → Personal access tokens
+   → **Fine-grained tokens**.
+2. Restrict the resource owner to a single account/org and scope the
+   token to only the repositories the agent needs.
+3. Grant only the minimum repository permissions the workflow expects
+   (`Contents: Read`, `Pull requests: Read/Write` where the agent
+   creates PRs). Read `docs/security/mcp-trust-boundaries.md` for the
+   full read/write capability table per MCP.
+4. Set an expiration ≤ 90 days. Rotate quarterly.
+5. Export the token via `export GITHUB_PERSONAL_ACCESS_TOKEN=...` in
+   the same shell session that starts OpenCode. Do NOT add the export
+   to a tracked file.
+
+Classic PATs are blocked by policy except for explicit short-term
+troubleshooting; if you find one in use, file an issue and rotate. The
+`ry-env-protection` plugin guards against reading `.env*` files at
+runtime, but the durable defense is keeping the token out of the repo.
+
+The same fine-grained-only policy applies to optional tokens for
+`mcp.context7` (`CONTEXT7_API_KEY`) and `mcp.figma`. See
+`docs/security/mcp-trust-boundaries.md` for the per-MCP trust class
+matrix.
+
 ## Serena memory hygiene
 
 Memory files at `.serena/memories/AREA-NN-SLUG.md` contain verified durable facts. Update them via `serena-memory-sync` or the `@flow-memory-sync` subagent. Do not write speculative notes, secrets, or runtime snapshots into memories. Use code, tests, and git history as the source of truth.
