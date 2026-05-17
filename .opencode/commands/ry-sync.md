@@ -15,4 +15,8 @@ Synchronize project state after meaningful work:
 
 Never commit secrets, runtime markers, browser artifacts, local env files, or accidental generated junk.
 
+## CI/CD and Git Mutation Gate
+
+`/ry-sync` may commit on feature branches and push to upstream when an upstream exists. It must NOT create or modify workflows, branch protection rules, GitHub environments, secrets, tags, or release artifacts unless the user explicitly asks for that mutation. Force-push, `git push --no-verify`, and product-branch (`main`/`master`/`release`/`production`) direct pushes require explicit user authorization in the same request. See AGENTS.md § CI/CD and Git Mutation Gate.
+
 Reference: references/post-task-sync.md, references/project-instructions-and-adrs.md
