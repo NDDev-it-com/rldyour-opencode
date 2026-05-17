@@ -66,6 +66,12 @@ jobs:
       - name: Verify skills index is in sync with SKILL.md files
         run: python3 scripts/generate_skills_index.py --check --strict
 
+      - name: Verify commands index is in sync with command .md files
+        run: python3 scripts/generate_commands_index.py --check --strict
+
+      - name: Verify plugins index is in sync with plugin .ts files
+        run: python3 scripts/generate_plugins_index.py --check --strict
+
       - name: Run validator unit tests
         run: python3 -m pytest scripts/tests/ -v
 

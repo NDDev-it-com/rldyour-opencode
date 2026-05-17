@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "generated_by": "scripts/generate_plugins_index.py",
+  "count": 10,
+  "plugins": [
+    {
+      "name": "ry-bootstrap",
+      "path": ".opencode/plugins/ry-bootstrap.ts",
+      "category": "lifecycle",
+      "description": "Session bootstrap. Logs a banner on session.created, pushes MCP/workflow context on experimental.session.compacting, and disables the synthetic autocontinue turn on overflow.",
+      "hooks": [
+        "event",
+        "experimental.compaction.autocontinue",
+        "experimental.session.compacting"
+      ],
+      "writes_files": false,
+      "network": false
+    },
+    {
+      "name": "ry-command-audit",
+      "path": ".opencode/plugins/ry-command-audit.ts",
+      "category": "observability",
+      "description": "Slash-command audit log. Appends one credential-sanitized line per command.execute.before to .serena/.command_audit.log (256 KiB rolling cap).",
+      "hooks": [
+        "command.execute.before"
+      ],
+      "writes_files": true,
+      "network": false
+    },
+    {
+      "name": "ry-env-protection",
+      "path": ".opencode/plugins/ry-env-protection.ts",
+      "category": "guardrail",
+      "description": "Best-effort sensitive-path guardrail. Blocks read/bash on .env*, .pem, .key, .ssh/, .gnupg/, .aws/ paths plus data-movement utilities (cp/mv/tar/zip/base64/dd/socat/...). NOT a DLP boundary.",
+      "hooks": [
+        "tool.execute.before"
+      ],
+      "writes_files": false,
+      "network": false
+    },
+    {
+      "name": "ry-flow-hooks",
+      "path": ".opencode/plugins/ry-flow-hooks.ts",
+      "category": "advisory",
+      "description": "Post-bash advice. Conventional Commits regex check on git commit output + /ry-sync nudge after every commit/merge/cherry-pick/rebase that changes the repo.",
+      "hooks": [
+        "tool.execute.after"
+      ],
+      "writes_files": false,
+      "network": false
+    },
+    {
+      "name": "ry-permission-policy",
+      "path": ".opencode/plugins/ry-permission-policy.ts",
+      "category": "guardrail",
+      "description": "Dynamic deny-only policy on permission.ask. Blocks force-push without lease, catastrophic rm -rf, and --no-verify pushes. Honours RY_ALLOW_NO_VERIFY=1 opt-out for symmetric coverage.",
+      "hooks": [
+        "permission.ask"
+      ],
+      "writes_files": false,
+      "network": false,
+      "defense_in_depth_pair": "ry-shell-strategy"
+    },
+    {
+      "name": "ry-shell-strategy",
+      "path": ".opencode/plugins/ry-shell-strategy.ts",
+      "category": "guardrail",
+      "description": "Unconditional shell guardrail on tool.execute.before. Same three patterns as ry-permission-policy plus shell.env hardening (GIT_TERMINAL_PROMPT=0, NO_UPDATE_NOTIFIER=1, conditional CI=1).",
+      "hooks": [
+        "shell.env",
+        "tool.execute.before"
+      ],
+      "writes_files": false,
+      "network": false,
+      "defense_in_depth_pair": "ry-permission-policy"
+    },
+    {
+      "name": "ry-sync-reminder",
+      "path": ".opencode/plugins/ry-sync-reminder.ts",
+      "category": "advisory",
+      "description": "Session-idle reminder. Toast-only nudge to run /ry-sync before ending the session; no log spam between events.",
+      "hooks": [
+        "event"
+      ],
+      "writes_files": false,
+      "network": false
+    },
+    {
+      "name": "ry-system-context",
+      "path": ".opencode/plugins/ry-system-context.ts",
+      "category": "context-injection",
+      "description": "Injects [rldyour runtime] date/branch/head/worktree-dirty stamp into every system prompt via experimental.chat.system.transform. Branch and HEAD cached at factory init; status spawn has 800ms timeout.",
+      "hooks": [
+        "experimental.chat.system.transform"
+      ],
+      "writes_files": false,
+      "network": false
+    },
+    {
+      "name": "ry-tool-hints",
+      "path": ".opencode/plugins/ry-tool-hints.ts",
+      "category": "routing",
+      "description": "Appends routing hints to known MCP tool descriptions via tool.definition. Encodes AGENTS.md § Tool Priority matrix in the tool itself so the LLM sees the hint inline.",
+      "hooks": [
+        "tool.definition"
+      ],
+      "writes_files": false,
+      "network": false,
+      "requires_mcp": [
+        "serena",
+        "context7",
+        "deepwiki",
+        "grep",
+        "playwright",
+        "chrome-devtools",
+        "semgrep",
+        "sequential-thinking"
+      ]
+    },
+    {
+      "name": "ry-tools",
+      "path": ".opencode/plugins/ry-tools.ts",
+      "category": "tool-registration",
+      "description": "Registers five LLM-callable custom tools (rldyour_validate_config, _check_deps, _lsp_health, _git_audit, _fullrepo_status) wrapping diagnostic scripts. Each tool has timeout + maxOutputBytes budget.",
+      "hooks": [
+        "tool"
+      ],
+      "writes_files": false,
+      "network": false,
+      "registers_tools": [
+        "rldyour_validate_config",
+        "rldyour_check_deps",
+        "rldyour_lsp_health",
+        "rldyour_git_audit",
+        "rldyour_fullrepo_status"
+      ]
+    }
+  ]
+}

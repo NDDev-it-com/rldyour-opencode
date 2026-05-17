@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "generated_by": "scripts/generate_commands_index.py",
+  "count": 10,
+  "commands": [
+    {
+      "name": "ry-deploy",
+      "path": ".opencode/commands/ry-deploy.md",
+      "description": "Деплой с sync/checks/логами/fix-forward/финализацией. Deploy with local↔GitHub↔server sync, log verification, fix-forward, and docs/git finalization.",
+      "agent": "build",
+      "subtask": false,
+      "domain": "flow",
+      "triggers": [
+        "deploy",
+        "release to server",
+        "fix-forward"
+      ]
+    },
+    {
+      "name": "ry-design",
+      "path": ".opencode/commands/ry-design.md",
+      "description": "Сквозной дизайн-воркфлоу: Figma + tokens + FSD + shadcn/ui + browser validation. Run end-to-end design workflow.",
+      "agent": "build",
+      "subtask": false,
+      "domain": "design",
+      "triggers": [
+        "Figma to code",
+        "build UI",
+        "design workflow",
+        "redesign"
+      ]
+    },
+    {
+      "name": "ry-explore",
+      "path": ".opencode/commands/ry-explore.md",
+      "description": "Глубокое исследование через ry-explore (Opus, max effort). Run deep multi-source research.",
+      "agent": "ry-explore",
+      "subtask": true,
+      "domain": "explore",
+      "triggers": [
+        "deep research",
+        "library lookup",
+        "tech investigation"
+      ]
+    },
+    {
+      "name": "ry-init",
+      "path": ".opencode/commands/ry-init.md",
+      "description": "Scoped read-only инициализация контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context (read-only).",
+      "agent": "build",
+      "subtask": false,
+      "domain": "flow",
+      "triggers": [
+        "init project",
+        "context pack",
+        "study repo",
+        "scope discovery"
+      ]
+    },
+    {
+      "name": "ry-newp",
+      "path": ".opencode/commands/ry-newp.md",
+      "description": "Проектирование нового проекта: скептические вопросы → research → архитектура docs → optional scaffold. Plan a new project with skeptical questions and research.",
+      "agent": "build",
+      "subtask": false,
+      "domain": "flow",
+      "triggers": [
+        "new project",
+        "design from brief",
+        "architecture docs"
+      ]
+    },
+    {
+      "name": "ry-review",
+      "path": ".opencode/commands/ry-review.md",
+      "description": "Report-only глубокое ревью diff/PR/scope с reviewer tracks (architecture/quality/consistency/integration/verification/security). Deep review with parallel reviewer tracks.",
+      "agent": "plan",
+      "subtask": false,
+      "domain": "flow",
+      "triggers": [
+        "review diff",
+        "review PR",
+        "report-only review",
+        "audit changes"
+      ]
+    },
+    {
+      "name": "ry-rules-review",
+      "path": ".opencode/commands/ry-rules-review.md",
+      "description": "Аудит реализации против rldyour rules. Audit implementation against rldyour rules (report-only).",
+      "agent": "plan",
+      "subtask": false,
+      "domain": "rules",
+      "triggers": [
+        "rules audit",
+        "report-only review",
+        "check rldyour rules"
+      ]
+    },
+    {
+      "name": "ry-sec-review",
+      "path": ".opencode/commands/ry-sec-review.md",
+      "description": "Защитный security review: OWASP Top 10, auth/authz, injection, secrets. Defensive Mythos-style security review.",
+      "agent": "plan",
+      "subtask": false,
+      "domain": "security",
+      "triggers": [
+        "security review",
+        "OWASP audit",
+        "defensive review"
+      ]
+    },
+    {
+      "name": "ry-start",
+      "path": ".opencode/commands/ry-start.md",
+      "description": "Полный lifecycle задачи: init → research → plan → implement → quality gates → reviewer subagents → post-task sync. Full task lifecycle from prompt to reviewed and synced state.",
+      "agent": "build",
+      "subtask": false,
+      "domain": "flow",
+      "triggers": [
+        "full SDLC",
+        "ship feature",
+        "implement task",
+        "build feature"
+      ]
+    },
+    {
+      "name": "ry-sync",
+      "path": ".opencode/commands/ry-sync.md",
+      "description": "Синхронизация Serena memories, AGENTS.md/CLAUDE.md, git и fullrepo после meaningful работы. Synchronize memories, docs, git state and fullrepo branch.",
+      "agent": "build",
+      "subtask": false,
+      "domain": "flow",
+      "triggers": [
+        "finalize task",
+        "post-task sync",
+        "publish fullrepo"
+      ]
+    }
+  ]
+}

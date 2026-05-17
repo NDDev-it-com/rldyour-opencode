@@ -57,11 +57,13 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Install pytest + PyYAML + jsonschema
         run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0"
-      - name: Validate config + schema + skills index + tests
+      - name: Validate config + schema + all indices + tests
         run: |
           bash scripts/validate_config.sh
           python3 scripts/validate_opencode_schema.py
           python3 scripts/generate_skills_index.py --check --strict
+          python3 scripts/generate_commands_index.py --check --strict
+          python3 scripts/generate_plugins_index.py --check --strict
           python3 -m pytest scripts/tests/ -q
       - name: Typecheck plugins
         working-directory: .opencode
