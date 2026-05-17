@@ -1,0 +1,8 @@
+title = "rldyour-opencode gitleaks config"
+
+[[allowlists]]
+description = "Synthetic sanitizer regression fixtures"
+paths = [
+  '''scripts/tests/test_command_audit_sanitizer\.py''',
+  '''scripts/tests/test_sanitize_diag\.py''',
+]
