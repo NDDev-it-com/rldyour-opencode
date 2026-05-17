@@ -1,6 +1,6 @@
 """Plugin surface integrity tests.
 
-Verify that the 8 plugins listed in AGENTS.md actually exist on disk, that
+Verify that the 10 plugins listed in AGENTS.md actually exist on disk, that
 ry-tool-hints' HINTS keys reference real MCP servers from opencode.json,
 and that ry-tools' registered tool IDs match what AGENTS.md and CHANGELOG
 claim. Catches future drift between plugin code, the manifest, and
@@ -108,14 +108,36 @@ def test_ry_tool_hints_no_legacy_aliases() -> None:
 
 
 def test_no_dead_project_path_cast_in_plugins() -> None:
-    """Defensive: catches re-introduction of the `project as { path? }`
-    cast that was dead code (Project type has no `path` field in v1.14.48).
-    Plugins should destructure `directory` directly from PluginInput.
+    """Defensive: catches re-introduction of the `project as { ... path? }`
+    cast and any access pattern that reads `project.path` directly. The
+    SDK Project type (gen/types.gen.d.ts) exposes `worktree` instead;
+    `path` was a hand-rolled runtime-only field that worked by accident
+    in early v1.14 and is now dead surface.
+
+    Plugins must use either the typed `project.worktree` or destructure
+    `directory` directly from PluginInput. Guards against three regression
+    classes:
+
+    1. Cast forms like `project as { path?: string }` or
+       `project as { name?: string; path?: string }`.
+    2. The fallback chain `.path ?? directory` (only meaningful if .path
+       is being read at all).
+    3. Direct `proj?.path` access on a cast-stored alias.
     """
+    cast_re = re.compile(r"project\s+as\s+\{[^}]*\bpath\?\s*:\s*string\b")
     for ts in PLUGINS_DIR.glob("*.ts"):
         src = ts.read_text(encoding="utf-8")
-        assert "as { path?: string }" not in src, (
-            f"{ts.name} re-introduced the dead `project as {{ path? }}` cast"
+        assert cast_re.search(src) is None, (
+            f"{ts.name} re-introduced a `project as {{ ... path?: string ... }}` cast"
+        )
+        assert ".path ?? directory" not in src, (
+            f"{ts.name} reads `.path ?? directory` — drop the dead `.path` arm"
+        )
+        # The literal `proj?.path` pattern only appears when something
+        # already aliased the cast — block it independently so a future
+        # contributor cannot quietly reintroduce one half of the regression.
+        assert "proj?.path" not in src, (
+            f"{ts.name} reads `proj?.path` — dead Project field"
         )
 
 
