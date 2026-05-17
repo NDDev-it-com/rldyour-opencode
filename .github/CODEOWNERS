@@ -1,0 +1,35 @@
+# Code owners for rldyour-opencode.
+# Format: <pattern> <owner> [<owner>...]
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+*                                       @rldyourmnd
+
+# Runtime configuration and master manifest
+/opencode.json                          @rldyourmnd
+/VERSION                                @rldyourmnd
+/CHANGELOG.md                           @rldyourmnd
+
+# OpenCode component tree
+/.opencode/                             @rldyourmnd
+/.opencode/plugins/                     @rldyourmnd
+/.opencode/agents/                      @rldyourmnd
+/.opencode/skills/                      @rldyourmnd
+/.opencode/commands/                    @rldyourmnd
+
+# Validation and diagnostic scripts
+/scripts/                               @rldyourmnd
+/scripts/tests/                         @rldyourmnd
+
+# Documentation and architecture
+/docs/                                  @rldyourmnd
+/docs/decisions/                        @rldyourmnd
+/references/                            @rldyourmnd
+
+# CI / governance
+/.github/                               @rldyourmnd
+/.github/workflows/                     @rldyourmnd
+/CODEOWNERS                             @rldyourmnd
+/SECURITY.md                            @rldyourmnd
+/CONTRIBUTING.md                        @rldyourmnd
+/CODE_OF_CONDUCT.md                     @rldyourmnd
