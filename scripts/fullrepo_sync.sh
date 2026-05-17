@@ -26,6 +26,7 @@ RUNTIME_EXCLUDE_PATTERNS=(
   ".serena/.active_workflow_intent.json"
   ".serena/.dirty_stop_ack"
   ".serena/.gitignore"
+  ".serena/.command_audit.log"
   ".opencode/local.json"
   ".opencode/node_modules/"
   "browser/"
@@ -221,16 +222,19 @@ cmd_publish() {
   # Also strip Python bytecode files anywhere
   find "$tmp_dir" -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete 2>/dev/null || true
 
-  # Secret detection (literal env-var-style assignments outside placeholder context)
+  # Secret detection. `grep -rI` follows binary-skip heuristic + reads every
+  # text file regardless of extension, closing the previous coverage gap
+  # (`--include='*.md|*.json|*.yml|*.yaml|*.ts|*.sh'` missed `*.py`, `*.log`,
+  # and extension-less files like `LICENSE` / `CODEOWNERS` / `VERSION`).
   local secrets_found=0
   while IFS= read -r line; do
     if echo "$line" | grep -qiE '(PRIVATE_KEY|SECRET_KEY|PASSWORD|TOKEN|API_KEY)\s*=\s*[^"]*\S'; then
-      if ! echo "$line" | grep -qiE '(example|template|sample|placeholder|xxx|todo|YOUR_)'; then
+      if ! echo "$line" | grep -qiE '(example|template|sample|placeholder|xxx|todo|YOUR_|<redacted-)'; then
         echo "[fullrepo] WARNING: Potential secret in $(echo "$line" | cut -d: -f1)" >&2
         secrets_found=1
       fi
     fi
-  done < <(cd "$tmp_dir" && grep -r --include='*.md' --include='*.json' --include='*.yml' --include='*.yaml' --include='*.ts' --include='*.sh' . 2>/dev/null || true)
+  done < <(cd "$tmp_dir" && grep -rIE '(PRIVATE_KEY|SECRET_KEY|PASSWORD|TOKEN|API_KEY)' . 2>/dev/null || true)
 
   if [ "$secrets_found" -eq 1 ]; then
     echo "[fullrepo] ERROR: Secrets detected in agent-only content. Remove them before publishing." >&2
@@ -327,17 +331,25 @@ cmd_status_json() {
   git branch -r 2>/dev/null | grep -q "origin/$FULLREPO_BRANCH" && fullrepo_remote="true" || fullrepo_remote="false"
   mem_count=$(find "$root/.serena/memories" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
-  cat <<EOF
-{
-  "branch": "$branch",
-  "dirty": "$dirty",
-  "ahead": $ahead,
-  "behind": $behind,
-  "fullrepo_local": $fullrepo_local,
-  "fullrepo_remote": $fullrepo_remote,
-  "serena_memory_count": $mem_count
-}
-EOF
+  # JSON-escape via Python so a branch name containing `"`, `\`, or any
+  # control char cannot produce malformed output. Booleans and integers
+  # are passed via env to keep the shell -> Python boundary explicit.
+  BRANCH="$branch" DIRTY="$dirty" \
+  AHEAD="$ahead" BEHIND="$behind" \
+  FL="$fullrepo_local" FR="$fullrepo_remote" \
+  MEM="$mem_count" \
+  python3 -c '
+import json, os
+print(json.dumps({
+    "branch": os.environ["BRANCH"],
+    "dirty": os.environ["DIRTY"],
+    "ahead": int(os.environ["AHEAD"]),
+    "behind": int(os.environ["BEHIND"]),
+    "fullrepo_local": os.environ["FL"] == "true",
+    "fullrepo_remote": os.environ["FR"] == "true",
+    "serena_memory_count": int(os.environ["MEM"]),
+}, indent=2))
+'
 }
 
 case "${1:-}" in
