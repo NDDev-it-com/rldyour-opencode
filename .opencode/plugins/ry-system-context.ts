@@ -17,17 +17,45 @@ declare const Bun: {
     exited: Promise<number>
     stdout: ReadableStream
     stderr: ReadableStream
+    kill: (signal?: number | string) => void
   }
 }
 
-async function readGitOutput(cwd: string, args: string[]): Promise<string> {
+// `experimental.chat.system.transform` runs before every model call, so the
+// git status probe MUST be ultra-fast and fail-open. Without an explicit
+// timeout+kill guard, a stuck `git status` (lockfile contention, slow FS,
+// network FS) could stall every chat turn. 800ms is a tight cap that still
+// allows a healthy local clone to respond. maxBytes caps the largest realistic
+// `git status --porcelain` output (a 16 KiB string corresponds to ~250 files)
+// — anything bigger gets truncated, the worktree dirty count uses the line
+// count of the truncated text which is acceptable for the system-prompt
+// stamp. Pattern is duplicated in ry-tools.ts on purpose; the limits differ.
+async function readGitOutput(
+  cwd: string,
+  args: string[],
+  timeoutMs = 800,
+  maxBytes = 16_384,
+): Promise<string> {
+  let proc: ReturnType<typeof Bun.spawn> | undefined
+  let killed = false
+  const timer = setTimeout(() => {
+    killed = true
+    try {
+      proc?.kill()
+    } catch {
+      // process may have already exited
+    }
+  }, timeoutMs)
   try {
-    const proc = Bun.spawn(["git", ...args], { cwd, stdout: "pipe", stderr: "pipe" })
+    proc = Bun.spawn(["git", ...args], { cwd, stdout: "pipe", stderr: "pipe" })
     const text = await new Response(proc.stdout).text()
     await proc.exited
-    return text.trim()
+    if (killed) return ""
+    return (text.length > maxBytes ? text.slice(0, maxBytes) : text).trim()
   } catch {
     return ""
+  } finally {
+    clearTimeout(timer)
   }
 }
 

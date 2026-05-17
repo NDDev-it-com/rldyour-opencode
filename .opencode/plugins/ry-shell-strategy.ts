@@ -1,5 +1,10 @@
 import type { Plugin } from "@opencode-ai/plugin"
 
+// The plugin tsconfig keeps `types: []` to avoid leaking the full Node API
+// surface into Bun plugin code — declare only what we actually consume.
+// Both Bun and Node runtimes expose `process.env`, so this is portable.
+declare const process: { env: Record<string, string | undefined> }
+
 // User-visible messaging uses OpenCode v1.14.48 client API:
 //   client.app.log({ body: { service, level, message }})  → server log file
 //   client.tui.showToast({ body: { variant, message }})  → toast banner in TUI
@@ -36,9 +41,18 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
 
   return {
     "shell.env": async (_input, output) => {
+      // Always silence interactive prompts and update notifiers — these are
+      // pure UX and never break correctness. `CI=1` is broader (affects test
+      // runners, package managers, watch modes, snapshot output), so allow
+      // the operator to opt out via `RY_DISABLE_CI_ENV=1` for interactive
+      // workflows that need TTY-aware behavior. YOLO mode keeps `CI=1` on by
+      // default — see docs/decisions/009-yolo-full-auto-mode.md.
       output.env.GIT_TERMINAL_PROMPT = "0"
-      output.env.CI = "1"
+      output.env.NO_UPDATE_NOTIFIER = "1"
       output.env.NODE_OPTIONS = "--max-old-space-size=4096"
+      if (process.env.RY_DISABLE_CI_ENV !== "1") {
+        output.env.CI = "1"
+      }
     },
 
     "tool.execute.before": async (input, output) => {
@@ -108,15 +122,35 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
         }
       }
 
-      // Layer 3 (git push --no-verify on product branches). Unconditional
-      // throw — pre-push hooks installed on main/master/release/production
-      // exist for a reason; bypassing them via --no-verify is a CI/policy
-      // escape hatch that this layer refuses.
-      if (isPush && noVerify.test(command) && branchAlt.test(command)) {
-        const msg = "Blocked git push --no-verify on a product branch (pre-push hook bypass)."
-        await log("error", `${msg} cmd=${command.slice(0, 200)}`)
-        await toast("error", msg)
-        throw new Error(`[rldyour] ${msg} Resolve the hook failure or push to a feature branch.`)
+      // Layer 3 (git push --no-verify). Audit Phase 1 widened the block:
+      // previously this only fired when the explicit branch token matched
+      // main/master/release/production, which the bypass
+      // `git push --no-verify origin HEAD` evaded when the *current* branch
+      // was a product branch (no token on the command line). Now we block
+      // every `--no-verify` push by default. Operators with a legitimate
+      // pre-push-hook-failure case can opt out by setting
+      // `RY_ALLOW_NO_VERIFY=1` in their shell before invoking the command;
+      // the override is intentionally explicit so a single command-line
+      // invocation cannot bypass it. branchAlt is still computed because
+      // the audit log distinguishes "product branch attempt" from "feature
+      // branch attempt" — same block, different signal severity.
+      if (isPush && noVerify.test(command)) {
+        if (process.env.RY_ALLOW_NO_VERIFY === "1") {
+          await log(
+            "warn",
+            `RY_ALLOW_NO_VERIFY=1 override active; allowing git push --no-verify. cmd=${command.slice(0, 200)}`,
+          )
+        } else {
+          const productBranch = branchAlt.test(command)
+          const msg = productBranch
+            ? "Blocked git push --no-verify (pre-push hook bypass on a product branch)."
+            : "Blocked git push --no-verify (pre-push hook bypass)."
+          await log("error", `${msg} cmd=${command.slice(0, 200)}`)
+          await toast("error", msg)
+          throw new Error(
+            `[rldyour] ${msg} Resolve the hook failure, or set RY_ALLOW_NO_VERIFY=1 to opt out of this guard for a single shell session.`,
+          )
+        }
       }
     },
   }
