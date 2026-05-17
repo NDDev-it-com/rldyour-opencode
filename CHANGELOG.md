@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-05-17
+
+Audit-driven stabilization pass closing every P0/P1 finding from four parallel external audits (ChatGPT 5.5 Pro prompt + three deep-audit reports). Closes a class of silent regex-only validation failures, completes defense-in-depth coverage at the unconditional layer, removes dead Project casts, refreshes drift between stale counts/pointers and HEAD facts, expands CI baseline to Ubuntu + macOS matrix, adds governance scaffolding, and ships three new ADRs.
+
+### Fixed
+
+- **CRITICAL — strict YAML frontmatter validation (`scripts/_validate_helpers.py`).** Replace regex-based `_yaml_top_key` / `_yaml_block_child_keys` with `yaml.safe_load`. The regex parser silently accepted 6 reviewer agent frontmatter files whose `description:` line contained an unquoted second colon (e.g. `description: Orchestrated architecture review: boundaries, ...`) — invalid YAML under any standards-conformant 1.2 implementation. PyYAML 6.0.3 is now a hard dependency of the validator; CI installs it via `uvx --with pyyaml==6.0.3`.
+- **CRITICAL — quote 6 reviewer agent descriptions** (`flow-architecture-review`, `flow-consistency-review`, `flow-integration-review`, `flow-quality-review`, `flow-security-review`, `flow-verification-review`) so the same content parses as a YAML scalar instead of triggering a mapping-values-not-allowed error.
+- **`scripts/_validate_helpers.py::validate_opencode_json`** now catches `FileNotFoundError` gracefully and reports a deterministic `[ERR]` line instead of an unhandled traceback when the manifest is missing.
+- **`scripts/_validate_helpers.py::validate_agent`** now accepts `mode: all` per OpenCode v1.15.x docs alongside `primary` and `subagent`. Previously rejected as an unknown mode — would have broken any future config that uses the `all` mode default documented at https://opencode.ai/docs/agents.
+- **`scripts/_validate_helpers.py::validate_skill`** now explicitly rejects the eight Claude Code / Codex residue fields (`allowed-tools`, `disable-model-invocation`, `model`, `effort`, `maxTurns`, `paths`, `context`, `agent`) listed as forbidden in `AGENTS.md` skill rules. Previously silent.
+- **HIGH — `.opencode/plugins/ry-shell-strategy.ts` defense-in-depth completion**. Add unconditional `tool.execute.before` throws for two patterns previously only caught by `permission.ask` (which fires only when bash permission is statically `"ask"` — not `"allow"` as the Build agent uses globally): (a) catastrophic `rm -rf` targeting root / `$HOME` / `~` / cwd with `node_modules` cleanup as the explicit allowlist exception; (b) `git push --no-verify` on `main`/`master`/`release`/`production` branches. Both throws now `log("error")` BEFORE the toast and throw, so the audit trail records the block reason even if the TUI toast call fails silently. Same hardening applied to the existing force-push throw.
+- **HIGH — `.opencode/plugins/ry-bootstrap.ts` dead Project cast**. Replace hand-rolled `project as { name?: string; path?: string }` cast with the typed `project.worktree` field from `@opencode-ai/sdk` `Project` (gen/types.gen.d.ts:607). Neither `name` nor `path` are typed Project fields; `name` is derived from the basename of `worktree` instead.
+- **`.opencode/plugins/ry-env-protection.ts`** widens bash secret-read detection from `cat|head|tail|less|more|type` only to also cover `grep|sed|awk|strings|xxd|od|hexdump|cut` (text and binary dumpers), `bat|view|nano|vim|vi|emacs` (pagers and editors), one-liner script execs (`python3 -c`, `node -e`, `ruby|perl|bash|sh|fish|zsh -[ce]`), and shell redirects (`< secrets.env`). Path detection now reuses the existing `isSensitivePath()` function so the `.env.example`/`.template`/`.sample` allowlist is honoured uniformly across `read` and `bash` tool blocks.
+
+### Added
+
+- **(group F)** Wire network-backed dependency freshness in `scripts/check_deps_freshness.sh` with `--check-freshness` flag, per-pin timeout, npm view + PyPI JSON API. JSON envelope extended with `latest`, `stale`, `source` fields.
+- **(group F)** Add `.serena/.command_audit.log` to `scripts/fullrepo_sync.sh::RUNTIME_EXCLUDE_PATTERNS` (mirrors the project-root `.gitignore` rule installed in 0.10.0).
+- **(group F)** Widen `scripts/fullrepo_sync.sh` secret-scan to all text files (Python `.py`, plain `.log`, no-extension files) using `grep -rI`; previous coverage missed Python tests and runtime logs.
+- **(group F)** JSON-escape `scripts/fullrepo_sync.sh status-json` output via Python helper (`json.dumps`) instead of heredoc interpolation; previously could produce malformed JSON when a branch name contained `"` or `\`.
+- **(group G)** New pytest suites: `test_fullrepo_sync.py` (publish/status/restore paths), `test_sanitize_diag.py` (every ordered redaction pattern), `test_check_deps_freshness.py` (envelope + flags). Extension of `test_validate_helpers.py` with strict YAML + FileNotFoundError + `mode: all` + forbidden-skill-field cases.
+- **(group H)** `.opencode/tsconfig.json` strict-mode plugin config + baseline `bunx tsc --noEmit`.
+- **(group I)** Expanded CI baseline — `validate.yml`, `dependency-check.yml`, `instruction-docs-check.yml`, `typecheck-plugins.yml`, `lint.yml` (ruff), `codeql.yml`, `secret-scan.yml` (gitleaks), `dependency-review.yml`, `release.yml`, `sbom.yml`. All actions pinned to commit SHA, `permissions: contents: read` per workflow, `concurrency` cancel-in-progress groups, explicit `timeout-minutes`. Ubuntu + macOS matrix for `validate`, `typecheck-plugins`, `lint`. CodeQL / gitleaks / dependency-review / SBOM stay Ubuntu-only (platform-independent). `.github/dependabot.yml` for weekly npm and github-actions ecosystem updates.
+- **(group J)** Governance scaffolding: `CONTRIBUTING.md`, `SECURITY.md` (private disclosure route), `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), `.github/CODEOWNERS`, `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config_question}.md`.
+- **(group K)** Three new ADRs (MADR 4.0.0): `005-fullrepo-snapshot-boundary.md` (declares two artifact classes: normal-branch checkout vs `fullrepo` agent-only snapshot, with snapshot-aware validation), `006-defense-in-depth-complete.md` (`tool.execute.before` unconditional + `permission.ask` deny-only, with mandatory test-side coverage for force-push / catastrophic rm / `--no-verify`), `007-ci-mirrors-local-validation.md` (local scripts are the source of truth, CI is thin wrappers; SHA-pinned actions, least-privilege permissions, concurrency groups).
+
+### Changed
+
+- **`AGENTS.md`** validation command line refreshed (259/9 -> 282/10, PyYAML pin added to `uvx` env). Permission keys section replaces incomplete 14-key list with full 17-key canonical set (v1.15.x JSON Schema), cites `sst/opencode#15507` silent-acceptance risk.
+- **`README.md`** pytest count table: 9/259 -> 10/282 with new `doctor_opencode` suite. Project structure block: 9 -> 10 suites. Models block: surface the real default (`opencode-go/glm-5.1`) plus Anthropic alternatives in a two-column table; document the `opencode debug config | grep` runtime smoke for verifying resolved model after switching providers.
+- **`.claude/CLAUDE.md`** catalog row counts: 9/259 -> 10/282, repo version 0.10.1 -> 0.11.0. Validation cookbook: PyYAML pin in `uvx` invocation. Broken pointer `CORE_00_memory_index.md` -> `CORE-01-INDEX.md`.
+- **All 4 ADR supersession banners** (`docs/decisions/001..004`): broken pointer `CORE_02_opencode_config.md` -> `CORE-02-PROJECT-SHAPE.md` (file referenced never existed under that underscore-style name; current taxonomy uses `AREA-01-SLUG.md`).
+- **`references/opencode-plugin-patterns.md`** removes the dead `project as { name?, path? }` cast guidance.
+- **`.serena/memories/*`** synchronized to HEAD facts: `CORE-01-INDEX.md`, `RELEASE-01-VALIDATION.md`, `TECHDEBT-01-NOW.md`, `CODEX-01-PLUGIN-CANON.md` updated with new pytest suite count, version bump, resolved-pattern entries for groups A-D.
+
+### Test coverage
+
+- Total pytest cases: **282+** (was 282 at HEAD `1e14c22`; final 0.11.0 count appended after groups F/G complete). Suite breakdown: 42 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 9 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + new suites in groups F/G.
+
 ## [0.10.1] - 2026-05-14
 
 Hardening pass closing every deferred item from the 0.10.0 reviewer round (Architecture H-1..L-3, Verification C-1, H-1..H-3, M-1..M-5). Repairs a silent-broken regex class that affected the security-critical permission-ask and tool-execute layers, redacts secrets from diagnostic bundles, sharpens MCP smoke semantics, and lifts pytest coverage by 65 cases.
