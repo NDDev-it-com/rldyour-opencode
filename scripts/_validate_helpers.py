@@ -17,6 +17,7 @@ from pathlib import Path
 
 try:
     import yaml
+    from yaml.nodes import MappingNode, ScalarNode
 except ImportError as _exc:  # pragma: no cover - tooling boundary
     print(
         "[ERR] PyYAML is required for fail-closed frontmatter validation. "
@@ -156,10 +157,12 @@ class DuplicateYamlKey(ValueError):
 
 
 def _parse_frontmatter_yaml(fm: str, label: str) -> tuple[dict[str, object] | None, int]:
-    """Parse YAML frontmatter strictly via yaml.safe_load.
+    """Parse YAML frontmatter strictly via yaml.safe_load + yaml.compose.
 
     Returns (parsed_dict, errors). `parsed_dict` is None on parse failure.
-    Reports duplicate top-level keys (silent ambiguity in regex parser).
+    Reports duplicate top-level keys via YAML node traversal instead of raw
+    line matching, so quoted keys and YAML-specific syntax are handled by the
+    parser that will actually load the document.
     Strict YAML parsing rejects unquoted descriptions that contain a second
     colon (e.g. `description: Orchestrated review: notes`) — exactly the
     failure mode silently allowed by the legacy regex parser.
@@ -177,12 +180,20 @@ def _parse_frontmatter_yaml(fm: str, label: str) -> tuple[dict[str, object] | No
         print(f"[ERR] {label}: frontmatter root must be a mapping, got {type(data).__name__}")
         return None, 1
 
+    try:
+        node = yaml.compose(fm)
+    except yaml.YAMLError as exc:
+        print(f"[ERR] {label}: YAML compose error during duplicate-key scan: {exc}")
+        return data, 1
+
     errors = 0
     seen: set[str] = set()
-    for line in fm.splitlines():
-        m = re.match(r"^([\w-]+):", line)
-        if m:
-            key = m.group(1)
+    if isinstance(node, MappingNode):
+        for key_node, _ in node.value:
+            if isinstance(key_node, ScalarNode):
+                key = str(key_node.value)
+            else:
+                key = str(key_node)
             if key in seen:
                 print(f"[ERR] {label}: duplicate top-level key {key!r}")
                 errors += 1

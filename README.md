@@ -77,10 +77,10 @@ A self-contained OpenCode project configuration that provides:
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
 | Reference docs (skill/agent contracts) | `references/*.md` | 16 |
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
-| Architecture decision archive | `docs/decisions/*.md` | 4 |
-| Diagnostic scripts (bash + python) | `scripts/` | 17 (15 wrappers + 3 helper modules: `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
-| Pytest suites | `scripts/tests/*.py` | 10 (282 cases: 42 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 9 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs + 8 doctor_opencode) |
-| CI workflows | `.github/workflows/*.yml` | 2 (`validate`, `dependency-check`) |
+| Architecture decision archive | `docs/decisions/*.md` | 7 |
+| Diagnostic scripts (bash + python) | `scripts/` | 18 (14 wrappers + 4 helper modules: `_check_freshness.py`, `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
+| Pytest suites | `scripts/tests/*.py` | 13 (372 cases: 52 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 11 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs + 8 doctor_opencode + 23 sanitize_diag + 40 dependency freshness + 15 fullrepo sync) |
+| CI workflows | `.github/workflows/*.yml` | 10 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`) |
 
 ### Project structure
 
@@ -99,15 +99,15 @@ rldyour-opencode/
 │   ├── plugins/  *.ts          # 10 Bun-runtime plugins
 │   └── package.json            # @opencode-ai/plugin pin
 ├── .serena/
-│   ├── memories/  *.md         # 14 verified knowledge files (AREA-NN-SLUG.md taxonomy)
+│   ├── memories/  *.md         # 6 verified knowledge files (AREA-NN-SLUG.md taxonomy)
 │   └── project.yml             # Serena project config
 ├── references/   *.md          # 16 durable contracts (consumed by skills/agents)
 ├── docs/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
-│   └── decisions/  001..004.md # 4 MADR-style ADRs
-├── scripts/                    # 17 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 10 pytest suites — 282 cases
-└── .github/workflows/          # validate.yml + dependency-check.yml (least-privilege, SHA-pinned)
+│   └── decisions/  001..007.md # 7 MADR-style ADRs
+├── scripts/                    # 18 bash + python diagnostic / validation / smoke scripts
+│   └── tests/  *.py            # 13 pytest suites — 372 cases
+└── .github/workflows/          # 10 least-privilege, SHA-pinned CI/release workflows
 ```
 
 ## Commands
@@ -186,7 +186,7 @@ Run `opencode models <provider>` to list every accepted ID. All current IDs are 
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
-uvx --from "pytest==9.0.2" --with "pyyaml==6.0.3" pytest scripts/tests/  # 282 cases in 10 suites
+uvx --from "pytest==9.0.2" --with "pyyaml==6.0.3" pytest scripts/tests/  # 372 cases in 13 suites
 bash scripts/check_deps_freshness.sh                       # list pinned MCP dependencies (npm/PyPI/Dart)
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
 python3 scripts/validate_instruction_docs.py               # verify AGENTS.md + .claude/CLAUDE.md anchor headings
