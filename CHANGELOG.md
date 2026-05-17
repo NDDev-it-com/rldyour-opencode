@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.4] - 2026-05-18
+
+Patch release aligning the release workflow's validation context with `validate.yml` after the `v0.11.3` tag run proved release pytest was missing agent-only instruction docs.
+
+### Fixed
+
+- `release.yml` now fetches `origin/fullrepo`, installs the canonical fullrepo exclude block, and restores only `AGENTS.md` plus `.claude/CLAUDE.md` before running the shared pytest corpus. This mirrors `validate.yml` without overlaying `scripts/` or `.opencode/` from `fullrepo` over the tagged release checkout.
+
 ## [0.11.3] - 2026-05-18
 
 Patch release fixing the live release/SBOM workflow pins after the first `v0.11.2` tag run proved two immutable action SHAs were invalid upstream.
