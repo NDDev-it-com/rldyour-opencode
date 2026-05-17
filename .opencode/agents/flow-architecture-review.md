@@ -1,5 +1,5 @@
 ---
-description: Orchestrated architecture review: boundaries, dependency direction, public API, data flow. Read-only. Invoked by ry-start or ry-review.
+description: "Orchestrated architecture review: boundaries, dependency direction, public API, data flow. Read-only. Invoked by ry-start or ry-review."
 mode: subagent
 temperature: 0.1
 steps: 36
