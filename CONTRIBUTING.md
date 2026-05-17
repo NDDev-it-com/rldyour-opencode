@@ -1,0 +1,101 @@
+# Contributing to rldyour-opencode
+
+Thanks for taking the time to contribute. This document captures the workflow, validation contract, and reviewer expectations for code, configuration, documentation, and Serena memory changes in this OpenCode marketplace.
+
+## Quick links
+
+- Code of Conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- Security disclosure: [SECURITY.md](./SECURITY.md)
+- Cross-tool root instructions: [AGENTS.md](./AGENTS.md) (agent-only, published to `fullrepo`)
+- Architecture decisions: [docs/decisions/](./docs/decisions/)
+- Release process: [docs/release-process.md](./docs/release-process.md)
+- Observability triage: [docs/observability.md](./docs/observability.md)
+- Reviewer protocol: [references/reviewer-protocol.md](./references/reviewer-protocol.md)
+
+## Repository layout
+
+The marketplace splits into two artifact classes:
+
+| Class | What lives there | Branch |
+|---|---|---|
+| Normal-branch runtime | `opencode.json`, `README.md`, `VERSION`, `CHANGELOG.md`, `.env.example`, `scripts/`, `docs/`, `references/`, `.github/`, `.opencode/{agents,skills,commands,plugins}/` | `main` |
+| Agent-only context | `AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, `.serena/project.yml` | `fullrepo` (orphan) |
+
+The `fullrepo` branch is managed via `scripts/fullrepo_sync.sh`. Do not commit agent-only paths to `main` — they are excluded via `.git/info/exclude`.
+
+## Local development setup
+
+```bash
+# Prerequisites: Python 3.13, Bun 1.2+, uvx (uv), bash, git
+git clone https://github.com/rldyourmnd/rldyour-opencode.git
+cd rldyour-opencode
+
+# Install plugin SDK dependencies (used by typecheck workflow)
+cd .opencode && bun install --frozen-lockfile && cd ..
+
+# Optionally bootstrap agent-only context from fullrepo
+bash scripts/bootstrap_opencode.sh
+bash scripts/fullrepo_sync.sh restore
+```
+
+## Validation contract
+
+Before opening a PR, every change MUST pass these local gates. They mirror the CI workflows in `.github/workflows/`.
+
+```bash
+bash scripts/validate_config.sh                                          # opencode.json + frontmatter (strict YAML) + VERSION
+uvx --from "pytest==9.0.2" --with "pyyaml==6.0.3" pytest scripts/tests/  # 350+ cases across 13+ suites
+bash scripts/check_deps_freshness.sh                                     # pin report
+bunx --bun tsc --noEmit -p .opencode/tsconfig.json                       # plugin typecheck
+ruff check scripts                                                       # python lint
+```
+
+When `opencode` CLI is on PATH, `validate_config.sh` also exercises the live `opencode debug config | skill | agent build` resolution smoke. CI runs the same scripts on Ubuntu and macOS matrices.
+
+## Commit, branch, and PR conventions
+
+- **Conventional Commits 1.0.0** for every commit. Format: `<type>(<scope>): <description>` with type from `feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert`.
+- **Atomic commits**: one logical change per commit. Never `--amend` an already-pushed commit; ship a follow-up commit instead.
+- **Commit subject ≤72 characters**; longer detail in the body.
+- **Branch naming**: `feat/<topic>`, `fix/<topic>`, `chore/<topic>`. Solo-maintainer commits on `main` are acceptable for small atomic changes; multi-step features should use a feature branch and a single PR.
+- **PR description** must include: scope, validation evidence (which gates ran green), risk assessment, ADR link if architectural.
+
+## Domain boundaries
+
+The marketplace assigns each skill / agent / command / plugin to exactly one of 10 domains (see `AGENTS.md` § Domain Boundaries). Cross-domain logic is forbidden. The single exception is `.opencode/plugins/ry-tools.ts`, which intentionally bundles multi-domain diagnostic tools and documents the bundling intent in its file header.
+
+## Reviewer subagent contract
+
+When PRs are reviewed via `/ry-review` or `/ry-start`, six parallel reviewer subagents (`flow-architecture-review`, `flow-quality-review`, `flow-consistency-review`, `flow-integration-review`, `flow-verification-review`, `flow-security-review`) run read-only checks against the diff. See `references/reviewer-protocol.md` for the finding format and disposition rules.
+
+## ADR policy
+
+Architectural decisions follow MADR 4.0.0 in `docs/decisions/NNN-slug.md`. Add an ADR when:
+
+- changing the source-of-truth contract for a file class,
+- introducing a new domain or relaxing a domain boundary,
+- changing release / packaging / governance defaults,
+- adopting or removing a critical dependency,
+- expanding or contracting the CI baseline.
+
+ADR bodies are immutable. Update guidance through a supersession banner at the top of the file, not by rewriting history.
+
+## Serena memory hygiene
+
+Memory files at `.serena/memories/AREA-NN-SLUG.md` contain verified durable facts. Update them via `serena-memory-sync` or the `@flow-memory-sync` subagent. Do not write speculative notes, secrets, or runtime snapshots into memories. Use code, tests, and git history as the source of truth.
+
+## What we won't accept
+
+- Hacks, temporary workarounds, or untracked debt.
+- Fake green checks. If a check cannot run, the PR must say so explicitly.
+- Silent destructive git actions (force-push without lease, hard reset on shared branches, dropping branches without verified merged state).
+- Secrets, credentials, tokens, cookies, or runtime markers in commits, logs, docs, or memories.
+- `console.log` family in production plugin code (use `client.app.log` + `client.tui.showToast` per `references/opencode-plugin-patterns.md`).
+- Cross-domain skill / agent / command bundling.
+- New ADRs without the four MADR sections (Context, Considered Options, Decision Outcome, Consequences).
+
+## Questions
+
+- Operational: open a GitHub issue using the `config_question.md` template.
+- Security: see [SECURITY.md](./SECURITY.md). Do not file public issues for vulnerabilities.
+- Repository owner: `rldyourmnd`.
