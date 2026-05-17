@@ -234,3 +234,56 @@ def test_no_console_log_in_plugin_production_code() -> None:
             f"use client.app.log + client.tui.showToast (see references/"
             f"opencode-plugin-patterns.md § Observability pattern)"
         )
+
+
+def test_flow_hooks_reads_command_from_input_args() -> None:
+    """`tool.execute.after` in ry-flow-hooks.ts MUST read bash args from `input.args`,
+    not `output.args`. The SDK contract (@opencode-ai/plugin@1.15.4) places args
+    on the input side; reading from output silently swallows every git commit
+    detection. This regression slipped through the 0.11.x train and is closed
+    here in 0.12.0 with a structural guard. See audit Phase 0 P0-1.
+    """
+    src = (PLUGINS_DIR / "ry-flow-hooks.ts").read_text(encoding="utf-8")
+    # The helper extracts from input.args:
+    assert "input.args" in src, (
+        "ry-flow-hooks.ts must read command from input.args (SDK contract). "
+        "See audit Phase 0 P0-1 and references/opencode-plugin-patterns.md."
+    )
+    # The buggy pattern must not be reintroduced:
+    assert "(output as { args?:" not in src, (
+        "ry-flow-hooks.ts must not cast `output` to a shape with `.args` — "
+        "args live on `input.args`, not `output.args`."
+    )
+    # The dedicated helper is present:
+    assert "function getBashCommand(" in src, (
+        "Expected `getBashCommand` helper in ry-flow-hooks.ts to centralize the input.args extraction."
+    )
+
+
+def test_plugin_spawn_calls_have_timeout_guard() -> None:
+    """Any plugin that spawns a child process via `Bun.spawn` must arm a
+    timeout that calls `proc.kill()` on the kill path. Without that guard a
+    hung subprocess can wedge `experimental.chat.system.transform` (ultra-hot
+    path) or a custom diagnostic tool. See audit Phase 1 plugin timeouts.
+    """
+    for name in ("ry-system-context.ts", "ry-tools.ts"):
+        src = (PLUGINS_DIR / name).read_text(encoding="utf-8")
+        assert "Bun.spawn(" in src, f"{name} no longer uses Bun.spawn — update this test"
+        assert "setTimeout(" in src and "proc?.kill()" in src, (
+            f"{name} spawns child processes but is missing the timeout+kill guard. "
+            f"See audit Phase 1 — every Bun.spawn call must arm a kill timer."
+        )
+
+
+def test_ry_env_protection_blocks_data_movement_utilities() -> None:
+    """The env-protection plugin must block cp/mv/tar/zip/base64-style
+    exfiltration utilities targeting sensitive paths, not just read/dump
+    tokens. Audit Phase 1 widened the regex from the read-token set to also
+    cover data movement.
+    """
+    src = (PLUGINS_DIR / "ry-env-protection.ts").read_text(encoding="utf-8")
+    assert "dataMoveRe" in src or "data movement" in src.lower(), (
+        "ry-env-protection.ts must classify cp/mv/tar/zip/base64 as data-movement "
+        "vectors (audit Phase 1). Update the BLOCKED_PATTERNS comment block "
+        "or restore the explicit dataMoveRe matcher."
+    )
