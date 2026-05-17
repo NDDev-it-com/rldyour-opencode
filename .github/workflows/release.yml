@@ -30,6 +30,20 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
         with:
           fetch-depth: 0
+      - name: Prepare agent-only validation context
+        shell: bash
+        run: |
+          # Release runs the same pytest corpus as validate.yml. Some tests
+          # assert cross-layer contracts in AGENTS.md / .claude, while normal
+          # branches keep those files on origin/fullrepo. Restore only the
+          # instruction docs and exclude marker; do not bootstrap fullrepo over
+          # the release checkout because that could mask the tagged tree under
+          # validation.
+          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo
+          bash scripts/fullrepo_sync.sh install-exclude
+          git show origin/fullrepo:AGENTS.md > AGENTS.md
+          mkdir -p .claude
+          git show origin/fullrepo:.claude/CLAUDE.md > .claude/CLAUDE.md
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
