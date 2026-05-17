@@ -43,7 +43,7 @@ Audit-driven stabilization pass closing every P0/P1 finding from four parallel e
 
 ### Test coverage
 
-- Total pytest cases: **282+** (was 282 at HEAD `1e14c22`; final 0.11.0 count appended after groups F/G complete). Suite breakdown: 42 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 9 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + new suites in groups F/G.
+- Total pytest cases: **353** (was 282 at HEAD `1e14c22`, +71). Suite breakdown across 13 suites: 48 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 9 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + 24 sanitize_diag (new) + 17 check_freshness (new) + 16 fullrepo_sync (new).
 
 ## [0.10.1] - 2026-05-14
 
