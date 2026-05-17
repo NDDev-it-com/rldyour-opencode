@@ -379,6 +379,102 @@ def test_agent_accepts_nested_bash_pattern_permission(tmp_path: Path) -> None:
     assert vh.validate_agent(p) == 0
 
 
+# ---------- 0.11.0 strict-YAML extension ----------
+
+
+def test_opencode_json_missing_file_returns_err(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """validate_opencode_json must report a deterministic ERR line on a
+    missing manifest, not raise an unhandled FileNotFoundError. Closes
+    audit finding 4MUSTHAVE P1 'validate_opencode_json catches only
+    JSONDecodeError'."""
+    cfg = tmp_path / "does-not-exist.json"
+    assert vh.validate_opencode_json(cfg) == 1
+    captured = capsys.readouterr()
+    assert "file not found" in captured.out
+
+
+def test_agent_mode_all_accepted(tmp_path: Path) -> None:
+    """OpenCode v1.15.x docs (https://opencode.ai/docs/agents) allow
+    mode: primary | subagent | all. The validator must accept `all`
+    alongside primary/subagent so a future config using mode: all does
+    not trip a false-negative."""
+    p = _write_agent(tmp_path, "all-mode", "---\ndescription: x\nmode: all\n---\n")
+    assert vh.validate_agent(p) == 0
+
+
+def test_agent_yaml_unquoted_colon_in_description_is_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The 0.10.1 regex parser silently accepted an unquoted scalar
+    containing a second colon (the actual reviewer-agent failure mode).
+    The 0.11.0 yaml.safe_load parser must reject it as
+    'mapping values are not allowed here'."""
+    p = _write_agent(
+        tmp_path,
+        "broken",
+        "---\ndescription: Orchestrated review: notes\nmode: subagent\n---\n",
+    )
+    assert vh.validate_agent(p) > 0
+    captured = capsys.readouterr()
+    assert "YAML parse error" in captured.out
+
+
+def test_skill_yaml_invalid_is_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Skill validator must also surface a real YAML parse error rather
+    than silently passing on broken frontmatter (the regex parser used
+    to accept this)."""
+    skill_dir = tmp_path / "broken-skill"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: broken-skill\ndescription: One: two: three\n---\nbody\n",
+        encoding="utf-8",
+    )
+    assert vh.validate_skill(skill_dir) > 0
+    captured = capsys.readouterr()
+    assert "YAML parse error" in captured.out
+
+
+def test_skill_forbidden_field_is_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """SKILL frontmatter must not carry Claude Code / Codex residue
+    fields per AGENTS.md skill rules. The 0.10.1 validator silently
+    accepted them; 0.11.0 must explicitly reject."""
+    skill_dir = tmp_path / "tainted-skill"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\n"
+        "name: tainted-skill\n"
+        "description: a valid description with enough length for the gate\n"
+        "model: should-not-be-here\n"
+        "allowed-tools: should-not-be-here\n"
+        "---\n",
+        encoding="utf-8",
+    )
+    assert vh.validate_skill(skill_dir) > 0
+    captured = capsys.readouterr()
+    assert "forbidden skill frontmatter field" in captured.out
+
+
+def test_command_yaml_invalid_is_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Command validator parity: yaml.safe_load failures must surface
+    as a structured ERR line."""
+    p = tmp_path / "bad-cmd.md"
+    p.write_text(
+        "---\ndescription: Run: do something\nagent: build\n---\nbody\n",
+        encoding="utf-8",
+    )
+    assert vh.validate_command(p) > 0
+    captured = capsys.readouterr()
+    assert "YAML parse error" in captured.out
+
+
 # ---------- CLI dispatch ----------
 
 
