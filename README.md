@@ -80,7 +80,7 @@ A self-contained OpenCode project configuration that provides:
 | Architecture decision archive | `docs/decisions/*.md` | 8 |
 | Diagnostic scripts (bash + python) | `scripts/` | 19 (15 wrappers + 4 helper modules: `_check_freshness.py`, `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
 | Pytest suites | `scripts/tests/*.py` | 14 (383 cases: 6 action_pins + 52 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 11 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs + 8 doctor_opencode + 23 sanitize_diag + 40 dependency freshness + 20 fullrepo sync) |
-| CI workflows | `.github/workflows/*.yml` | 10 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`) |
+| CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
 
 ### Project structure
 
@@ -107,7 +107,7 @@ rldyour-opencode/
 │   └── decisions/  001..008.md # 8 MADR-style ADRs
 ├── scripts/                    # 19 bash + python diagnostic / validation / smoke scripts
 │   └── tests/  *.py            # 14 pytest suites — 383 cases
-└── .github/workflows/          # 10 least-privilege, SHA-pinned CI/release workflows
+└── .github/workflows/          # 11 least-privilege, SHA-pinned CI/release workflows
 ```
 
 ## Commands
@@ -138,7 +138,7 @@ All reviewer tracks are `mode: subagent`, `hidden: true`, `edit: deny`, with `ba
 | `@flow-verification-review` | `#ec4899` | Tests, quality gates, browser/server evidence |
 | `@flow-security-review` | `error` | OWASP Top 10, auth/authz, injection, secrets (defensive-only) |
 | `@flow-memory-sync` | `#eab308` | Fact-only Serena memory synchronization |
-| `@ry-explore` | `info` | Deep multi-source research (Opus 4.7, 1M context) |
+| `@ry-explore` | `info` | Deep multi-source research (90 reasoning steps; inherits top-level `model`) |
 | `@customize-opencode` | `accent` | Safely edit `opencode.json` with validation, backup, rollback |
 
 ## MCP Servers

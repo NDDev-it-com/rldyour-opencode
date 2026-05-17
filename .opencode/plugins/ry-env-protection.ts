@@ -109,18 +109,36 @@ export const RyEnvProtection: Plugin = async ({ client }) => {
           /\b(cat|head|tail|less|more|type|bat|view|nano|vim|vi|emacs|grep|sed|awk|strings|xxd|od|hexdump|cut)\b/i
         const scriptExecRe = /(?:python3?|node|ruby|perl|bash|sh|fish|zsh)\s+-[ce]\b/i
         const shellRedirectRe = /<\s*[^\s|&;<>]*\.(env|pem|key|p12|pfx)\b/i
-        const dataMoveRe = /\b(cp|mv|tar|zip|gzip|7z|rsync|scp|base64|openssl|find)\b/i
+        // Security review F-1 widened the data-movement matcher. `dd`,
+        // `socat`, `tee`, `curl`, `wget` all move bytes from a sensitive
+        // path to a non-sensitive destination without producing direct
+        // stdout, so they evade the read-token detector while still
+        // performing exfiltration. They are now first-class blockers.
+        const dataMoveRe =
+          /\b(cp|mv|tar|zip|gzip|7z|rsync|scp|base64|openssl|find|dd|socat|tee|curl|wget)\b/i
+        // `dd` and related tools use `key=value` argv syntax (`dd if=.env
+        // of=/tmp/out`). Our default split on `[\s|&;<>(){}"']+` keeps
+        // `if=.env` as a single token; the path-bounded `(^|/)\.foo/`
+        // regex inside isSensitivePath then misses it because there is no
+        // `^` or `/` before the dotfile. Add an extra splitter that breaks
+        // on `=` and `:` so the value half of every `key=path` /
+        // `key:path` argv pair gets its own sensitivity check.
+        // Security review F-2.
+        const ddArgPathRe = /\b(if|of|file|source|src|in|out)=\S*\.(env|pem|key|p12|pfx)\b/i
 
         // Keep backslash inside tokens: shell escapes such as `.ssh\\config`
         // still carry path information that isSensitivePath() must inspect.
-        const tokens = command.split(/[\s|&;<>(){}"']+/).filter(Boolean)
+        const primaryTokens = command.split(/[\s|&;<>(){}"']+/).filter(Boolean)
+        const ddSplitTokens = primaryTokens.flatMap((t) => t.split(/[=:]/g).filter(Boolean))
+        const tokens = [...primaryTokens, ...ddSplitTokens]
         const sensitiveToken = tokens.find((t) => isSensitivePath(t))
         const isRead = readTokenRe.test(command) || scriptExecRe.test(command)
         const isDataMove = dataMoveRe.test(command)
 
         if (
           ((isRead || isDataMove) && sensitiveToken) ||
-          shellRedirectRe.test(command)
+          shellRedirectRe.test(command) ||
+          ddArgPathRe.test(command)
         ) {
           await notifyBlock(command.slice(0, 200), "bash")
           throw new Error(
