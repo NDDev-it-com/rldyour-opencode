@@ -271,7 +271,7 @@ def test_command_missing_description(tmp_path: Path) -> None:
 
 
 def test_canonical_permission_keys_has_expected_size() -> None:
-    """v1.15.3 canonical set has 17 keys (verified via built-in customize-opencode skill)."""
+    """v1.15.4 canonical set has 17 keys (verified via built-in customize-opencode skill)."""
     assert len(vh.CANONICAL_PERMISSION_KEYS) == 17
 
 
