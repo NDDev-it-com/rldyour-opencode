@@ -1,0 +1,93 @@
+name: OpenCode Runtime
+
+# Installs a pinned opencode-ai CLI and exercises the runtime resolver:
+# `opencode --version`, `opencode debug config`, and the runtime smoke in
+# `scripts/validate_config.sh` (which is downgraded to [INFO] without the CLI
+# but is the canonical resolver gate when present).
+#
+# Decoupled from the static `validate.yml` job because runtime resolution
+# requires the opencode binary on PATH, and we want a separate signal: a
+# green static check should not imply a green runtime resolve, and vice
+# versa. See ADR-007 (CI mirrors local validation) and the audit roadmap
+# Phase 1 "OpenCode runtime job".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "opencode.json"
+      - ".opencode/**"
+      - "scripts/validate_config.sh"
+      - "scripts/_validate_helpers.py"
+      - ".github/workflows/opencode-runtime.yml"
+  pull_request:
+    paths:
+      - "opencode.json"
+      - ".opencode/**"
+      - "scripts/validate_config.sh"
+      - "scripts/_validate_helpers.py"
+      - ".github/workflows/opencode-runtime.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: opencode-runtime-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - name: Prepare agent-only validation context
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin fullrepo || true
+          bash scripts/fullrepo_sync.sh install-exclude
+          if git rev-parse --verify origin/fullrepo >/dev/null 2>&1; then
+            for path in AGENTS.md .claude/CLAUDE.md; do
+              if git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
+                mkdir -p "$(dirname "${path}")"
+                git show "origin/fullrepo:${path}" > "${path}"
+              fi
+            done
+          fi
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
+        with:
+          bun-version: "1.3.14"
+
+      - name: Install pinned OpenCode CLI
+        run: |
+          set -euo pipefail
+          bun install -g opencode-ai@1.15.4
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
+
+      - name: opencode --version
+        run: opencode --version
+
+      - name: opencode debug config
+        env:
+          OPENCODE_DISABLE_DEFAULT_PLUGINS: "0"
+        run: |
+          set -euo pipefail
+          opencode debug config 2>&1 | tee /tmp/opencode-debug-config.txt
+          # Smoke assertion: the resolver must surface our top-level model.
+          grep -q '"opencode-go/glm-5.1"' /tmp/opencode-debug-config.txt
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Install validator runtime
+        run: python3 -m pip install --upgrade pip "PyYAML==6.0.3"
+
+      - name: Runtime validation gate
+        run: bash scripts/validate_config.sh
