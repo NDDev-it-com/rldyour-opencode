@@ -77,7 +77,15 @@ def validate(config_path: Path, schema_path: Path) -> int:
     # union; mypy and Pyright cannot unify it with our `dict[str, object]`
     # bound. The runtime contract is identical, so we cast for the call.
     validator = Draft202012Validator(schema)  # type: ignore[arg-type]
-    errors = sorted(validator.iter_errors(config), key=lambda e: e.absolute_path)  # type: ignore[arg-type]
+    # Sort by string-normalised path segments — quality review F-2 noted
+    # that `absolute_path` is a deque of mixed `int` (array indices) and
+    # `str` (object keys), and Python 3 raises TypeError when sorting
+    # `int < str`. Stringifying every segment gives a stable, predictable
+    # ordering for both kinds of error locations.
+    errors = sorted(  # type: ignore[arg-type]
+        validator.iter_errors(config),  # type: ignore[arg-type]
+        key=lambda e: [str(p) for p in e.absolute_path],
+    )
     if not errors:
         print(f"[OK] {config_path.name} validates against {schema_path.name}")
         return 0

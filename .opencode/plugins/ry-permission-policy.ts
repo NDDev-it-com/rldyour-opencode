@@ -1,5 +1,10 @@
 import type { Plugin } from "@opencode-ai/plugin"
 
+// Plugin tsconfig keeps `types: []` to stay off @types/node; declare the
+// process surface we actually consume so the RY_ALLOW_NO_VERIFY opt-out
+// env check type-checks.
+declare const process: { env: Record<string, string | undefined> }
+
 // Dynamic permission policy. Fires only when the static permission config
 // (in opencode.json or per-agent frontmatter) sets a slot to "ask" — for
 // "allow" / "deny" the runtime never calls this hook. The marketplace
@@ -102,19 +107,35 @@ export const RyPermissionPolicy: Plugin = async ({ client }) => {
         }
       }
 
-      // git push to product branch with --no-verify — bypasses pre-push
-      // hooks the owner installed to keep release branches clean.
-      // The branch-name alternation is grouped so the trailing `\b`
-      // applies to every option; the previous flat form matched
-      // substrings like `mainline` / `productionish` (false positive).
-      // `noVerify` uses the same flag-boundary trick as `longForce` above.
+      // git push --no-verify. Audit Phase 1 + architecture-review F-1
+      // widened both this secondary deny layer and the unconditional
+      // Layer 1 in ry-shell-strategy.ts to block every --no-verify push
+      // by default. The previous product-branch gate (main/master/release/
+      // production) could be bypassed by `git push --no-verify origin HEAD`
+      // when the CURRENT branch happens to be a product branch — no token
+      // on the command line. The opt-out is the same RY_ALLOW_NO_VERIFY=1
+      // env var honoured by Layer 1; setting it suppresses the auto-deny
+      // here too, so the user keeps the interactive dialog choice. The
+      // branchAlt regex is preserved to discriminate the audit-log signal
+      // (product-branch attempt vs feature-branch attempt) with the same
+      // block applied to both. ADR-006 defense-in-depth requires this
+      // layer mirror the Layer 1 pattern coverage.
       const branchAlt = /\b(main|master|release|production)\b/i
-      if (isPush && noVerify.test(cmd) && branchAlt.test(cmd)) {
-        output.status = "deny"
-        const message = "Denied git push --no-verify on a product branch (pre-push hook bypass)."
-        await toast(message)
-        await log("error", `${message} cmd=${cmd.slice(0, 200)}`)
-        return
+      if (isPush && noVerify.test(cmd)) {
+        if (process.env.RY_ALLOW_NO_VERIFY !== "1") {
+          output.status = "deny"
+          const productBranch = branchAlt.test(cmd)
+          const message = productBranch
+            ? "Denied git push --no-verify (pre-push hook bypass on a product branch)."
+            : "Denied git push --no-verify (pre-push hook bypass)."
+          await toast(message)
+          await log("error", `${message} cmd=${cmd.slice(0, 200)}`)
+          return
+        }
+        await log(
+          "warn",
+          `RY_ALLOW_NO_VERIFY=1 override active in permission.ask layer; user-dialog kept. cmd=${cmd.slice(0, 200)}`,
+        )
       }
 
       // Everything else keeps the default "ask" so the user stays in control.

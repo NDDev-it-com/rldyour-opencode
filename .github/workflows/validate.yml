@@ -54,11 +54,17 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install pytest + PyYAML (pinned)
-        run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3"
+      - name: Install pytest + PyYAML + jsonschema (pinned)
+        run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0"
 
       - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
         run: bash scripts/validate_config.sh
+
+      - name: Validate opencode.json against vendored JSON Schema (v1.15.4)
+        run: python3 scripts/validate_opencode_schema.py
+
+      - name: Verify skills index is in sync with SKILL.md files
+        run: python3 scripts/generate_skills_index.py --check --strict
 
       - name: Run validator unit tests
         run: python3 -m pytest scripts/tests/ -v
