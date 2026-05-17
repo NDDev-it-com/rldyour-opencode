@@ -78,8 +78,8 @@ A self-contained OpenCode project configuration that provides:
 | Reference docs (skill/agent contracts) | `references/*.md` | 16 |
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
 | Architecture decision archive | `docs/decisions/*.md` | 8 |
-| Diagnostic scripts (bash + python) | `scripts/` | 19 (15 wrappers + 4 helper modules: `_check_freshness.py`, `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
-| Pytest suites | `scripts/tests/*.py` | 14 (383 cases: 6 action_pins + 52 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 11 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs + 8 doctor_opencode + 23 sanitize_diag + 40 dependency freshness + 20 fullrepo sync) |
+| Diagnostic scripts (bash + python) | `scripts/` | 23 (16 wrappers including new `generate_skills_index`, `generate_commands_index`, `generate_plugins_index`, `validate_opencode_schema` + 4 helper modules) |
+| Pytest suites | `scripts/tests/*.py` | 18 (412 cases — adds 6 cases each for `test_validate_opencode_schema`, `test_skills_index`, `test_commands_index`, `test_plugins_index` plus +3 plugin-surface regression locks) |
 | CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
 
 ### Project structure
@@ -106,7 +106,7 @@ rldyour-opencode/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
 │   └── decisions/  001..008.md # 8 MADR-style ADRs
 ├── scripts/                    # 19 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 14 pytest suites — 383 cases
+│   └── tests/  *.py            # 18 pytest suites — 412 cases
 └── .github/workflows/          # 11 least-privilege, SHA-pinned CI/release workflows
 ```
 
@@ -186,7 +186,7 @@ Run `opencode models <provider>` to list every accepted ID. All current IDs are 
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
-uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" pytest scripts/tests/  # 383 cases in 14 suites
+uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" pytest scripts/tests/  # 412 cases in 18 suites
 bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
 python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
