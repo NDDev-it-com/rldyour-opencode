@@ -9,7 +9,7 @@ Every plugin factory receives:
 ```ts
 PluginInput = {
   client: ReturnType<typeof createOpencodeClient>  // SDK client for server API
-  project: Project                                 // { name, path, ... }
+  project: Project                                 // { id, worktree, vcsDir?, vcs?, time }
   directory: string                                // process working directory
   worktree: string                                 // git worktree root
   experimental_workspace: { register: (type, adapter) => void }
@@ -18,7 +18,7 @@ PluginInput = {
 }
 ```
 
-Use `directory` (not `process.cwd()`) for relative paths. Cast `project as { name?, path? }` when you need those fields — they exist at runtime but the published `Project` type does not expose them in v1.14.
+`Project` shape per `@opencode-ai/sdk` `gen/types.gen.d.ts:607` exposes `id`, `worktree`, `vcsDir?`, `vcs?`, and a `time` object. The `name` and `path` fields used to exist only as informal runtime extensions; they are NOT typed by the SDK and casting `project as { name?: string; path?: string }` is dead surface. Use `project.worktree` for the project directory and `directory` for the process working directory (always defined per `PluginInput` contract). Project name can be derived from the basename of `worktree`. The cast guard is enforced by `scripts/tests/test_plugin_surface.py::test_no_dead_project_path_cast_in_plugins`.
 
 ## Hook surface (server-side)
 
