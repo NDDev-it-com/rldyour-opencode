@@ -96,9 +96,11 @@ classic PAT. Setup checklist:
    creates PRs). Read `docs/security/mcp-trust-boundaries.md` for the
    full read/write capability table per MCP.
 4. Set an expiration ≤ 90 days. Rotate quarterly.
-5. Export the token via `export GITHUB_PERSONAL_ACCESS_TOKEN=...` in
-   the same shell session that starts OpenCode. Do NOT add the export
-   to a tracked file.
+5. Set the `GITHUB_PERSONAL_ACCESS_TOKEN` variable in the same shell
+   session that starts OpenCode (export it from your profile or pass
+   it through your secret manager). Do NOT write the value into any
+   tracked file — `.env*` is git-ignored and blocked at runtime by
+   the `ry-env-protection` plugin.
 
 Classic PATs are blocked by policy except for explicit short-term
 troubleshooting; if you find one in use, file an issue and rotate. The
