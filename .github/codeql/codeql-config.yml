@@ -1,0 +1,10 @@
+name: rldyour-opencode-codeql
+
+paths:
+  - .opencode/plugins
+  - scripts
+  - .github/workflows
+
+paths-ignore:
+  - .opencode/node_modules
+  - scripts/tests
