@@ -7,13 +7,13 @@ on:
       - ".opencode/plugins/**"
       - ".opencode/tsconfig.json"
       - ".opencode/package.json"
-      - ".opencode/package-lock.json"
+      - ".opencode/bun.lock"
   pull_request:
     paths:
       - ".opencode/plugins/**"
       - ".opencode/tsconfig.json"
       - ".opencode/package.json"
-      - ".opencode/package-lock.json"
+      - ".opencode/bun.lock"
   workflow_dispatch: {}
 
 permissions:
