@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2026-05-18
+
+Patch stabilization pass closing the deferred 0.11.0 reviewer findings that were below the release-blocking threshold. The patch tightens parser fidelity, dependency freshness ordering, and plugin advisory coverage without changing public marketplace layout.
+
+### Fixed
+
+- **`scripts/_validate_helpers.py` duplicate-key detection** now uses `yaml.compose` node traversal after strict `yaml.safe_load`, so quoted duplicate top-level keys (for example `"name"` repeated twice) are rejected by the same YAML parser surface that loads the frontmatter. The old regex pass only caught unquoted `key:` lines.
+- **`scripts/_check_freshness.py` prerelease ordering** now compares `(major, minor, patch, stability)` tuples, with stable releases sorted above matching `dev` / `rc` / `alpha` / `beta` / `preview` / `nightly` / `snapshot` builds. `1.3.0.dev0` vs `1.3.0` now reports `stale`; the inverse reports `ahead`.
+- **`.opencode/plugins/ry-env-protection.ts` command tokenization** now preserves literal backslashes inside path tokens. Escaped shell paths keep enough information for `isSensitivePath()` instead of being split before inspection.
+- **`.opencode/plugins/ry-shell-strategy.ts` destructive-rm advisory** now warns for bare recursive build-output targets such as `rm -rf build` / `rm -rf dist`; `node_modules` cleanup remains the explicit non-catastrophic warning allowlist.
+
+### Changed
+
+- `VERSION` bumped to `0.11.1`.
+- `README.md`, `AGENTS.md`, `.claude/CLAUDE.md`, and Serena release memories refreshed from the 0.11.1 validation baseline.
+- Corrected the 0.11.0 changelog test-count line from stale intermediate numbers to the final `7c02482` collection state.
+
+### Test coverage
+
+- Total pytest cases: **372** across 13 suites (was 357 at `7c02482`, +15). Breakdown: 52 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 11 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + 23 sanitize_diag + 40 check_freshness + 15 fullrepo_sync.
+
 ## [0.11.0] - 2026-05-17
 
 Audit-driven stabilization pass closing every P0/P1 finding from four parallel external audits (ChatGPT 5.5 Pro prompt + three deep-audit reports). Closes a class of silent regex-only validation failures, completes defense-in-depth coverage at the unconditional layer, removes dead Project casts, refreshes drift between stale counts/pointers and HEAD facts, expands CI baseline to Ubuntu + macOS matrix, adds governance scaffolding, and ships three new ADRs.
@@ -43,7 +64,7 @@ Audit-driven stabilization pass closing every P0/P1 finding from four parallel e
 
 ### Test coverage
 
-- Total pytest cases: **353** (was 282 at HEAD `1e14c22`, +71). Suite breakdown across 13 suites: 48 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 9 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + 24 sanitize_diag (new) + 17 check_freshness (new) + 16 fullrepo_sync (new).
+- Total pytest cases: **357** (was 282 at HEAD `1e14c22`, +75). Suite breakdown across 13 suites: 50 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 9 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + 23 sanitize_diag (new) + 29 check_freshness (new) + 15 fullrepo_sync (new).
 
 ## [0.10.1] - 2026-05-14
 

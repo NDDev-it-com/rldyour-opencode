@@ -141,6 +141,34 @@ def test_no_dead_project_path_cast_in_plugins() -> None:
         )
 
 
+def test_ry_env_protection_token_splitter_preserves_backslash() -> None:
+    """Backslash is an escape marker, not a token separator.
+
+    The splitter may still use `\\s` for whitespace, but it must not include a
+    literal `\\` delimiter that would strip escaped path information before
+    `isSensitivePath()` sees the token.
+    """
+    src = (PLUGINS_DIR / "ry-env-protection.ts").read_text(encoding="utf-8")
+    match = re.search(r"command\.split\(/\[([^\]]+)\]\+/\)", src)
+    assert match, "ry-env-protection.ts must tokenize bash commands"
+    delimiter_class = match.group(1)
+    assert r"\\" not in delimiter_class, (
+        "command token splitter must preserve literal backslashes inside path tokens"
+    )
+
+
+def test_ry_shell_strategy_warns_on_bare_recursive_rm_targets() -> None:
+    """Non-catastrophic recursive rm must warn even without slash targets."""
+    src = (PLUGINS_DIR / "ry-shell-strategy.ts").read_text(encoding="utf-8")
+    assert r"&& /\//.test(command)" not in src, (
+        "destructive-rm warning must not be gated on slash-containing targets only"
+    )
+    assert "if (!isNodeModulesCleanup)" in src, (
+        "node_modules remains the only non-catastrophic rm warning allowlist"
+    )
+    assert "Destructive rm command detected" in src
+
+
 def test_ry_tool_hints_dispatch_path_wired() -> None:
     """Structural verification that the `tool.definition` hook in
     ry-tool-hints.ts actually mutates `output.description` when a

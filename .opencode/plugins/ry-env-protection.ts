@@ -88,7 +88,9 @@ export const RyEnvProtection: Plugin = async ({ client }) => {
         const scriptExecRe = /(?:python3?|node|ruby|perl|bash|sh|fish|zsh)\s+-[ce]\b/i
         const shellRedirectRe = /<\s*[^\s|&;<>]*\.(env|pem|key|p12|pfx)\b/i
 
-        const tokens = command.split(/[\s|&;<>(){}\\"']+/).filter(Boolean)
+        // Keep backslash inside tokens: shell escapes such as `.ssh\\config`
+        // still carry path information that isSensitivePath() must inspect.
+        const tokens = command.split(/[\s|&;<>(){}"']+/).filter(Boolean)
         const sensitiveToken = tokens.find((t) => isSensitivePath(t))
         const isRead = readTokenRe.test(command) || scriptExecRe.test(command)
 

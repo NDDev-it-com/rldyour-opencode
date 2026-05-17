@@ -163,6 +163,19 @@ def test_skill_duplicate_key(tmp_path: Path) -> None:
     assert vh.validate_skill(d) > 0
 
 
+def test_skill_duplicate_quoted_key(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    d = _write_skill(
+        tmp_path,
+        "dup-quoted",
+        '---\n"name": dup-quoted\n"name": other\ndescription: x\n---\n',
+    )
+    assert vh.validate_skill(d) > 0
+    captured = capsys.readouterr()
+    assert "duplicate top-level key 'name'" in captured.out
+
+
 # ---------- Agents ----------
 
 
@@ -214,6 +227,22 @@ def test_agent_block_scalar_description(tmp_path: Path) -> None:
         tmp_path,
         "rye",
         "---\ndescription: |\n  Long block-scalar description for the agent.\nmode: subagent\n---\n",
+    )
+    assert vh.validate_agent(p) == 0
+
+
+def test_agent_duplicate_scan_allows_nested_mappings(tmp_path: Path) -> None:
+    p = _write_agent(
+        tmp_path,
+        "nested-permission",
+        "---\n"
+        "description: x\n"
+        "mode: subagent\n"
+        "permission:\n"
+        "  bash:\n"
+        "    git diff: allow\n"
+        "  edit: deny\n"
+        "---\n",
     )
     assert vh.validate_agent(p) == 0
 

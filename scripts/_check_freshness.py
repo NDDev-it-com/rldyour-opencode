@@ -31,14 +31,34 @@ from typing import Any
 
 NETWORK_TIMEOUT_SECONDS = 5.0
 
-_SEMVER_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)(?:[.-].*)?$")
+_SEMVER_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)([.-].*)?$")
+_PRERELEASE_TOKEN_RE = re.compile(
+    r"(?:^|[.\-_])"
+    r"(?:dev|rc|alpha|beta|pre|preview|nightly|snapshot|a\d+|b\d+|pre\d+)",
+    re.IGNORECASE,
+)
 
 
-def _semver_tuple(version: str) -> tuple[int, int, int] | None:
+def _semver_parts(version: str) -> tuple[int, int, int, int] | None:
+    """Parse a version into (major, minor, patch, stability).
+
+    Stability is 1 for stable releases and 0 for prerelease/dev builds, so
+    `1.3.0` sorts above `1.3.0.dev0` and `1.3.0-rc1`.
+    """
     m = _SEMVER_RE.match(version.strip())
     if not m:
         return None
-    return int(m.group(1)), int(m.group(2)), int(m.group(3))
+    suffix = m.group(4) or ""
+    stability = 0 if _PRERELEASE_TOKEN_RE.search(suffix) else 1
+    return int(m.group(1)), int(m.group(2)), int(m.group(3)), stability
+
+
+def _semver_tuple(version: str) -> tuple[int, int, int] | None:
+    """Backward-compatible 3-part parser for callers that only display versions."""
+    parts = _semver_parts(version)
+    if parts is None:
+        return None
+    return parts[0], parts[1], parts[2]
 
 
 def _fetch_json(url: str) -> Any:
@@ -81,13 +101,13 @@ def probe_pypi(name: str) -> tuple[str | None, str | None]:
 def classify(current: str, latest: str | None) -> str:
     if latest is None:
         return "unknown"
-    cur_t = _semver_tuple(current)
-    new_t = _semver_tuple(latest)
-    if cur_t is None or new_t is None:
+    cur = _semver_parts(current)
+    new = _semver_parts(latest)
+    if cur is None or new is None:
         return "unknown" if current != latest else "current"
-    if cur_t == new_t:
+    if cur == new:
         return "current"
-    if cur_t < new_t:
+    if cur < new:
         return "stale"
     return "ahead"
 
