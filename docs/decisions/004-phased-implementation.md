@@ -5,7 +5,7 @@
 > `claude-opus-4-20250514`) are historical and produce `ConfigInvalidError`
 > against OpenCode v1.14.30+. As of 0.10.1, no model IDs are hardcoded in
 > agent configs — all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
-> The ADR text itself is preserved unchanged. See `.serena/memories/CORE_02_opencode_config.md`
+> The ADR text itself is preserved unchanged. See `.serena/memories/CORE-02-PROJECT-SHAPE.md`
 > for current config facts.
 
 Based on commit history analysis of both rldyour-codex (108 commits) and rldyour-claudecode (87 commits).
