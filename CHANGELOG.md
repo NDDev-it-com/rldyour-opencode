@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.5] - 2026-05-18
+
+Patch release fixing a live `fullrepo_sync.sh publish` cleanup gap found during final post-task git audit.
+
+### Fixed
+
+- `scripts/fullrepo_sync.sh publish` now explicitly removes its temporary staging worktree on the success path, while keeping the existing EXIT trap as a failure-path safety net. This prevents detached `/tmp` worktrees from accumulating after successful `fullrepo` publication.
+- `test_fullrepo_sync.py` now asserts the publish path leaves only the main worktree registered after publishing to a local bare origin.
+
 ## [0.11.4] - 2026-05-18
 
 Patch release aligning the release workflow's validation context with `validate.yml` after the `v0.11.3` tag run proved release pytest was missing agent-only instruction docs.
