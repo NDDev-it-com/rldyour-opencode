@@ -19,4 +19,8 @@ Implement a task through the full quality workflow:
 12. Run browser/security/design/LSP workflows when triggered by the change type.
 13. Synchronize Serena memories, AGENTS.md, instruction docs, git, and fullrepo through /ry-sync.
 
+## CI/CD and Git Mutation Gate
+
+Do not create, edit, delete, enable, disable, or trigger CI/CD workflows, release pipelines, deployment automation, branch protection, GitHub rulesets, GitHub environments, GitHub secrets/variables, remote branch creation/deletion, force-pushes, tag creation/deletion, commits on product branches (`main`/`master`/`release`/`production`), or pull-request merges unless the user explicitly asks for that change in the current request. Running existing read-only validation commands is always allowed. See AGENTS.md § CI/CD and Git Mutation Gate.
+
 Reference: references/flow-lifecycle.md, references/context-sufficiency-gate.md, references/post-task-sync.md
