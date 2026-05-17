@@ -2,10 +2,16 @@ import type { Plugin } from "@opencode-ai/plugin"
 
 // We deliberately stay on Bun's native APIs instead of importing `node:fs`
 // or `node:path` to keep the plugin tsconfig `types: []` baseline working
-// without pulling in `@types/node`. Bun.write performs an atomic
-// write-then-rename internally, so we get crash safety without a manual
-// temp+rename dance. Parent directories must exist before the write — we
-// ensure that via the Bun shell helper below.
+// without pulling in `@types/node`. Security review F-3 corrected an
+// earlier claim about `Bun.write` performing an atomic write-then-rename;
+// per the Bun docs (https://bun.sh/docs/api/file-io) `Bun.write(path,
+// string)` uses a direct `write(2)` syscall and is NOT crash-atomic. For
+// the audit log this is acceptable — the threat model is best-effort
+// observability rather than tamper-evident audit, so a half-written log
+// line on a crash is preferable to the runtime cost of a temp+rename per
+// slash-command. The trade-off is documented here and in ADR-009.
+// Parent directories must exist before the write; we ensure that via the
+// Bun shell helper below.
 declare const Bun: {
   file: (path: string) => {
     exists: () => Promise<boolean>
@@ -87,8 +93,9 @@ export const RyCommandAudit: Plugin = async ({ client, directory }) => {
       const line = `${ts} session=${input.sessionID.slice(0, 12)} cmd=/${input.command} args=${sanitizeArgs(args)}\n`
 
       try {
-        // Audit Phase 1: make the audit append resilient to the two failure
-        // modes the original code couldn't handle.
+        // Audit Phase 1 (later corrected by security review F-3): make the
+        // audit append resilient to the two failure modes the original
+        // code couldn't handle.
         //
         // (1) Missing `.serena/` directory. On a freshly cloned repo where
         //     the agent-only files have not been restored from `fullrepo`
@@ -99,16 +106,15 @@ export const RyCommandAudit: Plugin = async ({ client, directory }) => {
         //     in the original code could lose audit lines when two
         //     OpenCode instances target the same project tree (a
         //     configuration that became more relevant once upstream
-        //     v1.15.4 fixed project-scoped bus events). Bun.write performs
-        //     an atomic write-then-rename internally, so the final replace
-        //     is crash-safe. The remaining read-modify-write race window
-        //     (between `f.text()` and `Bun.write`) is documented and
-        //     accepted — within a single OpenCode instance, plugin hooks
-        //     are serialised by the Bun event loop, so the race only
-        //     applies to genuinely concurrent OpenCode processes targeting
-        //     the same project. That scenario sacrifices at most one audit
-        //     line per overlap, which is acceptable for a best-effort
-        //     audit log.
+        //     v1.15.4 fixed project-scoped bus events). Bun.write uses
+        //     a direct write(2) syscall (NOT write-then-rename — see the
+        //     top-of-file note), so we sacrifice strict atomicity for
+        //     the simpler API. Within a single OpenCode instance, plugin
+        //     hooks are serialised by the Bun event loop, so the race
+        //     only applies to genuinely concurrent OpenCode processes
+        //     targeting the same project. That scenario sacrifices at
+        //     most one audit line per overlap, which is acceptable for
+        //     a best-effort audit log.
         await ensureDir(parentDir(auditPath))
         const f = Bun.file(auditPath)
         const existing = (await f.exists()) ? await f.text() : ""
