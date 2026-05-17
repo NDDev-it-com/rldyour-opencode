@@ -1,0 +1,579 @@
+{
+  "version": 1,
+  "generated_by": "scripts/generate_skills_index.py",
+  "count": 32,
+  "skills": [
+    {
+      "name": "architecture-boundaries",
+      "path": ".opencode/skills/architecture-boundaries/SKILL.md",
+      "domain": "rules",
+      "triggers": [
+        "architecture boundaries",
+        "module layers",
+        "public API design",
+        "import discipline",
+        "where to place code",
+        "ADR worthy",
+        "layer policy"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "browser-debug",
+      "path": ".opencode/skills/browser-debug/SKILL.md",
+      "domain": "browser",
+      "triggers": [
+        "browser bug",
+        "debug UI",
+        "console errors",
+        "network failure",
+        "hydration error",
+        "fix browser issue",
+        "Lighthouse audit",
+        "layout broken",
+        "runtime exception"
+      ],
+      "requires_mcp": [
+        "chrome-devtools"
+      ],
+      "network": true
+    },
+    {
+      "name": "browser-tool-routing",
+      "path": ".opencode/skills/browser-tool-routing/SKILL.md",
+      "domain": "browser",
+      "triggers": [
+        "pick browser MCP",
+        "validation vs diagnosis",
+        "screenshot vs debug",
+        "which browser tool",
+        "route browser task",
+        "Playwright vs DevTools"
+      ],
+      "requires_mcp": [
+        "playwright",
+        "chrome-devtools"
+      ],
+      "network": true
+    },
+    {
+      "name": "browser-validation",
+      "path": ".opencode/skills/browser-validation/SKILL.md",
+      "domain": "browser",
+      "triggers": [
+        "validate UI",
+        "browser check",
+        "e2e test",
+        "regression test",
+        "responsive check",
+        "business logic in browser",
+        "take screenshot",
+        "pixel-perfect validation",
+        "visual QA"
+      ],
+      "requires_mcp": [
+        "playwright",
+        "chrome-devtools"
+      ],
+      "network": true
+    },
+    {
+      "name": "dependency-compatibility-policy",
+      "path": ".opencode/skills/dependency-compatibility-policy/SKILL.md",
+      "domain": "rules",
+      "triggers": [
+        "bump dependencies",
+        "package version policy",
+        "latest-compatible",
+        "lockfile discipline",
+        "supply chain check",
+        "SLSA level 2",
+        "SBOM"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "design-system-implementation",
+      "path": ".opencode/skills/design-system-implementation/SKILL.md",
+      "domain": "design",
+      "triggers": [
+        "design system",
+        "design tokens",
+        "build theme",
+        "color palette",
+        "typography scale",
+        "spacing scale",
+        "motion presets",
+        "design primitives",
+        "UI primitives",
+        "shadcn setup"
+      ],
+      "requires_mcp": [
+        "shadcn"
+      ],
+      "network": false
+    },
+    {
+      "name": "design-validation",
+      "path": ".opencode/skills/design-validation/SKILL.md",
+      "domain": "design",
+      "triggers": [
+        "validate design",
+        "check layout",
+        "responsive validation",
+        "pixel-perfect check",
+        "design screenshots",
+        "design QA",
+        "compare to Figma frame"
+      ],
+      "requires_mcp": [
+        "playwright",
+        "chrome-devtools"
+      ],
+      "network": true
+    },
+    {
+      "name": "figma-to-code",
+      "path": ".opencode/skills/figma-to-code/SKILL.md",
+      "domain": "design",
+      "triggers": [
+        "Figma to code",
+        "port from Figma",
+        "implement frame",
+        "design handoff",
+        "Figma URL",
+        "build mockup",
+        "pixel-perfect from Figma"
+      ],
+      "requires_mcp": [
+        "figma",
+        "shadcn"
+      ],
+      "network": true
+    },
+    {
+      "name": "flow-post-task-sync",
+      "path": ".opencode/skills/flow-post-task-sync/SKILL.md",
+      "domain": "flow",
+      "triggers": [
+        "finalize task",
+        "post-task sync",
+        "memory sync",
+        "sync to fullrepo",
+        "finalize before delivery"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "fsd-frontend-architecture",
+      "path": ".opencode/skills/fsd-frontend-architecture/SKILL.md",
+      "domain": "design",
+      "triggers": [
+        "FSD architecture",
+        "frontend layers",
+        "place code",
+        "slice public API",
+        "layer boundaries",
+        "where to put component",
+        "feature-sliced design"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "implementation-discipline",
+      "path": ".opencode/skills/implementation-discipline/SKILL.md",
+      "domain": "rules",
+      "triggers": [
+        "implementation discipline",
+        "refactor cleanup",
+        "naming convention",
+        "code reuse",
+        "integration sync",
+        "contract change",
+        "error handling pattern"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "instruction-docs-sync",
+      "path": ".opencode/skills/instruction-docs-sync/SKILL.md",
+      "domain": "docs-sync",
+      "triggers": [
+        "instruction-docs-sync",
+        "project docs sync",
+        "refresh AGENTS"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "lsp-health-check",
+      "path": ".opencode/skills/lsp-health-check/SKILL.md",
+      "domain": "lsp",
+      "triggers": [
+        "check LSP",
+        "language server health",
+        "LSP diagnostics",
+        "verify LSP setup",
+        "are LSP installed",
+        "LSP project prerequisites",
+        "LSP doctor"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "lsp-routing",
+      "path": ".opencode/skills/lsp-routing/SKILL.md",
+      "domain": "lsp",
+      "triggers": [
+        "route LSP workflow",
+        "type checking",
+        "semantic diagnostics",
+        "symbol search",
+        "refactor with LSP",
+        "language server choice",
+        "Python/Rust/Dart/TS/Go/C++/Qt/YAML/Docker/HTML/CSS/Shell LSP"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "lsp-setup",
+      "path": ".opencode/skills/lsp-setup/SKILL.md",
+      "domain": "lsp",
+      "triggers": [
+        "install LSP",
+        "install language server",
+        "update LSP",
+        "fix LSP",
+        "brew LSP",
+        "set up language server",
+        "bootstrap LSPs"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "owasp-top-10-implementation",
+      "path": ".opencode/skills/owasp-top-10-implementation/SKILL.md",
+      "domain": "security",
+      "triggers": [
+        "security check",
+        "OWASP audit",
+        "auth/authz",
+        "secrets handling",
+        "injection check",
+        "XSS prevention",
+        "SSRF check",
+        "supply chain",
+        "crypto",
+        "security headers",
+        "CORS",
+        "secure coding"
+      ],
+      "requires_mcp": [
+        "semgrep"
+      ],
+      "network": true
+    },
+    {
+      "name": "project-instructions-policy",
+      "path": ".opencode/skills/project-instructions-policy/SKILL.md",
+      "domain": "rules",
+      "triggers": [
+        "project rules",
+        "project instructions",
+        "ADR",
+        "MADR",
+        "write durable docs",
+        "update AGENTS"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "quality-first-engineering",
+      "path": ".opencode/skills/quality-first-engineering/SKILL.md",
+      "domain": "rules",
+      "triggers": [
+        "code quality",
+        "clean code",
+        "no hacks",
+        "no tech debt",
+        "scalable code",
+        "consistent code",
+        "hard bans",
+        "quality-first engineering"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "ry-deploy",
+      "path": ".opencode/skills/ry-deploy/SKILL.md",
+      "domain": "flow",
+      "triggers": [
+        "ry-deploy",
+        "deploy server",
+        "production deploy",
+        "ship to prod",
+        "rollout",
+        "deploy lifecycle",
+        "deploy verification",
+        "fix-forward"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "ry-design",
+      "path": ".opencode/skills/ry-design/SKILL.md",
+      "domain": "design",
+      "triggers": [
+        "end-to-end design",
+        "build UI",
+        "ship landing page",
+        "ship dashboard",
+        "redesign feature",
+        "production-ready UI",
+        "pixel-perfect implementation",
+        "design workflow"
+      ],
+      "requires_mcp": [
+        "figma",
+        "shadcn",
+        "playwright",
+        "chrome-devtools"
+      ],
+      "network": true
+    },
+    {
+      "name": "ry-init",
+      "path": ".opencode/skills/ry-init/SKILL.md",
+      "domain": "flow",
+      "triggers": [
+        "ry-init",
+        "init project",
+        "init scope",
+        "initialize context",
+        "project onboarding",
+        "context pack",
+        "study repo",
+        "learn project",
+        "fullrepo bootstrap"
+      ],
+      "requires_mcp": [
+        "serena"
+      ],
+      "network": false
+    },
+    {
+      "name": "ry-newp",
+      "path": ".opencode/skills/ry-newp/SKILL.md",
+      "domain": "flow",
+      "triggers": [
+        "ry-newp",
+        "new project",
+        "design project from scratch",
+        "requirements",
+        "architecture docs",
+        "scaffold project",
+        "MADR ADR"
+      ],
+      "requires_mcp": [
+        "context7",
+        "deepwiki",
+        "grep",
+        "sequential-thinking"
+      ],
+      "network": true
+    },
+    {
+      "name": "ry-review",
+      "path": ".opencode/skills/ry-review/SKILL.md",
+      "domain": "flow",
+      "triggers": [
+        "ry-review",
+        "code review",
+        "audit changes",
+        "deep review",
+        "multi-track review",
+        "report-only review",
+        "reviewer subagents"
+      ],
+      "requires_mcp": [
+        "serena"
+      ],
+      "network": false
+    },
+    {
+      "name": "ry-rules-review",
+      "path": ".opencode/skills/ry-rules-review/SKILL.md",
+      "domain": "rules",
+      "triggers": [
+        "rules review",
+        "hard rules audit",
+        "check against rules",
+        "rldyour rules check",
+        "policy compliance audit",
+        "rules audit"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "ry-sec-review",
+      "path": ".opencode/skills/ry-sec-review/SKILL.md",
+      "domain": "security",
+      "triggers": [
+        "security review",
+        "audit security",
+        "threat model",
+        "OWASP audit",
+        "hypothesis-driven security",
+        "defensive review",
+        "vulnerability review",
+        "audit auth/authz/secrets/injection"
+      ],
+      "requires_mcp": [
+        "semgrep"
+      ],
+      "network": true
+    },
+    {
+      "name": "ry-start",
+      "path": ".opencode/skills/ry-start/SKILL.md",
+      "domain": "flow",
+      "triggers": [
+        "ry-start",
+        "full SDLC",
+        "implement task",
+        "ship feature",
+        "build feature",
+        "complete lifecycle",
+        "end-to-end task",
+        "reviewer pipeline"
+      ],
+      "requires_mcp": [
+        "serena",
+        "sequential-thinking"
+      ],
+      "network": false
+    },
+    {
+      "name": "serena-code-workflow",
+      "path": ".opencode/skills/serena-code-workflow/SKILL.md",
+      "domain": "serena",
+      "triggers": [
+        "navigate code",
+        "find symbol",
+        "find references",
+        "semantic refactor",
+        "trace usages",
+        "inspect file",
+        "code lookup",
+        "symbol search",
+        "where is X defined"
+      ],
+      "requires_mcp": [
+        "serena"
+      ],
+      "network": false
+    },
+    {
+      "name": "serena-lsp-integration",
+      "path": ".opencode/skills/serena-lsp-integration/SKILL.md",
+      "domain": "serena",
+      "triggers": [
+        "configure Serena",
+        "Serena LSP keys",
+        "project"
+      ],
+      "requires_mcp": [
+        "serena"
+      ],
+      "network": false
+    },
+    {
+      "name": "serena-memory-sync",
+      "path": ".opencode/skills/serena-memory-sync/SKILL.md",
+      "domain": "serena",
+      "triggers": [
+        "sync memories",
+        "refresh project knowledge",
+        "fact-only memory audit",
+        "post-commit sync",
+        "post-Stop sync",
+        "durable changes",
+        "update Serena memories"
+      ],
+      "requires_mcp": [
+        "serena"
+      ],
+      "network": false
+    },
+    {
+      "name": "tech-research",
+      "path": ".opencode/skills/tech-research/SKILL.md",
+      "domain": "explore",
+      "triggers": [
+        "library API lookup",
+        "framework research",
+        "official docs",
+        "production code patterns",
+        "compare implementations",
+        "repo architecture",
+        "migration guide",
+        "breaking changes",
+        "since version",
+        "how does X library work"
+      ],
+      "requires_mcp": [
+        "context7",
+        "deepwiki",
+        "grep"
+      ],
+      "network": true
+    },
+    {
+      "name": "verification-quality-gates",
+      "path": ".opencode/skills/verification-quality-gates/SKILL.md",
+      "domain": "rules",
+      "triggers": [
+        "quality gates",
+        "run tests",
+        "run linter",
+        "type check",
+        "run LSP checks",
+        "run all checks",
+        "verify before delivery",
+        "evidence-based pass"
+      ],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "web-research",
+      "path": ".opencode/skills/web-research/SKILL.md",
+      "domain": "explore",
+      "triggers": [
+        "current trends",
+        "industry news",
+        "security advisories",
+        "vendor announcements",
+        "latest releases",
+        "news search",
+        "web search",
+        "current state of X"
+      ],
+      "requires_mcp": [],
+      "network": true
+    }
+  ]
+}
