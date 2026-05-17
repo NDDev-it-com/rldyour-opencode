@@ -45,11 +45,11 @@ jobs:
           # as a workflow artifact instead of uploading it to code scanning.
           upload: never
           upload-database: false
-          output: ../results
+          output: codeql-results
       - name: Upload CodeQL SARIF artifact
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882  # v4.4.3
         with:
           name: codeql-${{ matrix.language }}-sarif
-          path: ../results
+          path: codeql-results
           if-no-files-found: error
           retention-days: 14
