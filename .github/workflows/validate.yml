@@ -40,11 +40,11 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
-        run: bash scripts/validate_config.sh
-
       - name: Install pytest + PyYAML (pinned)
         run: python3 -m pip install --upgrade pip "pytest==9.0.2" "PyYAML==6.0.3"
+
+      - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
+        run: bash scripts/validate_config.sh
 
       - name: Run validator unit tests
         run: python3 -m pytest scripts/tests/ -v
