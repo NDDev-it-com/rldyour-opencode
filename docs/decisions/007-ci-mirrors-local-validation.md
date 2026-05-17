@@ -39,7 +39,7 @@ Workflow set:
 | Workflow | Trigger | Matrix | Purpose |
 |---|---|---|---|
 | `validate.yml` | push + PR + manual dispatch | Linux + macOS | runs `scripts/validate_config.sh` and the pytest corpus; shell-strict-mode lint job |
-| `dependency-check.yml` | weekly cron + dispatch | Linux | pin report + network freshness + MCP smoke |
+| `dependency-check.yml` | weekly cron + dispatch | Linux | pin report + GitHub Actions SHA/comment integrity + network freshness + MCP smoke |
 | `instruction-docs-check.yml` | path-filtered + manual dispatch | Linux | `validate_instruction_docs.py` (skips on normal-branch PRs that lack the agent-only files) |
 | `typecheck-plugins.yml` | path-filtered + manual dispatch | Linux + macOS | `bun install --frozen-lockfile && bunx --bun tsc --noEmit -p .opencode/tsconfig.json` |
 | `lint.yml` | path-filtered + manual dispatch | Linux + macOS | ruff against `scripts/` |
@@ -49,7 +49,7 @@ Workflow set:
 | `release.yml` | `v*.*.*` tag + dispatch | Linux | full validation + typecheck + tag-vs-VERSION check + SBOM generation + GitHub Release |
 | `sbom.yml` | release published + dispatch | Linux | standalone CycloneDX SBOM artifact |
 
-Dependabot watches `npm` (`.opencode/`) and `github-actions` (`/`) on a weekly cadence, capped at 5 open PRs per ecosystem; both use scoped Conventional Commits prefixes (`chore(deps)`, `chore(ci)`).
+Dependabot watches `npm` (`.opencode/`) and `github-actions` (`/`) on a weekly cadence, capped at 10 open PRs per ecosystem; both use scoped Conventional Commits prefixes (`chore(deps)`, `chore(ci)`). `scripts/check_action_pins.py` is the local guard that enforces each workflow `uses:` pin is a 40-character SHA and, in `--remote` mode, that the inline `# vX.Y.Z` comment resolves to that SHA.
 
 ## Consequences
 
@@ -64,7 +64,7 @@ Negative:
 
 - Workflow count grew from 2 to 10. Cognitive load on contributors is higher, mitigated by the consistent hardening pattern across all files and by `CONTRIBUTING.md` documenting the gate set.
 - macOS matrix doubles the runner-minute usage on touched surfaces. Mitigation: workflows are path-filtered where possible (`typecheck-plugins`, `lint`) so unrelated PRs don't pay the macOS cost.
-- Some non-GitHub release pins (gitleaks CLI tarball, CycloneDX action) require periodic re-verification. Mitigation: keep explicit version/checksum comments in workflow docs and use dependabot's `github-actions` ecosystem watcher for action pins.
+- Some non-GitHub release pins (gitleaks CLI tarball, CycloneDX action) require periodic re-verification. Mitigation: keep explicit version/checksum comments in workflow docs, use dependabot's `github-actions` ecosystem watcher for action pins, and keep `scripts/check_action_pins.py --remote` green.
 - `.gitleaks.toml` is intentionally narrow: it allowlists only sanitizer regression fixture files that contain fake token/private-key strings by design; do not add broad token regex allowlists.
 - CodeQL SARIF upload to code scanning is intentionally disabled (`upload: never`) until GitHub Code Security is enabled for this private repository. The workflow still runs extraction and queries, then stores SARIF as an Actions artifact.
 - GitHub Dependency Review is skipped on this private repository until Dependency Graph plus GitHub Advanced Security are enabled. The portable dependency gate remains `dependency-check.yml` (`check_deps_freshness.sh` + MCP smoke).
@@ -74,6 +74,7 @@ Negative:
 - 0.11.0 group I implements the workflow set + dependabot.
 - 0.11.0 group H implements the `.opencode/tsconfig.json` that `typecheck-plugins.yml` consumes.
 - 0.11.0 groups A-G implement the local scripts that all workflows wrap.
+- 0.11.6 adds `scripts/check_action_pins.py` as the local + CI guard for SHA-pinned action comments and Dependabot action-update drift.
 - `scripts/tests/test_fullrepo_sync.py::test_script_has_strict_bash_header` enforces the shell strictness contract that `validate.yml::shell-strict-mode` also asserts at CI time.
 
 ## Future work

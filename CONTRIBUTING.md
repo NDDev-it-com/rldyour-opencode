@@ -43,11 +43,12 @@ bash scripts/fullrepo_sync.sh restore
 Before opening a PR, every change MUST pass these local gates. They mirror the CI workflows in `.github/workflows/`.
 
 ```bash
-bash scripts/validate_config.sh                                          # opencode.json + frontmatter (strict YAML) + VERSION
-uvx --from "pytest==9.0.2" --with "pyyaml==6.0.3" pytest scripts/tests/  # 350+ cases across 13+ suites
-bash scripts/check_deps_freshness.sh                                     # pin report
+bash scripts/validate_config.sh                                          # opencode.json + frontmatter (strict YAML) + VERSION + action pins
+uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" pytest scripts/tests/  # 383 cases across 14 suites
+bash scripts/check_deps_freshness.sh --check-freshness                   # pin report + registry freshness
+python3 scripts/check_action_pins.py .github/workflows --remote          # SHA/comment integrity for actions
 bunx --bun tsc --noEmit -p .opencode/tsconfig.json                       # plugin typecheck
-ruff check scripts                                                       # python lint
+uvx --from "ruff==0.15.13" ruff check scripts                            # python lint
 ```
 
 When `opencode` CLI is on PATH, `validate_config.sh` also exercises the live `opencode debug config | skill | agent build` resolution smoke. CI runs the same scripts on Ubuntu and macOS matrices.
