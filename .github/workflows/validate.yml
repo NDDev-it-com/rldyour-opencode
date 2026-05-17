@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch: {}
 
 # Least-privilege token (OSSF Scorecard "Token-Permissions" check).
 # Validation jobs only need read access to the repository contents.

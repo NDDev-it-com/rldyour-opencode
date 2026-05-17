@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.2] - 2026-05-18
+
+Patch release aligning the repository-local `fullrepo` workflow with the generic rldyour-flow post-task state contract. This removes the completed-sync Stop-hook loop where `rldyour-opencode` was clean locally but generic flow state still reported `fullrepo_needs_attention: true`.
+
+### Fixed
+
+- **`scripts/fullrepo_sync.sh publish` now publishes a complete portable snapshot**: current `HEAD` plus ignored agent-only files (`AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, etc.). Runtime markers and caches are stripped before commit. This supersedes the former agent-only orphan tree that omitted `opencode.json`, `VERSION`, `.github/workflows/`, and other runtime files.
+- **`scripts/fullrepo_sync.sh status-json` now reports tree parity fields** (`expected_fullrepo_tree`, `local_fullrepo_matches_worktree`, `remote_fullrepo_matches_worktree`) so local and generic flow checks can agree on whether `fullrepo` is current.
+- **Stop-hook loop root cause documented** in new ADR-008, with ADR-005 marked superseded.
+
+### Changed
+
+- `VERSION` bumped to `0.11.2`.
+- Added `workflow_dispatch` triggers to `validate.yml`, `typecheck-plugins.yml`, `lint.yml`, `codeql.yml`, `secret-scan.yml`, and `instruction-docs-check.yml` so the full CI set can be manually launched after maintenance work even when path filters would otherwise skip a workflow.
+- Release, rollback, observability, README, AGENTS, and Claude instructions now describe `fullrepo` as a complete `HEAD + agent-only` generated branch.
+
+### Test coverage
+
+- Total pytest cases: **377** across 13 suites (was 374 at `babc224`, +3). `test_fullrepo_sync.py` now has 20 cases and includes a real local-bare-origin publish test proving that `fullrepo` contains root runtime files plus agent-only files while excluding `.serena/.flow_sync_marker`.
+
 ## [0.11.1] - 2026-05-18
 
 Patch stabilization pass closing the deferred 0.11.0 reviewer findings that were below the release-blocking threshold. The patch tightens parser fidelity, dependency freshness ordering, and plugin advisory coverage without changing public marketplace layout.

@@ -1,9 +1,18 @@
 # ADR-005: Fullrepo snapshot boundary and auditability
 
-- Status: accepted
+- Status: superseded by [ADR-008: Fullrepo complete-state snapshot](008-fullrepo-complete-state-snapshot.md)
 - Date: 2026-05-17
 - Deciders: @rldyourmnd
 - Consulted: ChatGPT 5.5 Pro audit prompt (2026-05-17) + three deep-audit reports
+
+## Supersession Note
+
+ADR-005 captured the 0.11.0 split between the normal runtime branch and an
+agent-only `fullrepo` orphan. Live post-task synchronization later proved that
+this split conflicts with the wider rldyour-flow contract: generic flow state
+expects `fullrepo` to equal the current normal-branch `HEAD` plus ignored
+agent-only files. ADR-008 supersedes this decision and makes `fullrepo` a
+complete portable snapshot.
 
 ## Context and Problem Statement
 

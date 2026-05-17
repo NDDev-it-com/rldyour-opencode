@@ -47,7 +47,7 @@ Initialization flow:
 
 1. Before relying on missing agent-only context, check `origin/fullrepo`.
 2. If `origin/fullrepo` exists, restore its agent-only files and install excludes.
-3. If `origin/fullrepo` does not exist but local agent-only files exist, publish the initial `fullrepo` snapshot.
+3. If `origin/fullrepo` does not exist but local agent-only files exist, publish the initial complete `HEAD + agent-only` snapshot.
 4. If the current branch tracks agent-only files, remove them from the index and commit that cleanup on the normal branch before final delivery.
 
 `fullrepo` uses safe force updates because it is a generated snapshot branch. Use `--force-with-lease`, not a blind `--force`, so an unexpected remote update cannot be silently overwritten.
