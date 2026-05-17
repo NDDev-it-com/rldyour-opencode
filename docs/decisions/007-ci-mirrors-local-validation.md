@@ -44,7 +44,7 @@ Workflow set:
 | `typecheck-plugins.yml` | path-filtered | Linux + macOS | `bun install --frozen-lockfile && bunx --bun tsc --noEmit -p .opencode/tsconfig.json` |
 | `lint.yml` | path-filtered | Linux + macOS | ruff against `scripts/` |
 | `codeql.yml` | push + PR + weekly | Linux | javascript-typescript + python analysis using `.github/codeql/codeql-config.yml` so hidden `.opencode/plugins` TypeScript is included |
-| `secret-scan.yml` | push + PR | Linux | gitleaks CLI release tarball with SHA256 verification and checkout fetch-depth: 0 |
+| `secret-scan.yml` | push + PR | Linux | gitleaks CLI release tarball with SHA256 verification, `.gitleaks.toml` fixture allowlist, and checkout fetch-depth: 0 |
 | `dependency-review.yml` | PR | Linux | actions/dependency-review-action, fail-on-severity: moderate |
 | `release.yml` | `v*.*.*` tag + dispatch | Linux | full validation + typecheck + tag-vs-VERSION check + SBOM generation + GitHub Release |
 | `sbom.yml` | release published + dispatch | Linux | standalone CycloneDX SBOM artifact |
@@ -65,6 +65,7 @@ Negative:
 - Workflow count grew from 2 to 10. Cognitive load on contributors is higher, mitigated by the consistent hardening pattern across all files and by `CONTRIBUTING.md` documenting the gate set.
 - macOS matrix doubles the runner-minute usage on touched surfaces. Mitigation: workflows are path-filtered where possible (`typecheck-plugins`, `lint`) so unrelated PRs don't pay the macOS cost.
 - Some non-GitHub release pins (gitleaks CLI tarball, CycloneDX action) require periodic re-verification. Mitigation: keep explicit version/checksum comments in workflow docs and use dependabot's `github-actions` ecosystem watcher for action pins.
+- `.gitleaks.toml` is intentionally narrow: it allowlists only sanitizer regression fixture files that contain fake token/private-key strings by design; do not add broad token regex allowlists.
 - CodeQL uploads SARIF from a private repository, so the workflow needs `actions: read` in addition to `security-events: write`; without it the analysis can complete locally but fail during upload with `Resource not accessible by integration`.
 
 ## Compliance
