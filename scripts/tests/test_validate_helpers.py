@@ -475,6 +475,33 @@ def test_command_yaml_invalid_is_rejected(
     assert "YAML parse error" in captured.out
 
 
+def test_agent_non_dict_yaml_root_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The frontmatter root MUST be a YAML mapping. A list / scalar root
+    (legal YAML, but not the agent frontmatter shape) must be reported
+    rather than silently coerced. Closes reviewer 0.11.0 finding
+    'non-dict YAML root not asserted' (verification axis)."""
+    p = _write_agent(tmp_path, "list-root-agent", "---\n- item1\n- item2\n---\n")
+    assert vh.validate_agent(p) > 0
+    captured = capsys.readouterr()
+    assert "must be a mapping" in captured.out
+
+
+def test_skill_non_dict_yaml_root_rejected(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Same parity for skill validator."""
+    skill_dir = tmp_path / "list-skill"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\n- not-a-mapping\n---\nbody\n", encoding="utf-8"
+    )
+    assert vh.validate_skill(skill_dir) > 0
+    captured = capsys.readouterr()
+    assert "must be a mapping" in captured.out
+
+
 # ---------- CLI dispatch ----------
 
 

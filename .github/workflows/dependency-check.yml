@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: dependency-check-${{ github.ref }}
+  group: dependency-check-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
