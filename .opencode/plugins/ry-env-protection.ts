@@ -63,7 +63,31 @@ export const RyEnvProtection: Plugin = async ({ client }) => {
 
       if (input.tool === "bash") {
         const command: string = output.args?.command ?? ""
-        if (/\b(cat|head|tail|less|more|type)\b.*\.(env|pem|key|p12|pfx)\b/i.test(command)) {
+
+        // Three independent attack vectors. The original pattern only
+        // caught (1). All three must be covered or the guard is
+        // bypassable with one extra utility.
+        //
+        // (1) Read/dump/edit tools targeting a sensitive path token.
+        //     Expanded from cat/head/tail/less/more/type to also cover
+        //     grep, sed, awk, strings, xxd, od, hexdump, cut (text +
+        //     binary dumping), and bat/view/nano/vim/vi/emacs (pagers
+        //     and editors that print file contents to stdout/stderr).
+        // (2) One-liner script execs with -c / -e flags. Allows
+        //     `python3 -c 'print(open(".env").read())'` style bypass.
+        // (3) Shell redirect from a sensitive file
+        //     (`grep token < secrets.env`). The redirect operator
+        //     itself encodes the read intent regardless of the program.
+        const readTokenRe =
+          /\b(cat|head|tail|less|more|type|bat|view|nano|vim|vi|emacs|grep|sed|awk|strings|xxd|od|hexdump|cut)\b/i
+        const scriptExecRe = /(?:python3?|node|ruby|perl|bash|sh|fish|zsh)\s+-[ce]\b/i
+        const shellRedirectRe = /<\s*[^\s|&;<>]*\.(env|pem|key|p12|pfx)\b/i
+
+        const tokens = command.split(/[\s|&;<>(){}\\"']+/).filter(Boolean)
+        const sensitiveToken = tokens.find((t) => isSensitivePath(t))
+        const isRead = readTokenRe.test(command) || scriptExecRe.test(command)
+
+        if ((isRead && sensitiveToken) || shellRedirectRe.test(command)) {
           await notifyBlock(command.slice(0, 200), "bash")
           throw new Error(
             "[rldyour] Blocked bash command that reads sensitive files. Use environment variables or secret managers instead.",

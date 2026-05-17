@@ -29,9 +29,13 @@ async function readMcpNames(projectDir: string): Promise<{ names: string[]; warn
 }
 
 export const RyBootstrap: Plugin = async ({ client, project, directory }) => {
-  const proj = project as { name?: string; path?: string } | undefined
-  const projectName = proj?.name ?? "unknown"
-  const projectDir = proj?.path ?? directory ?? "."
+  // Project type per @opencode-ai/sdk (gen/types.gen.d.ts) exposes
+  // { id, worktree, vcsDir?, vcs?, time }. Neither `name` nor `path`
+  // are typed fields — they were hand-rolled casts in earlier versions.
+  // Use the typed `worktree` for the project directory and derive a
+  // human-readable name from its basename.
+  const projectDir = project?.worktree ?? directory ?? "."
+  const projectName = projectDir.split("/").filter(Boolean).pop() ?? "unknown"
 
   async function log(level: "info" | "warn", message: string): Promise<void> {
     try {
