@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.3] - 2026-05-18
+
+Patch release fixing the live release/SBOM workflow pins after the first `v0.11.2` tag run proved two immutable action SHAs were invalid upstream.
+
+### Fixed
+
+- `release.yml` and `sbom.yml` now pin `CycloneDX/gh-node-module-generatebom` to the verified `v1.0.3` commit `27e13c2bf0fae78d66387b35ca9749d8cc853060`.
+- `release.yml` now pins `softprops/action-gh-release` to the verified `v2.6.1` commit `153bb8e04406b158c6c84fc1615b65b24149a1fe`.
+- Manual release dispatch now passes the resolved input tag to `softprops/action-gh-release` via `tag_name`, so tag-triggered and manually-triggered releases target the same version.
+
 ## [0.11.2] - 2026-05-18
 
 Patch release aligning the repository-local `fullrepo` workflow with the generic rldyour-flow post-task state contract. This removes the completed-sync Stop-hook loop where `rldyour-opencode` was clean locally but generic flow state still reported `fullrepo_needs_attention: true`.
