@@ -77,9 +77,9 @@ A self-contained OpenCode project configuration that provides:
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
 | Reference docs (skill/agent contracts) | `references/*.md` | 16 |
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
-| Architecture decision archive | `docs/decisions/*.md` | 7 |
-| Diagnostic scripts (bash + python) | `scripts/` | 18 (14 wrappers + 4 helper modules: `_check_freshness.py`, `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
-| Pytest suites | `scripts/tests/*.py` | 13 (377 cases: 52 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 11 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs + 8 doctor_opencode + 23 sanitize_diag + 40 dependency freshness + 20 fullrepo sync) |
+| Architecture decision archive | `docs/decisions/*.md` | 8 |
+| Diagnostic scripts (bash + python) | `scripts/` | 19 (15 wrappers + 4 helper modules: `_check_freshness.py`, `_extract_pins.py`, `_sanitize_diag.py`, `_validate_helpers.py`) |
+| Pytest suites | `scripts/tests/*.py` | 14 (383 cases: 6 action_pins + 52 validator + 12 extract_pins + 129 skill routing + 16 sanitizer + 11 plugin surface + 4 opencode integration + 44 permission-policy regexes + 11 smoke MCP + 7 validate instruction docs + 8 doctor_opencode + 23 sanitize_diag + 40 dependency freshness + 20 fullrepo sync) |
 | CI workflows | `.github/workflows/*.yml` | 10 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`) |
 
 ### Project structure
@@ -104,9 +104,9 @@ rldyour-opencode/
 ├── references/   *.md          # 16 durable contracts (consumed by skills/agents)
 ├── docs/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
-│   └── decisions/  001..007.md # 7 MADR-style ADRs
-├── scripts/                    # 18 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 13 pytest suites — 377 cases
+│   └── decisions/  001..008.md # 8 MADR-style ADRs
+├── scripts/                    # 19 bash + python diagnostic / validation / smoke scripts
+│   └── tests/  *.py            # 14 pytest suites — 383 cases
 └── .github/workflows/          # 10 least-privilege, SHA-pinned CI/release workflows
 ```
 
@@ -150,8 +150,8 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 | serena | local (uvx) | 1.3.0 | Semantic code navigation, analysis, editing |
 | sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
 | playwright | local (bunx) | 0.0.75 | Browser automation, UI validation |
-| chrome-devtools | local (bunx) | 0.25.0 | Chrome DevTools diagnostics |
-| semgrep | local (uvx) | 1.162.0 | Static analysis and security |
+| chrome-devtools | local (bunx) | 0.26.0 | Chrome DevTools diagnostics |
+| semgrep | local (uvx) | 1.163.0 | Static analysis and security |
 | shadcn | local (bunx) | 4.7.0 | shadcn/ui registry access |
 | dart-flutter | local (dart) | — | Dart/Flutter project support |
 | context7 | remote | — | Current library documentation |
@@ -186,8 +186,9 @@ Run `opencode models <provider>` to list every accepted ID. All current IDs are 
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
-uvx --from "pytest==9.0.2" --with "pyyaml==6.0.3" pytest scripts/tests/  # 377 cases in 13 suites
-bash scripts/check_deps_freshness.sh                       # list pinned MCP dependencies (npm/PyPI/Dart)
+uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" pytest scripts/tests/  # 383 cases in 14 suites
+bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
+python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
 python3 scripts/validate_instruction_docs.py               # verify AGENTS.md + .claude/CLAUDE.md anchor headings
 bash scripts/doctor_opencode.sh                            # full diagnostics: MCP, LSP binaries, agent/skill/command discovery, git

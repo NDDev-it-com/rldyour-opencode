@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.6] - 2026-05-18
+
+Patch dependency-maintenance release closing the current Dependabot backlog, clearing live MCP freshness drift, and adding a guard against GitHub Actions SHA/comment drift.
+
+### Added
+
+- `scripts/check_action_pins.py` validates every external workflow `uses:` entry is pinned to a 40-character SHA and carries an inline semver tag comment. `--remote` resolves the tag through `git ls-remote` and verifies it points at the pinned SHA, including annotated-tag dereference.
+- `scripts/tests/test_action_pins.py` adds regression coverage for SHA-pinned actions, local/docker skips, tag-only rejection, missing-comment rejection, annotated tags, and mismatched SHA/comment drift.
+- `dependency-check.yml` now runs `scripts/check_action_pins.py .github/workflows --remote` before the registry freshness probe.
+- `collect_diagnostics.sh` now captures `action-pins.txt` for local triage bundles.
+
+### Changed
+
+- GitHub Actions pins refreshed to current upstream stable refs verified with `git ls-remote`: `actions/checkout` v6.0.2, `actions/setup-python` v6.2.0, `actions/setup-node` v6.4.0, `oven-sh/setup-bun` v2.2.0, `actions/upload-artifact` v7.0.1, `github/codeql-action` v4.35.5, `actions/dependency-review-action` v5.0.0, and `softprops/action-gh-release` v3.0.0.
+- Workflow runtime pins refreshed: Bun 1.3.14, pytest 9.0.3, and ruff 0.15.13. PyYAML 6.0.3 and gitleaks 8.30.1 remain current.
+- MCP pins refreshed: `chrome-devtools-mcp` 0.26.0 and `semgrep` 1.163.0. `scripts/check_deps_freshness.sh --check-freshness --json` now reports `stale: 0`.
+- `.github/dependabot.yml` raises npm and GitHub Actions open-PR limits from 5 to 10 so future action-update backlog cannot block additional recommendations.
+- README, AGENTS.md, `.claude/CLAUDE.md`, dependency-update docs, observability docs, release process, and ADR-007 now document the action-pin integrity guard and the 0.11.6 validation baseline.
+
+### Test coverage
+
+- Total pytest cases: **383** across 14 suites (was 377 at `566b738`, +6). New suite: `test_action_pins.py`.
+
 ## [0.11.5] - 2026-05-18
 
 Patch release fixing a live `fullrepo_sync.sh publish` cleanup gap found during final post-task git audit.

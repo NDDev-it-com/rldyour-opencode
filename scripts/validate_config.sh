@@ -45,6 +45,13 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+log_step "GitHub Actions pins"
+if python3 "${PROJECT_ROOT}/scripts/check_action_pins.py" "${PROJECT_ROOT}/.github/workflows"; then
+    log_ok "GitHub Actions pins passed"
+else
+    ERRORS=$((ERRORS + 1))
+fi
+
 log_step "Skills"
 SKILLS_DIR="${PROJECT_ROOT}/.opencode/skills"
 if [ -d "$SKILLS_DIR" ]; then
