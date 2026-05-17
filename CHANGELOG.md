@@ -5,6 +5,148 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-05-18
+
+Minor release closing every P0 and P1 finding from the external audit
+(2026-05-17 archive review) plus the Phase 2 scalability slice. The release
+moves the marketplace from "right architecture, fragile reliability" to
+"right architecture, hardened reliability + documented governance".
+
+### Fixed
+
+- **P0-1 — `ry-flow-hooks.ts` hook contract.** `tool.execute.after` previously
+  read the bash command from `output.args.command`. The
+  `@opencode-ai/plugin@1.15.4` SDK contract places `args` on `input`, so the
+  buggy form silently swallowed every `git commit` / `git push` /
+  `git merge` / `git cherry-pick` / `git rebase` detection — Conventional
+  Commits validation and the `/ry-sync` post-commit nudge were dead.
+  Introduced a `getBashCommand(input)` helper, locked the contract with
+  `test_plugin_surface.py::test_flow_hooks_reads_command_from_input_args`,
+  and added a parallel `getBashOutput(output)` helper for symmetry.
+- **P0-2 — Lockfile policy.** `.opencode/.gitignore` previously listed
+  `bun.lock`, `package-lock.json`, and even `package.json` as ignored, so
+  `bun install --frozen-lockfile` in `typecheck-plugins.yml` and
+  `release.yml` ran against a missing lockfile in CI. New policy: Bun
+  canonical. `.opencode/.gitignore` is now just `node_modules/`,
+  `.opencode/bun.lock` is tracked, and `.opencode/package-lock.json` is
+  removed. Workflow path filters in `typecheck-plugins.yml` and
+  `dependency-review.yml` point at `bun.lock` instead. Note: OpenCode's
+  runtime auto-rewrites `.opencode/package.json` on startup to match the
+  installed CLI version (AGENTS.md § Plugins), so the committed pin
+  tracks whatever OpenCode is currently running; the v0.12.0 baseline is
+  `@opencode-ai/plugin@1.15.3` mirroring the v1.15.3 runtime, with
+  `opencode-runtime.yml` pinning the CI runtime to `opencode-ai@1.15.4`
+  to detect contract regressions before the local runtime gets bumped.
+- **P0-4 — OpenCode runtime job.** The static `validate_config.sh` runtime
+  check used to skip when `opencode` was off PATH, which was always the
+  case in GitHub-hosted runners. New `.github/workflows/opencode-runtime.yml`
+  installs a pinned `opencode-ai@1.15.4` via `bun install -g`, runs
+  `opencode --version`, `opencode debug config`, and the runtime smoke
+  inside `validate_config.sh` — the resolver is now an actual CI gate.
+- **P0-5 — Serena project languages.** `.serena/project.yml` now lists
+  `typescript`, `python`, `yaml`, `json`, `markdown`, `bash` instead of the
+  YAML-only subset; the 10 TypeScript plugins and the 19 Python scripts
+  now get full semantic indexing.
+- **autoupdate flip.** `opencode.json.autoupdate` flipped from `true` to
+  `"notify"`. The runtime no longer drifts between sessions; the operator
+  gets a notification instead of an automatic mutation.
+- **Opus 4.7 reference cleanup.** README, AGENTS.md, and
+  `.opencode/agents/ry-explore.md` previously claimed `@ry-explore` ran on
+  Opus 4.7 / 1M context. Per the marketplace policy, every subagent
+  inherits the user's chosen top-level `model` (currently
+  `opencode-go/glm-5.1`) — no per-agent override is set. References
+  refreshed.
+
+### Hardening (audit Phase 1)
+
+- **Plugin spawn timeouts.** `ry-system-context.ts::readGitOutput` now arms
+  a 800 ms `setTimeout` + `proc?.kill()` so the hot
+  `experimental.chat.system.transform` path cannot stall on a slow FS or
+  lockfile contention. `ry-tools.ts::runScript` accepts a
+  `{ timeoutMs, maxOutputBytes }` budget per tool, returns structured
+  `{ timedOut, truncated }` results, and renders a deterministic
+  `formatTimeoutResult` on the kill path. Five tool budgets: validate 30 s,
+  check_deps 30 s, lsp_health 20 s, git_audit 15 s, fullrepo_status 15 s.
+- **`ry-env-protection.ts` widening.** Sensitive path matchers for `.ssh/`,
+  `.gnupg/`, `.aws/` switched to component-bounded `(^|/)\.foo/` form (the
+  previous `/\.foo/` form silently missed relative paths). Added a fourth
+  attack vector: data-movement utilities (`cp/mv/tar/zip/base64/find/scp/
+  rsync/openssl/gzip/7z`) targeting sensitive path tokens. Documented
+  in-file as a best-effort interactive guardrail (not DLP).
+- **`ry-shell-strategy.ts` --no-verify widening.** Previously blocked only
+  when the branch token matched product names. Now blocks every
+  `git push --no-verify` by default; explicit opt-out via
+  `RY_ALLOW_NO_VERIFY=1` env var. `shell.env` also gained
+  `NO_UPDATE_NOTIFIER=1` and an `RY_DISABLE_CI_ENV=1` escape hatch for
+  interactive TTY-aware workflows.
+- **`ry-command-audit.ts` resilience.** `mkdir -p .serena` before write
+  (handles fresh clones without restored agent-only context). Uses Bun's
+  atomic write-then-rename semantics for crash safety; multi-instance
+  audit race window documented in-file.
+- **AGENTS.md § CI/CD and Git Mutation Gate.** Explicit policy that the
+  agent must not create, edit, delete, enable, disable, or trigger CI/CD
+  workflows, release pipelines, branch protection, GitHub secrets, or
+  remote-state mutations unless the user explicitly requests that change.
+  Referenced from `/ry-start`, `/ry-sync`, and `/ry-deploy` command
+  templates.
+- **JSON Schema offline validation.** New
+  `scripts/validate_opencode_schema.py` validates `opencode.json` against
+  the vendored
+  `references/opencode-config.schema.v1.15.4.json` (fetched from
+  https://opencode.ai/config.json). Uses `jsonschema==4.26.0` via uvx so
+  CI never depends on opencode.ai being reachable.
+
+### Scalability (audit Phase 2)
+
+- **`.opencode/skills/index.json` machine-readable.**
+  `scripts/generate_skills_index.py` produces a deterministic JSON map of
+  every SKILL.md → domain → MCP requirements → triggers → network class.
+  `--check` mode fails CI when the committed index drifts from the
+  generator output. Catches "skill silently references a removed MCP"
+  bugs at static-validation time.
+- **`docs/security/mcp-trust-boundaries.md`.** 13 MCP servers classified
+  by trust class (trusted-official / trusted-public / local-only /
+  secrets-required / network-optional) plus repo-read / repo-write flags
+  and recommended CI mode. Pairs with the `ry-env-protection.ts` scope
+  statement.
+- **`docs/github/branch-protection.md`.** Operator-side governance
+  contract: required status checks for `main`, linear history, force-push
+  ban, codeowner review enforcement, `gh api` snippet for restore. The
+  agent does not apply these — owners do. Documented so a future audit
+  knows what to expect.
+- **ADR-009 — YOLO / full-auto permission profile.** Locks in the explicit
+  trust-model rationale for keeping global `edit: "allow"` and
+  `bash: "allow"` in `opencode.json`. Auditors will likely flag the
+  permission model again; this ADR is the documented "we know it's broad
+  and we chose it" record, citing the defense-in-depth plugin pair and
+  the single-developer scope.
+
+### Test coverage
+
+- Total pytest cases: **399** across 16 suites (was 383 at `bbd528c`,
+  +16). New suites: `test_validate_opencode_schema.py` (7 cases),
+  `test_skills_index.py` (6 cases). New cases in
+  `test_plugin_surface.py`: `test_flow_hooks_reads_command_from_input_args`,
+  `test_plugin_spawn_calls_have_timeout_guard`,
+  `test_ry_env_protection_blocks_data_movement_utilities`. CI count is 398
+  passed + 1 skipped (the missing-jsonschema-import path test, correctly
+  skipped when the dependency is present).
+
+### Migration / operator notes
+
+- Run `cd .opencode && bun install` to refresh the local lockfile against
+  the new `package.json`. The committed `.opencode/bun.lock` is the
+  canonical source of truth from this release onward.
+- If you keep `.serena/project.yml` customizations, merge the new
+  languages list (`typescript`, `python`) with your overrides; Serena
+  needs both for full semantic indexing.
+- If you relied on the implicit Opus 4.7 claim for `@ry-explore`, set
+  `agent.ry-explore.model` in your local `opencode.json` overlay — the
+  marketplace default no longer makes that promise.
+- If `git push --no-verify` is part of your workflow, set
+  `export RY_ALLOW_NO_VERIFY=1` in the shell session that needs the
+  override; otherwise `ry-shell-strategy.ts` blocks the call.
+
 ## [0.11.7] - 2026-05-18
 
 Patch dependency-maintenance release accepting the open Dependabot bump for the OpenCode plugin SDK. The `@opencode-ai/plugin` patch update preserves the runtime hook surface, tool-ID format, and `Project` SDK shape consumed by every plugin — verified by the strict TypeScript baseline against all 10 plugins.
