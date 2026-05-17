@@ -3,7 +3,7 @@
   "model": "opencode-go/glm-5.1",
   "small_model": "opencode-go/glm-5.1",
   "default_agent": "build",
-  "autoupdate": true,
+  "autoupdate": "notify",
   "share": "manual",
   "snapshot": true,
   "shell": "/bin/zsh",
