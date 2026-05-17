@@ -1,0 +1,32 @@
+name: SBOM Snapshot
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sbom-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cyclonedx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Generate CycloneDX SBOM (.opencode plugin deps)
+        uses: CycloneDX/gh-node-module-generatebom@02f4abdef6cda31d50fc6a8eb22c1a48b04dd95b  # v1.x
+        with:
+          path: .opencode
+          output: sbom.json
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882  # v4.4.3
+        with:
+          name: sbom-${{ github.event.release.tag_name || github.sha }}
+          path: sbom.json
+          if-no-files-found: error

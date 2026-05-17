@@ -1,0 +1,58 @@
+name: Instruction Docs Check
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - ".claude/CLAUDE.md"
+      - ".serena/memories/**"
+      - "docs/**"
+      - "references/**"
+      - ".opencode/**"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "VERSION"
+  push:
+    branches: [main]
+    paths:
+      - "AGENTS.md"
+      - ".claude/CLAUDE.md"
+      - ".serena/memories/**"
+      - "docs/**"
+      - "references/**"
+      - ".opencode/**"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "VERSION"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: instruction-docs-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  instruction-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.13"
+      - name: Validate instruction docs
+        # AGENTS.md and .claude/CLAUDE.md live on the `fullrepo` orphan branch
+        # in the agent-only artifact path. PR runs against the normal branch
+        # do not see them; the script tolerates absent files gracefully. The
+        # cron run scheduled in validate.yml uses the same script but reads
+        # the fullrepo snapshot via a separate checkout step (deferred to
+        # future automation).
+        run: |
+          if [ -f AGENTS.md ] && [ -f .claude/CLAUDE.md ]; then
+            python3 scripts/validate_instruction_docs.py
+          else
+            echo "[INFO] AGENTS.md / .claude/CLAUDE.md not present on this branch (normal-branch PR); skipping"
+          fi
