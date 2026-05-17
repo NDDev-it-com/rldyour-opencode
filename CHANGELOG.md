@@ -24,12 +24,15 @@ Patch stabilization pass closing the deferred 0.11.0 reviewer findings that were
 - `.github/workflows/validate.yml` now installs the pinned PyYAML dependency before invoking `scripts/validate_config.sh`; live GitHub runners do not carry PyYAML by default.
 - `.github/workflows/secret-scan.yml` now installs the `gitleaks` v8.30.1 CLI directly from the official release tarball with SHA256 verification, avoiding the organization/private-repository license gate in `gitleaks/gitleaks-action`.
 - `.gitleaks.toml` allowlists only the synthetic sanitizer regression fixture files that intentionally contain fake token/private-key strings; the workflow still scans git history for every other path.
+- `.github/workflows/validate.yml` now restores only `AGENTS.md` and `.claude/CLAUDE.md` from `origin/fullrepo` for test-time cross-layer assertions, while leaving `scripts/` and `.opencode/` on the exact `main` / PR checkout being validated.
+- `scripts/fullrepo_sync.sh` adds `install-exclude` for CI and bootstrap flows that need the `.git/info/exclude` block without restoring the full agent-only tree.
+- `scripts/fullrepo_sync.sh status-json` now reports `serena_memory_count: 0` when `.serena/memories` is absent, matching normal clean GitHub runner checkouts instead of exiting under `set -euo pipefail`.
 - `README.md`, `AGENTS.md`, `.claude/CLAUDE.md`, and Serena release memories refreshed from the 0.11.1 validation baseline.
 - Corrected the 0.11.0 changelog test-count line from stale intermediate numbers to the final `7c02482` collection state.
 
 ### Test coverage
 
-- Total pytest cases: **372** across 13 suites (was 357 at `7c02482`, +15). Breakdown: 52 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 11 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + 23 sanitize_diag + 40 check_freshness + 15 fullrepo_sync.
+- Total pytest cases: **374** across 13 suites (was 357 at `7c02482`, +17). Breakdown: 52 validate_helpers + 12 extract_pins + 129 skill_routing + 16 command_audit_sanitizer + 11 plugin_surface + 4 opencode_resolve + 44 permission_policy_regexes + 11 smoke_mcp + 7 validate_instruction_docs + 8 doctor_opencode + 23 sanitize_diag + 40 check_freshness + 17 fullrepo_sync.
 
 ## [0.11.0] - 2026-05-17
 
