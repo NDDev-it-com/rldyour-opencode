@@ -15,6 +15,16 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    import yaml
+except ImportError as _exc:  # pragma: no cover - tooling boundary
+    print(
+        "[ERR] PyYAML is required for fail-closed frontmatter validation. "
+        "Install via `pip install PyYAML` (CI uses pinned PyYAML==6.0.3).",
+        file=sys.stderr,
+    )
+    raise SystemExit(2) from _exc
+
 # v1.15.3 canonical permission key set sourced from the built-in
 # `customize-opencode` skill (`opencode debug skill` -> the `<built-in>`
 # entry) and cross-validated against the v1.15.3 JSON Schema published
@@ -83,6 +93,9 @@ def validate_opencode_json(path: Path) -> int:
     errors = 0
     try:
         cfg = json.loads(path.read_text(encoding="utf-8-sig"))
+    except FileNotFoundError:
+        print(f"[ERR] {path}: file not found")
+        return 1
     except json.JSONDecodeError as exc:
         print(f"[ERR] {path}: JSON decode error: {exc}")
         return 1
@@ -140,6 +153,42 @@ def _extract_frontmatter(text: str) -> str | None:
 
 class DuplicateYamlKey(ValueError):
     """Raised when a frontmatter has the same top-level key more than once."""
+
+
+def _parse_frontmatter_yaml(fm: str, label: str) -> tuple[dict[str, object] | None, int]:
+    """Parse YAML frontmatter strictly via yaml.safe_load.
+
+    Returns (parsed_dict, errors). `parsed_dict` is None on parse failure.
+    Reports duplicate top-level keys (silent ambiguity in regex parser).
+    Strict YAML parsing rejects unquoted descriptions that contain a second
+    colon (e.g. `description: Orchestrated review: notes`) — exactly the
+    failure mode silently allowed by the legacy regex parser.
+    """
+    try:
+        data = yaml.safe_load(fm)
+    except yaml.YAMLError as exc:
+        print(f"[ERR] {label}: YAML parse error: {exc}")
+        return None, 1
+
+    if data is None:
+        print(f"[ERR] {label}: empty frontmatter")
+        return None, 1
+    if not isinstance(data, dict):
+        print(f"[ERR] {label}: frontmatter root must be a mapping, got {type(data).__name__}")
+        return None, 1
+
+    errors = 0
+    seen: set[str] = set()
+    for line in fm.splitlines():
+        m = re.match(r"^([\w-]+):", line)
+        if m:
+            key = m.group(1)
+            if key in seen:
+                print(f"[ERR] {label}: duplicate top-level key {key!r}")
+                errors += 1
+            seen.add(key)
+
+    return data, errors
 
 
 def _yaml_top_key(fm: str, key: str) -> str | None:
@@ -245,7 +294,7 @@ def _yaml_block_child_keys(fm: str, parent_key: str) -> list[str]:
 
 
 def validate_skill(skill_dir: Path) -> int:
-    """Validate one skill directory."""
+    """Validate one skill directory via strict YAML parse."""
     name = skill_dir.name
     errors = 0
 
@@ -264,15 +313,19 @@ def validate_skill(skill_dir: Path) -> int:
         print(f"[ERR] {name}: missing frontmatter delimiter")
         return errors + 1
 
-    try:
-        fm_name = _yaml_top_key(fm, "name")
-        description = _yaml_top_key(fm, "description")
-    except DuplicateYamlKey as exc:
-        print(f"[ERR] {name}: {exc}")
-        return errors + 1
+    data, parse_errors = _parse_frontmatter_yaml(fm, f"skill {name}")
+    errors += parse_errors
+    if data is None:
+        return errors
+
+    fm_name = data.get("name")
+    description = data.get("description")
 
     if fm_name is None:
         print(f"[ERR] {name}: missing frontmatter name")
+        errors += 1
+    elif not isinstance(fm_name, str):
+        print(f"[ERR] {name}: frontmatter name must be a string, got {type(fm_name).__name__}")
         errors += 1
     elif fm_name != name:
         print(f"[ERR] {name}: frontmatter name {fm_name!r} != directory name")
@@ -281,9 +334,31 @@ def validate_skill(skill_dir: Path) -> int:
     if not description:
         print(f"[ERR] {name}: missing frontmatter description")
         errors += 1
+    elif not isinstance(description, str):
+        print(f"[ERR] {name}: description must be a string, got {type(description).__name__}")
+        errors += 1
     elif not (1 <= len(description) <= 1024):
         print(f"[ERR] {name}: description length {len(description)} not in 1-1024")
         errors += 1
+
+    # Forbidden Claude Code / Codex residue fields per AGENTS.md skill rules.
+    forbidden_skill_fields = {
+        "allowed-tools",
+        "disable-model-invocation",
+        "model",
+        "effort",
+        "maxTurns",
+        "paths",
+        "context",
+        "agent",
+    }
+    for forbidden in forbidden_skill_fields:
+        if forbidden in data:
+            print(
+                f"[ERR] {name}: forbidden skill frontmatter field {forbidden!r} "
+                "(Claude Code / Codex residue; not honoured by OpenCode)"
+            )
+            errors += 1
 
     if errors == 0:
         print(f"[OK] skill {name}")
@@ -291,7 +366,7 @@ def validate_skill(skill_dir: Path) -> int:
 
 
 def validate_agent(agent_md: Path) -> int:
-    """Validate one agent markdown file."""
+    """Validate one agent markdown file via strict YAML parse."""
     name = agent_md.stem
     text = agent_md.read_text(encoding="utf-8-sig")
     fm = _extract_frontmatter(text)
@@ -300,26 +375,37 @@ def validate_agent(agent_md: Path) -> int:
         print(f"[ERR] agent {name}: missing frontmatter delimiter")
         return 1
 
-    errors = 0
-    try:
-        description = _yaml_top_key(fm, "description")
-        mode = _yaml_top_key(fm, "mode")
-        color = _yaml_top_key(fm, "color")
-    except DuplicateYamlKey as exc:
-        print(f"[ERR] agent {name}: {exc}")
-        return errors + 1
+    data, errors = _parse_frontmatter_yaml(fm, f"agent {name}")
+    if data is None:
+        return errors
 
-    if not description and "description:" not in fm:
+    description = data.get("description")
+    mode = data.get("mode")
+    color = data.get("color")
+    agent_perm = data.get("permission")
+
+    if not description:
         print(f"[ERR] agent {name}: missing description")
         errors += 1
+    elif not isinstance(description, str):
+        print(f"[ERR] agent {name}: description must be a string, got {type(description).__name__}")
+        errors += 1
+    elif not (1 <= len(description) <= 1024):
+        print(f"[ERR] agent {name}: description length {len(description)} not in 1-1024")
+        errors += 1
 
-    if mode and mode not in ("primary", "subagent"):
-        print(f"[ERR] agent {name}: invalid mode {mode!r}")
+    # OpenCode v1.15.x supports mode: primary | subagent | all (default all).
+    # https://opencode.ai/docs/agents
+    if mode is not None and mode not in ("primary", "subagent", "all"):
+        print(f"[ERR] agent {name}: invalid mode {mode!r} (expected primary | subagent | all)")
         errors += 1
 
     if color is not None:
         valid_named = {"primary", "secondary", "accent", "success", "warning", "error", "info"}
-        if color not in valid_named and not re.match(r"^#[0-9a-fA-F]{6}$", color):
+        if not isinstance(color, str):
+            print(f"[ERR] agent {name}: color must be a string, got {type(color).__name__}")
+            errors += 1
+        elif color not in valid_named and not re.match(r"^#[0-9a-fA-F]{6}$", color):
             print(f"[ERR] agent {name}: invalid color {color!r}")
             errors += 1
 
@@ -328,15 +414,15 @@ def validate_agent(agent_md: Path) -> int:
     # v1.15.3) and PascalCase typos are accepted silently by the runtime
     # (issue sst/opencode#15507), so project validation is the only line
     # of defense.
-    perm_keys = _yaml_block_child_keys(fm, "permission")
-    for key in perm_keys:
-        if key not in CANONICAL_PERMISSION_KEYS:
-            sorted_canon = ", ".join(sorted(CANONICAL_PERMISSION_KEYS))
-            print(
-                f"[ERR] agent {name}: unknown permission key {key!r} "
-                f"(canonical set for v1.15.x: {sorted_canon})"
-            )
-            errors += 1
+    if isinstance(agent_perm, dict):
+        for key in agent_perm.keys():
+            if not isinstance(key, str) or key not in CANONICAL_PERMISSION_KEYS:
+                sorted_canon = ", ".join(sorted(CANONICAL_PERMISSION_KEYS))
+                print(
+                    f"[ERR] agent {name}: unknown permission key {key!r} "
+                    f"(canonical set for v1.15.x: {sorted_canon})"
+                )
+                errors += 1
 
     if errors == 0:
         print(f"[OK] agent {name}")
@@ -344,7 +430,7 @@ def validate_agent(agent_md: Path) -> int:
 
 
 def validate_command(cmd_md: Path) -> int:
-    """Validate one command markdown file."""
+    """Validate one command markdown file via strict YAML parse."""
     name = cmd_md.stem
     text = cmd_md.read_text(encoding="utf-8-sig")
     fm = _extract_frontmatter(text)
@@ -353,18 +439,21 @@ def validate_command(cmd_md: Path) -> int:
         print(f"[ERR] command {name}: missing frontmatter delimiter")
         return 1
 
-    try:
-        description = _yaml_top_key(fm, "description")
-    except DuplicateYamlKey as exc:
-        print(f"[ERR] command {name}: {exc}")
-        return 1
+    data, errors = _parse_frontmatter_yaml(fm, f"command {name}")
+    if data is None:
+        return errors
 
+    description = data.get("description")
     if not description:
         print(f"[ERR] command {name}: missing description")
-        return 1
+        return errors + 1
+    if not isinstance(description, str):
+        print(f"[ERR] command {name}: description must be a string, got {type(description).__name__}")
+        return errors + 1
 
-    print(f"[OK] command {name}")
-    return 0
+    if errors == 0:
+        print(f"[OK] command {name}")
+    return errors
 
 
 def validate_version(path: Path) -> int:

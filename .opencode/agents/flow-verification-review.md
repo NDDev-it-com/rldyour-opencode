@@ -1,5 +1,5 @@
 ---
-description: Orchestrated verification review: tests, quality gates, browser/server evidence. Read-only. Invoked by ry-start or ry-review.
+description: "Orchestrated verification review: tests, quality gates, browser/server evidence. Read-only. Invoked by ry-start or ry-review."
 mode: subagent
 temperature: 0.1
 steps: 36
