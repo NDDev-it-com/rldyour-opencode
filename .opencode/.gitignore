@@ -1,6 +1,9 @@
+# OpenCode plugin layer is Bun-canonical (ADR-009 + audit Phase 0 P0-2).
+# Source-of-truth files that MUST be tracked: package.json, bun.lock,
+# tsconfig.json, plus every .ts under plugins/. Everything else is
+# build/runtime detritus.
 node_modules/
-# OpenCode plugin layer is Bun-canonical (ADR-009 + audit Phase 0 P0-2);
-# bun.lock is the tracked lockfile. package-lock.json may appear on disk if
-# the operator runs `npm install` for diagnostic purposes, but it is not the
-# CI / runtime contract and must not enter git history.
+# package-lock.json may appear on disk if the operator runs `npm install`
+# for diagnostic purposes, but npm is not the CI / runtime contract and
+# this artifact must not enter git history.
 package-lock.json
