@@ -19,6 +19,10 @@ Patch stabilization pass closing the deferred 0.11.0 reviewer findings that were
 ### Changed
 
 - `VERSION` bumped to `0.11.1`.
+- `.github/workflows/codeql.yml` now loads `.github/codeql/codeql-config.yml`, explicitly scanning `.opencode/plugins`, `scripts`, and workflow files. This prevents the JavaScript/TypeScript CodeQL job from seeing only workflow YAML while missing plugin sources under the hidden `.opencode/` directory.
+- `.github/workflows/codeql.yml` now grants `actions: read` alongside `security-events: write`, matching the CodeQL Action private-repository SARIF upload requirement.
+- `.github/workflows/validate.yml` now installs the pinned PyYAML dependency before invoking `scripts/validate_config.sh`; live GitHub runners do not carry PyYAML by default.
+- `.github/workflows/secret-scan.yml` now pins `gitleaks/gitleaks-action@v2.3.7` to the real tag SHA (`83373cf...`) instead of an unresolvable object ID.
 - `README.md`, `AGENTS.md`, `.claude/CLAUDE.md`, and Serena release memories refreshed from the 0.11.1 validation baseline.
 - Corrected the 0.11.0 changelog test-count line from stale intermediate numbers to the final `7c02482` collection state.
 
