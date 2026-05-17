@@ -64,8 +64,16 @@ jobs:
             exit 1
           fi
           echo "[OK] tag $tag_input matches VERSION $ver"
+      - name: Resolve release tag
+        id: release_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            printf 'tag=%s\n' "${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            printf 'tag=%s\n' "${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"
+          fi
       - name: Generate CycloneDX SBOM
-        uses: CycloneDX/gh-node-module-generatebom@02f4abdef6cda31d50fc6a8eb22c1a48b04dd95b  # v1.x
+        uses: CycloneDX/gh-node-module-generatebom@27e13c2bf0fae78d66387b35ca9749d8cc853060  # v1.0.3
         with:
           path: .opencode
           output: sbom.json
@@ -76,8 +84,9 @@ jobs:
           path: sbom.json
           if-no-files-found: error
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@c062e08bd532815e2f80e1d8ec6a17b075b88a48  # v2.0.8
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe  # v2.6.1
         with:
+          tag_name: ${{ steps.release_tag.outputs.tag }}
           files: |
             sbom.json
             CHANGELOG.md
