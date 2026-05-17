@@ -100,7 +100,9 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
         // Non-catastrophic destructive rm: still surface a warning so
         // the operator notices, but do not block; cleanup of project
         // dirs, build outputs, and node_modules paths is legitimate.
-        if (!isNodeModulesCleanup && /\//.test(command)) {
+        // Bare build-output targets like `rm -rf build` also deserve
+        // operator attention even though they do not contain a slash.
+        if (!isNodeModulesCleanup) {
           await toast("warning", "Destructive rm command detected — verify target before proceeding.")
           await log("warn", `destructive rm command: ${command.slice(0, 200)}`)
         }

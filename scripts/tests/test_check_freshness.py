@@ -20,7 +20,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 WRAPPER_SH = PROJECT_ROOT / "scripts" / "check_deps_freshness.sh"
 
 
-# ---------- _semver_tuple ----------
+# ---------- _semver_tuple / _semver_parts ----------
 
 
 @pytest.mark.parametrize(
@@ -41,6 +41,23 @@ def test_semver_tuple_parses(version: str, expected: tuple[int, int, int]) -> No
 @pytest.mark.parametrize("version", ["", "system", "latest", "not-a-version", "1.2"])
 def test_semver_tuple_returns_none_for_non_semver(version: str) -> None:
     assert cf._semver_tuple(version) is None
+
+
+@pytest.mark.parametrize(
+    "version,expected",
+    [
+        ("1.3.0", (1, 3, 0, 1)),
+        ("v1.3.0", (1, 3, 0, 1)),
+        ("1.3.0-rc1", (1, 3, 0, 0)),
+        ("1.3.0.dev0", (1, 3, 0, 0)),
+        ("1.3.0-alpha.1", (1, 3, 0, 0)),
+        ("1.3.0.beta2", (1, 3, 0, 0)),
+    ],
+)
+def test_semver_parts_classifies_stability(
+    version: str, expected: tuple[int, int, int, int]
+) -> None:
+    assert cf._semver_parts(version) == expected
 
 
 # ---------- classify ----------
@@ -65,6 +82,22 @@ def test_classify_unknown_when_latest_none() -> None:
 def test_classify_unknown_when_unparseable() -> None:
     assert cf.classify("system", "system") == "current"
     assert cf.classify("1.3.0", "not-semver") == "unknown"
+
+
+@pytest.mark.parametrize(
+    "current,latest,expected",
+    [
+        ("1.3.0.dev0", "1.3.0", "stale"),
+        ("1.3.0-rc1", "1.3.0", "stale"),
+        ("1.3.0-alpha.1", "1.3.0", "stale"),
+        ("1.3.0", "1.3.0.dev0", "ahead"),
+        ("1.3.0", "1.3.0-rc1", "ahead"),
+    ],
+)
+def test_classify_orders_prerelease_below_matching_stable(
+    current: str, latest: str, expected: str
+) -> None:
+    assert cf.classify(current, latest) == expected
 
 
 # ---------- probe_npm / probe_pypi (mocked) ----------
