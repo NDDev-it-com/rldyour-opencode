@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.7] - 2026-05-18
+
+Patch dependency-maintenance release accepting the open Dependabot bump for the OpenCode plugin SDK. The `@opencode-ai/plugin` patch update preserves the runtime hook surface, tool-ID format, and `Project` SDK shape consumed by every plugin — verified by the strict TypeScript baseline against all 10 plugins.
+
+### Changed
+
+- `.opencode/package.json` bumps `@opencode-ai/plugin` from `1.15.3` to `1.15.4`. Upstream `v1.15.4` release notes scope to bugfixes (project-scoped bus events, custom LSP refresh events, hidden background subagent task instructions) plus a TUI markdown polish; the server-side `Plugin`/`Hooks` factory contract and MCP `<server>_<tool>` tool-ID format are unchanged.
+- `.opencode/bun.lock` and `.opencode/package-lock.json` regenerated from the bumped manifest.
+- README, AGENTS.md, `references/opencode-plugin-patterns.md`, `scripts/_validate_helpers.py`, and `scripts/tests/test_validate_helpers.py` refresh `1.15.3` → `1.15.4` plugin-pin citations while preserving historical "removed between v1.14.48 and v1.15.3" facts (the `codesearch` permission key removal).
+- Dependabot PR #6 is superseded by this commit; close after merge.
+
+### Test coverage
+
+- Total pytest cases: **383** across 14 suites (unchanged from `108fc29`).
+- `bunx --bun tsc --noEmit -p .opencode/tsconfig.json` passes against `@opencode-ai/plugin@1.15.4`.
+- `bash scripts/check_deps_freshness.sh --check-freshness --json` continues to report `stale: 0, errors: 0` for all MCP pins.
+
 ## [0.11.6] - 2026-05-18
 
 Patch dependency-maintenance release closing the current Dependabot backlog, clearing live MCP freshness drift, and adding a guard against GitHub Actions SHA/comment drift.
