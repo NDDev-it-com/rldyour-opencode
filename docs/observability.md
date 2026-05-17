@@ -10,7 +10,7 @@ When something feels wrong:
 - `git log --oneline -20` — recent change history.
 - `bash scripts/git_sync_audit.sh` — branch, upstream, dirty files, worktrees, merged-branch cleanup candidates.
 - `bash scripts/validate_config.sh` — full repository-level validator (opencode.json schema, skill/agent/command frontmatter, VERSION semver).
-- `bash scripts/fullrepo_sync.sh status-json` — agent-only file and `fullrepo` branch sync state.
+- `bash scripts/fullrepo_sync.sh status-json` — complete `HEAD + agent-only` fullrepo branch sync state.
 - `bash scripts/flow_post_task_state.sh` — composite git / Serena / fullrepo / instruction-docs state in JSON.
 - `python3 scripts/smoke_mcp_capabilities.py` — verify every declared MCP server in `opencode.json` is reachable.
 - `python3 scripts/validate_instruction_docs.py` — verify `AGENTS.md` and `.claude/CLAUDE.md` are present, non-trivially large, and contain required anchor sections.

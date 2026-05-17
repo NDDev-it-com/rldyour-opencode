@@ -12,6 +12,7 @@ on:
       - "scripts/**.py"
       - "pyrightconfig.json"
       - ".github/workflows/lint.yml"
+  workflow_dispatch: {}
 
 permissions:
   contents: read

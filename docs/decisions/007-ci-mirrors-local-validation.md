@@ -38,13 +38,13 @@ Workflow set:
 
 | Workflow | Trigger | Matrix | Purpose |
 |---|---|---|---|
-| `validate.yml` | push + PR | Linux + macOS | runs `scripts/validate_config.sh` and the pytest corpus; shell-strict-mode lint job |
+| `validate.yml` | push + PR + manual dispatch | Linux + macOS | runs `scripts/validate_config.sh` and the pytest corpus; shell-strict-mode lint job |
 | `dependency-check.yml` | weekly cron + dispatch | Linux | pin report + network freshness + MCP smoke |
-| `instruction-docs-check.yml` | path-filtered | Linux | `validate_instruction_docs.py` (skips on normal-branch PRs that lack the agent-only files) |
-| `typecheck-plugins.yml` | path-filtered | Linux + macOS | `bun install --frozen-lockfile && bunx --bun tsc --noEmit -p .opencode/tsconfig.json` |
-| `lint.yml` | path-filtered | Linux + macOS | ruff against `scripts/` |
-| `codeql.yml` | push + PR + weekly | Linux | javascript-typescript + python analysis using `.github/codeql/codeql-config.yml` so hidden `.opencode/plugins` TypeScript is included; SARIF is kept as a workflow artifact instead of uploaded to code scanning |
-| `secret-scan.yml` | push + PR | Linux | gitleaks CLI release tarball with SHA256 verification, `.gitleaks.toml` fixture allowlist, and checkout fetch-depth: 0 |
+| `instruction-docs-check.yml` | path-filtered + manual dispatch | Linux | `validate_instruction_docs.py` (skips on normal-branch PRs that lack the agent-only files) |
+| `typecheck-plugins.yml` | path-filtered + manual dispatch | Linux + macOS | `bun install --frozen-lockfile && bunx --bun tsc --noEmit -p .opencode/tsconfig.json` |
+| `lint.yml` | path-filtered + manual dispatch | Linux + macOS | ruff against `scripts/` |
+| `codeql.yml` | push + PR + weekly + manual dispatch | Linux | javascript-typescript + python analysis using `.github/codeql/codeql-config.yml` so hidden `.opencode/plugins` TypeScript is included; SARIF is kept as a workflow artifact instead of uploaded to code scanning |
+| `secret-scan.yml` | push + PR + manual dispatch | Linux | gitleaks CLI release tarball with SHA256 verification, `.gitleaks.toml` fixture allowlist, and checkout fetch-depth: 0 |
 | `dependency-review.yml` | PR | Linux | actions/dependency-review-action, fail-on-severity: moderate on public / GHAS-enabled repositories; private repositories emit an explicit skip notice because Dependency Review is unavailable without GitHub Advanced Security |
 | `release.yml` | `v*.*.*` tag + dispatch | Linux | full validation + typecheck + tag-vs-VERSION check + SBOM generation + GitHub Release |
 | `sbom.yml` | release published + dispatch | Linux | standalone CycloneDX SBOM artifact |
