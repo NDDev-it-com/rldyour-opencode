@@ -7,7 +7,12 @@ const BLOCKED_PATTERNS = [
   /\/\.ssh\//i,
   /\/\.gnupg\//i,
   /\/\.aws\//i,
-  /secret/i,
+  // Path-bounded "secret(s)?" — matches secret / secrets / .secret(s) as
+  // directory or filename component. Closes reviewer 0.11.0 finding
+  // "secret-scan.yml / secret_data.py false-positives": the bare
+  // /secret/i pattern previously matched any substring, blocking
+  // legitimate reads of the workflow file shipped in this same release.
+  /(^|\/)\.?secrets?(\.|$|\/)/i,
   /private[_-]?key/i,
   /service[_-]?account/i,
   /\.pem$/i,

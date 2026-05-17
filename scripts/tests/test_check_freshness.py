@@ -230,6 +230,48 @@ def test_main_strict_with_errors_exits_two(
     assert env["errors"] == 1
 
 
+def test_main_pypi_stale_classified(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Parity with the npm stale path: a PyPI pin that lags must be
+    classified stale, surface in `latest`, and bump the envelope
+    `stale` counter. Closes reviewer 0.11.0 finding 'stale path only
+    tests npm flavor'."""
+    pins = [{"kind": "pypi", "server": "y", "name": "y-pkg", "version": "1.0.0"}]
+    code, env = _run_main_with_pins(
+        monkeypatch,
+        pins,
+        npm_versions={},
+        pypi_versions={"y-pkg": "2.0.0"},
+        capsys=capsys,
+    )
+    assert code == 1
+    assert env["stale"] == 1
+    assert env["pins"][0]["status"] == "stale"
+    assert env["pins"][0]["latest"] == "2.0.0"
+    assert env["pins"][0]["source"] == "pypi"
+
+
+def test_main_npm_ahead_classified(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """An `ahead` classification (local pin newer than upstream stable)
+    must NOT count as stale and must NOT exit non-zero. Future regression
+    in semver comparison would otherwise downgrade an ahead pin to
+    stale."""
+    pins = [{"kind": "npm", "server": "x", "name": "x-pkg", "version": "2.0.0"}]
+    code, env = _run_main_with_pins(
+        monkeypatch,
+        pins,
+        npm_versions={"x-pkg": "1.9.9"},
+        pypi_versions={},
+        capsys=capsys,
+    )
+    assert code == 0
+    assert env["stale"] == 0
+    assert env["pins"][0]["status"] == "ahead"
+
+
 def test_main_dart_kind_is_skipped(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

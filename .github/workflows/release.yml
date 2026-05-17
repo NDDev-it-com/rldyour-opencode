@@ -12,8 +12,10 @@ on:
 
 permissions:
   contents: write
-  id-token: write
-  attestations: write
+  # id-token: write + attestations: write are intentionally NOT requested
+  # until the Sigstore-backed attest-build-provenance step is wired
+  # (ADR-007 § Future work). Granting them today without a consumer
+  # violates least-privilege per OSSF Scorecard "Token-Permissions".
 
 concurrency:
   group: release-${{ github.workflow }}-${{ github.ref }}
