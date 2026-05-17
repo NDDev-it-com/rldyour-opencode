@@ -23,6 +23,7 @@ Patch stabilization pass closing the deferred 0.11.0 reviewer findings that were
 - `.github/workflows/codeql.yml` now grants `actions: read` alongside `security-events: write`, matching the CodeQL Action private-repository SARIF upload requirement.
 - `.github/workflows/validate.yml` now installs the pinned PyYAML dependency before invoking `scripts/validate_config.sh`; live GitHub runners do not carry PyYAML by default.
 - `.github/workflows/secret-scan.yml` now installs the `gitleaks` v8.30.1 CLI directly from the official release tarball with SHA256 verification, avoiding the organization/private-repository license gate in `gitleaks/gitleaks-action`.
+- `.gitleaks.toml` allowlists only the synthetic sanitizer regression fixture files that intentionally contain fake token/private-key strings; the workflow still scans git history for every other path.
 - `README.md`, `AGENTS.md`, `.claude/CLAUDE.md`, and Serena release memories refreshed from the 0.11.1 validation baseline.
 - Corrected the 0.11.0 changelog test-count line from stale intermediate numbers to the final `7c02482` collection state.
 
