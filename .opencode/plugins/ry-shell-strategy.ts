@@ -56,6 +56,7 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
       const lease = new RegExp(`${FLAG_BOUNDARY_PRE}--force-with-lease${FLAG_BOUNDARY_POST}`, "i")
       const noVerify = new RegExp(`${FLAG_BOUNDARY_PRE}--no-verify${FLAG_BOUNDARY_POST}`, "i")
       const shortForce = /(?:^|\s)-f(?:\s|$)/
+      const branchAlt = /\b(main|master|release|production)\b/i
 
       const isPush = /\bgit\s+push\b/i.test(command)
 
@@ -67,15 +68,53 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
         )
       }
 
+      // Layer 1 (force-push without lease). Order matters: log BEFORE
+      // throw so the audit trail records the block reason even when the
+      // toast notification fails silently.
       if (isPush && (longForce.test(command) || shortForce.test(command)) && !lease.test(command)) {
         const msg = "Blocked git push --force / -f without --force-with-lease (data-loss risk)."
+        await log("error", `${msg} cmd=${command.slice(0, 200)}`)
         await toast("error", msg)
         throw new Error(`[rldyour] ${msg} Use --force-with-lease for safer force pushes.`)
       }
 
-      if (/\brm\s+(-rf?|--recursive)\s+.*\//i.test(command) && !/\/node_modules\/?$/i.test(command)) {
-        await toast("warning", "Destructive rm command detected — verify target before proceeding.")
-        await log("warn", `destructive rm command: ${command.slice(0, 200)}`)
+      // Layer 2 (catastrophic rm -rf). Unconditional throw mirrors the
+      // deny-only policy in ry-permission-policy.ts so the same pattern
+      // is blocked regardless of whether bash permission is statically
+      // "allow" (Build agent) or "ask" (plan + reviewer subagents).
+      // node_modules cleanup is the documented allowlist exception.
+      if (/\brm\s+(-rf?|-fr|--recursive)\b/i.test(command)) {
+        const dangerous =
+          /\brm\s+(-rf?|-fr|--recursive)\s+\/\s*$/i.test(command) ||
+          /\brm\s+(-rf?|-fr|--recursive)\s+\$HOME\b/i.test(command) ||
+          /\brm\s+(-rf?|-fr|--recursive)\s+~\/?\s*$/i.test(command) ||
+          /\brm\s+(-rf?|-fr|--recursive)\s+\.\s*$/i.test(command)
+        const isNodeModulesCleanup =
+          /\brm\s+(-rf?|-fr|--recursive)\s+\S*\/?node_modules\/?\s*$/i.test(command)
+        if (dangerous && !isNodeModulesCleanup) {
+          const msg = "Blocked catastrophic rm -rf target (root/home/cwd)."
+          await log("error", `${msg} cmd=${command.slice(0, 200)}`)
+          await toast("error", msg)
+          throw new Error(`[rldyour] ${msg} Refusing to recursively delete a protected target.`)
+        }
+        // Non-catastrophic destructive rm: still surface a warning so
+        // the operator notices, but do not block; cleanup of project
+        // dirs, build outputs, and node_modules paths is legitimate.
+        if (!isNodeModulesCleanup && /\//.test(command)) {
+          await toast("warning", "Destructive rm command detected — verify target before proceeding.")
+          await log("warn", `destructive rm command: ${command.slice(0, 200)}`)
+        }
+      }
+
+      // Layer 3 (git push --no-verify on product branches). Unconditional
+      // throw — pre-push hooks installed on main/master/release/production
+      // exist for a reason; bypassing them via --no-verify is a CI/policy
+      // escape hatch that this layer refuses.
+      if (isPush && noVerify.test(command) && branchAlt.test(command)) {
+        const msg = "Blocked git push --no-verify on a product branch (pre-push hook bypass)."
+        await log("error", `${msg} cmd=${command.slice(0, 200)}`)
+        await toast("error", msg)
+        throw new Error(`[rldyour] ${msg} Resolve the hook failure or push to a feature branch.`)
       }
     },
   }
