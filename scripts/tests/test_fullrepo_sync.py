@@ -66,6 +66,15 @@ def _run_status_json() -> subprocess.CompletedProcess:
     )
 
 
+def _copy_script_to_tmp_repo(tmp_path: Path) -> Path:
+    scripts_dir = tmp_path / "scripts"
+    scripts_dir.mkdir()
+    tmp_script = scripts_dir / "fullrepo_sync.sh"
+    tmp_script.write_text(SCRIPT.read_text(encoding="utf-8"), encoding="utf-8")
+    subprocess.run(["git", "init"], check=True, capture_output=True, cwd=tmp_path)
+    return tmp_script
+
+
 def test_status_json_emits_well_formed_json() -> None:
     """The wrapper must always produce parsable JSON regardless of
     the local branch/dirty state."""
@@ -100,6 +109,36 @@ def test_status_json_dirty_is_clean_or_dirty() -> None:
     result = _run_status_json()
     parsed = json.loads(result.stdout.decode("utf-8"))
     assert parsed["dirty"] in ("clean", "dirty")
+
+
+def test_status_json_handles_missing_serena_memories(tmp_path: Path) -> None:
+    """GitHub runner checkouts do not restore `.serena` by default.
+
+    `status-json` is a status command, so missing memories must report
+    `serena_memory_count: 0` instead of exiting under `set -euo pipefail`.
+    """
+    tmp_script = _copy_script_to_tmp_repo(tmp_path)
+    result = subprocess.run(
+        ["bash", str(tmp_script), "status-json"],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+    )
+    parsed = json.loads(result.stdout.decode("utf-8"))
+    assert parsed["serena_memory_count"] == 0
+
+
+def test_install_exclude_writes_canonical_marker(tmp_path: Path) -> None:
+    tmp_script = _copy_script_to_tmp_repo(tmp_path)
+    subprocess.run(
+        ["bash", str(tmp_script), "install-exclude"],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+    )
+    exclude_text = (tmp_path / ".git" / "info" / "exclude").read_text(encoding="utf-8")
+    assert "# >>> rldyour fullrepo agent-only files >>>" in exclude_text
+    assert "# <<< rldyour fullrepo agent-only files <<<" in exclude_text
 
 
 # ---------- help / usage ----------

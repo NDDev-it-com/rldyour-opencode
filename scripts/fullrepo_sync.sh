@@ -44,12 +44,15 @@ RUNTIME_EXCLUDE_DIRNAMES=(
 )
 
 FULLREPO_BRANCH="fullrepo"
+EXCLUDE_START_MARKER="# >>> rldyour fullrepo agent-only files >>>"
+EXCLUDE_END_MARKER="# <<< rldyour fullrepo agent-only files <<<"
 
 usage() {
   cat <<EOF
 Usage: $(basename "$0") <command> [options]
 
 Commands:
+  install-exclude   Install .git/info/exclude patterns only
   bootstrap-init    Install .git/info/exclude patterns and restore from fullrepo
   restore           Restore agent-only files from origin/fullrepo
   publish           Publish current agent-only files to origin/fullrepo
@@ -88,7 +91,7 @@ behind_count() {
   echo "$count"
 }
 
-cmd_bootstrap_init() {
+install_exclude_patterns() {
   local root
   root=$(git_root) || { echo "Error: not in a git repo" >&2; exit 1; }
 
@@ -98,23 +101,33 @@ cmd_bootstrap_init() {
   mkdir -p "$(dirname "$exclude_file")"
 
   if [ -f "$exclude_file" ]; then
-    if ! grep -q "# rldyour-opencode agent-only" "$exclude_file"; then
+    if ! grep -qF "$EXCLUDE_START_MARKER" "$exclude_file"; then
       echo "" >> "$exclude_file"
-      echo "# rldyour-opencode agent-only" >> "$exclude_file"
+      echo "$EXCLUDE_START_MARKER" >> "$exclude_file"
       for pattern in "${AGENT_ONLY_PATTERNS[@]}"; do
         echo "$pattern" >> "$exclude_file"
       done
+      echo "$EXCLUDE_END_MARKER" >> "$exclude_file"
       echo "[fullrepo] Added exclude patterns to $exclude_file"
     else
       echo "[fullrepo] Exclude patterns already present"
     fi
   else
-    echo "# rldyour-opencode agent-only" > "$exclude_file"
+    echo "$EXCLUDE_START_MARKER" > "$exclude_file"
     for pattern in "${AGENT_ONLY_PATTERNS[@]}"; do
       echo "$pattern" >> "$exclude_file"
     done
+    echo "$EXCLUDE_END_MARKER" >> "$exclude_file"
     echo "[fullrepo] Created $exclude_file with exclude patterns"
   fi
+}
+
+cmd_install_exclude() {
+  install_exclude_patterns
+}
+
+cmd_bootstrap_init() {
+  install_exclude_patterns
 
   echo "[fullrepo] Checking fullrepo branch..."
   if git branch -r | grep -q "origin/$FULLREPO_BRANCH" 2>/dev/null; then
@@ -329,7 +342,11 @@ cmd_status_json() {
   behind=$(behind_count)
   git show-ref --verify --quiet "refs/heads/$FULLREPO_BRANCH" && fullrepo_local="true" || fullrepo_local="false"
   git branch -r 2>/dev/null | grep -q "origin/$FULLREPO_BRANCH" && fullrepo_remote="true" || fullrepo_remote="false"
-  mem_count=$(find "$root/.serena/memories" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+  if [ -d "$root/.serena/memories" ]; then
+    mem_count=$(find "$root/.serena/memories" -name "*.md" | wc -l | tr -d ' ')
+  else
+    mem_count="0"
+  fi
 
   # JSON-escape via Python so a branch name containing `"`, `\`, or any
   # control char cannot produce malformed output. Booleans and integers
@@ -353,6 +370,7 @@ print(json.dumps({
 }
 
 case "${1:-}" in
+  install-exclude) cmd_install_exclude ;;
   bootstrap-init) cmd_bootstrap_init ;;
   restore) cmd_restore ;;
   publish) cmd_publish ;;

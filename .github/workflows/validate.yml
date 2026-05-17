@@ -35,6 +35,19 @@ jobs:
       # bumping the major version; verify via `gh api repos/actions/<name>/git/refs/tags/<tag>`.
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Prepare agent-only validation context
+        shell: bash
+        run: |
+          # Unit tests validate cross-layer contracts that reference AGENTS.md,
+          # while normal branches keep agent-only files on origin/fullrepo.
+          # Restore only instruction docs needed by tests; do not run
+          # bootstrap-init here because it would replace scripts/.opencode
+          # from fullrepo and could mask the exact PR/main files under test.
+          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo
+          bash scripts/fullrepo_sync.sh install-exclude
+          git show origin/fullrepo:AGENTS.md > AGENTS.md
+          mkdir -p .claude
+          git show origin/fullrepo:.claude/CLAUDE.md > .claude/CLAUDE.md
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
