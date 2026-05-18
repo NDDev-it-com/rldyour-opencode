@@ -22,6 +22,11 @@ permissions:
   # to let CodeQL inspect its own run; it does NOT widen privileges
   # beyond reading public workflow metadata.
   actions: read
+  # CodeQL also queries the CodeQL Action API during initialization/analyze
+  # post-processing. Keep this read-only so SARIF upload remains disabled
+  # (`upload: never`) while eliminating "Resource not accessible by
+  # integration" warning annotations on normal branch runs.
+  security-events: read
 
 concurrency:
   group: codeql-${{ github.workflow }}-${{ github.ref }}

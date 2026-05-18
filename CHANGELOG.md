@@ -19,6 +19,10 @@ and standalone SBOM workflows.
   the GitHub Actions Node 20 deprecation annotation instead of only forcing the
   old action onto Node 24. Runtime/plugin baseline remains `opencode-ai` /
   `@opencode-ai/plugin` / SDK `1.15.4`.
+- **CodeQL warning-free API access.** `codeql.yml` now grants
+  `security-events: read` alongside `actions: read`, which lets the pinned
+  CodeQL Action query its own read-only API metadata without enabling code
+  scanning upload. SARIF still stays as workflow artifacts via `upload: never`.
 
 ## [0.12.9] - 2026-05-18
 
