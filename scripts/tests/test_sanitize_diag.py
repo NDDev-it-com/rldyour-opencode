@@ -151,6 +151,7 @@ def test_cli_in_place_rewrites_file(tmp_path: Path) -> None:
         [sys.executable, str(SANITIZE_PY), str(p), "--in-place"],
         check=True,
         capture_output=True,
+        timeout=15,
     )
     assert result.returncode == 0
     rewritten = p.read_text(encoding="utf-8")
@@ -162,6 +163,7 @@ def test_cli_in_place_requires_file_arg(tmp_path: Path) -> None:
     result = subprocess.run(
         [sys.executable, str(SANITIZE_PY), "--in-place"],
         capture_output=True,
+        timeout=10,
     )
     assert result.returncode == 2
     assert b"--in-place requires" in result.stderr
