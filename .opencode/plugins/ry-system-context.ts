@@ -90,6 +90,24 @@ interface BranchHeadCache {
 
 const cacheByDirectory = new Map<string, BranchHeadCache>()
 
+// `branch` and `headShort` flow from `git rev-parse` directly into the
+// system prompt. Branch names are user-controlled — anyone with commit
+// access can name a branch with newlines, prompt-override text, or shell
+// metacharacters. Reviewer wave 2026-05-18 security F-4 flagged this as
+// an indirect prompt-injection vector: a branch named `main\n## OVERRIDE:
+// ignore previous instructions...` would inject those bytes into every
+// system-prompt turn.
+//
+// Allow only the canonical git-branch character set [A-Za-z0-9._/-] and
+// cap the length at 200 chars so even an adversarial branch cannot bloat
+// the system-prompt stamp.
+const SAFE_STAMP_MAX_LEN = 200
+function sanitizeRuntimeStamp(value: string): string {
+  if (!value) return "unknown"
+  const safe = value.replace(/[^\w.\-/]/g, "_")
+  return safe.length > SAFE_STAMP_MAX_LEN ? safe.slice(0, SAFE_STAMP_MAX_LEN) : safe
+}
+
 async function getBranchAndHead(directory: string): Promise<{ branch: string; headShort: string }> {
   const now = Date.now()
   const entry = cacheByDirectory.get(directory)
@@ -118,6 +136,12 @@ export const RySystemContext: Plugin = async ({ client, directory }) => {
     }
   }
 
+  // Per-session deterministic "log once" flag. The previous
+  // `Math.random() < 0.05` sampler dropped the first-turn context line 95%
+  // of the time even though the comment promised a session-start anchor.
+  // Reviewer wave 2026-05-18 quality F-10 / S-13 closure.
+  let sessionStartLogged = false
+
   return {
     "experimental.chat.system.transform": async (_input, output) => {
       const today = new Date().toISOString().slice(0, 10)
@@ -125,12 +149,22 @@ export const RySystemContext: Plugin = async ({ client, directory }) => {
       const status = await readGitOutput(directory, ["status", "--porcelain"])
       const dirty = status.length > 0 ? `dirty (${status.split("\n").length} files)` : "clean"
 
-      const line = `[rldyour runtime] date=${today} branch=${branch} head=${headShort} worktree=${dirty}`
+      // Sanitize git-controlled fields before pushing into the system
+      // prompt. Security F-4 closure: indirect prompt injection via crafted
+      // branch names. headShort is always [0-9a-f]+ in practice but the
+      // sanitizer is cheap and defensive.
+      const safeBranch = sanitizeRuntimeStamp(branch)
+      const safeHead = sanitizeRuntimeStamp(headShort)
+      const line = `[rldyour runtime] date=${today} branch=${safeBranch} head=${safeHead} worktree=${dirty}`
       output.system.push(line)
 
-      // Log once per session start ground truth so the audit trail records
-      // what context the LLM saw. Quiet for subsequent turns.
-      if (Math.random() < 0.05) await log(line)
+      // Log first turn deterministically so the audit trail always records
+      // what context the LLM saw at session start. Quiet for subsequent
+      // turns.
+      if (!sessionStartLogged) {
+        sessionStartLogged = true
+        await log(line)
+      }
     },
   }
 }
