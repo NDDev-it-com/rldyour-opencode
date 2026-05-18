@@ -5,6 +5,70 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.8] - 2026-05-18
+
+Public release finalization for full Linux/macOS parity and release hygiene.
+
+### Added
+
+- **Cross-platform release verification.** `release.yml` now runs validation,
+  plugin type-check, and pytest on both `ubuntu-latest` and `macos-latest`,
+  with release publication kept to `ubuntu-latest` only.
+- **OS-aware static-analysis artifacts.** `codeql.yml` now exports one SARIF
+  artifact name per OS/language pair to avoid collisions and preserve independent
+  platform traces.
+- **Release artifact naming stability.** `release.yml` SBOM artifacts now include
+  matrix OS in filenames for deterministic artifact retention.
+- **Runtime/toolchain baseline synchronized.** OpenCode runtime and plugin baselines
+  remain aligned with release metadata (`opencode-ai`, `@opencode-ai/plugin` and
+  SDK pinned to `1.15.4`, Bun `1.3.14`, and Python test stack pins).
+
+### Changed
+
+- **Context-surface documentation aligned to actual CI matrices.**
+  `docs/github/branch-protection.md` and `scripts/tests/test_print_required_check_contexts.py`
+  were updated to reflect the expanded CodeQL matrix context names and namespacing.
+
+### Fixed
+
+- **Final release bookkeeping sync.** `VERSION` and changelog top-state are aligned
+  for the next public publish step.
+
+## [0.12.7] - 2026-05-18
+
+Linux/macOS CI parity release for release-hardening and deterministic cross-platform
+validation before publish.
+
+### Added
+- **OpenCode baseline pinned for public release.** Baseline coordinates were
+  aligned to `opencode-ai` `1.15.4` with matching runtime pins and pinned
+  dependency versions documented in the 2026-05-18 release block.
+
+- **CodeQL matrix expanded to macOS.**
+  `.github/workflows/codeql.yml` now runs `javascript-typescript` and `python`
+  analyses on `ubuntu-latest` and `macos-latest` so platform-specific static
+  analysis regressions are caught before publish.
+- **Cross-platform release verification execution.**
+  `.github/workflows/release.yml` now executes the full validation/typecheck/test
+  stack on both `ubuntu-latest` and `macos-latest`, while release artifact
+  creation remains constrained to `ubuntu-latest`.
+
+### Changed
+
+- **Release CI determinism on OS matrix.**
+  `release.yml` SBOM artifact names now include OS in matrix builds, and the job
+  runs on a matrix with pinned `python` setup (`3.13`) for consistent release
+  resolver state.
+- **CodeQL artifact determinism on OS matrix.**
+  `codeql.yml` SARIF artifact names now include OS to avoid cross-job upload
+  collisions.
+
+### Fixed
+
+- **Docs and validation counts refreshed.**
+  `README.md` and `CONTRIBUTING.md` now reflect the current test result baseline
+  (`500 passed + 1 skipped in 23 suites`) and avoid stale corpus metrics.
+
 ## [0.12.6] - 2026-05-18
 
 Open-source finalization and macOS parity release for public consumption. This
