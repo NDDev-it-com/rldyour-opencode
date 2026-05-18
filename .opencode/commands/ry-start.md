@@ -23,4 +23,6 @@ Implement a task through the full quality workflow:
 
 Do not create, edit, delete, enable, disable, or trigger CI/CD workflows, release pipelines, deployment automation, branch protection, GitHub rulesets, GitHub environments, GitHub secrets/variables, remote branch creation/deletion, force-pushes, tag creation/deletion, commits on product branches (`main`/`master`/`release`/`production`), or pull-request merges unless the user explicitly asks for that change in the current request. Running existing read-only validation commands is always allowed. See AGENTS.md § CI/CD and Git Mutation Gate.
 
+Public repository exception: when the current repository is verified public, existing CI/CD workflows are automatic by default. After pushing or tagging public-repo changes, verify the GitHub Actions runs for the same HEAD/tag; if a required readiness/release workflow did not run because it is `workflow_dispatch`, scheduled, or release-only, trigger that existing workflow with `gh workflow run` and wait for completion. Do not edit workflows or GitHub governance surfaces without explicit owner request. See `references/public-repo-ci-policy.md`.
+
 Reference: references/flow-lifecycle.md, references/context-sufficiency-gate.md, references/post-task-sync.md

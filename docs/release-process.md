@@ -15,7 +15,7 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 ## Release checklist
 
 1. `bash scripts/validate_config.sh` — exit 0.
-2. `uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" pytest scripts/tests/` — all unit tests green.
+2. `uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/` — all unit tests green.
 3. `opencode debug config` — must resolve without error.
 4. `opencode debug skill | python3 -c "import json,sys;print(len(json.load(sys.stdin)))"` — equals the `.opencode/skills/` directory count.
 5. `bash scripts/check_lsps.sh` — at minimum every LSP defined in `opencode.json.lsp` must resolve to an executable.
@@ -26,7 +26,7 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 10. Update `README.md` if catalog counts changed (skills / commands / MCP / plugins / scripts / tests).
 11. `git commit` with subject `chore(release): X.Y.Z` and the CHANGELOG block in the body.
 12. `git tag vX.Y.Z` (annotated, signed if configured).
-13. Push `main` and tags; CI (`.github/workflows/validate.yml`) must stay green — that workflow now runs both `validate_config.sh` and `pytest scripts/tests/`.
+13. Push `main` and tags; public repositories use automatic CI/CD by default. Verify the GitHub Actions runs for the pushed HEAD/tag, including `.github/workflows/validate.yml` (which runs both `validate_config.sh` and `pytest scripts/tests/`). If a required release/readiness workflow did not run because it is dispatch-only, scheduled, or release-only, trigger that existing workflow with `gh workflow run` and wait for it.
 
 ## Publishing fullrepo context
 

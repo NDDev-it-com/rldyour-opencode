@@ -177,7 +177,7 @@
       "timeout": 15000
     }
   },
-  "instructions": ["AGENTS.md"],
+  "instructions": ["AGENTS.md", "references/public-repo-ci-policy.md"],
   "compaction": {
     "auto": true,
     "prune": true,
