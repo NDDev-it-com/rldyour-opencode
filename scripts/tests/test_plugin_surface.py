@@ -463,6 +463,45 @@ def test_env_protection_blocks_envrc_and_netrc() -> None:
     )
 
 
+
+def test_before_hooks_read_command_from_output_args() -> None:
+    """The SDK contract for `tool.execute.before` (per @opencode-ai/plugin
+    @1.15.4 dist/index.d.ts:234-240) places the mutable bash `args` on the
+    `output` parameter, NOT the `input` parameter. Both security-critical
+    guard plugins `ry-env-protection.ts` and `ry-shell-strategy.ts` must
+    read the command from `output.args?.command`. If either accidentally
+    switched to `input.args.command`, the regex matchers would silently
+    receive empty strings and the security guard would be bypassed.
+
+    Mirrors the existing P0-1 lock `test_flow_hooks_reads_command_from_
+    input_args` (which covers `tool.execute.after`). Reviewer wave
+    2026-05-18 quality F-2 closure.
+    """
+    for name in ("ry-env-protection.ts", "ry-shell-strategy.ts"):
+        src = (PLUGINS_DIR / name).read_text(encoding="utf-8")
+        # Strip comments so module-header documentation that quotes the
+        # buggy form verbatim does not trip the regression guard.
+        no_line_comments = re.sub(r"^\s*//.*$", "", src, flags=re.MULTILINE)
+        code_only = re.sub(r"/\*.*?\*/", "", no_line_comments, flags=re.DOTALL)
+
+        assert '"tool.execute.before"' in code_only, (
+            f"{name} must subscribe to `tool.execute.before`; if the hook "
+            f"name changed, update this test and the plugin together."
+        )
+        assert "output.args?.command" in code_only, (
+            f"{name} `tool.execute.before` handler must read bash command "
+            f"from `output.args?.command` per SDK contract; reading from "
+            f"input would silently swallow every guard check."
+        )
+        # Regression guard: the buggy `input.args.command` shape must not
+        # appear in production code for these plugins.
+        assert "input.args.command" not in code_only, (
+            f"{name} must NOT read bash command from `input.args.command` "
+            f"inside `tool.execute.before`; SDK places args on `output` for "
+            f"this hook (reviewer wave 2026-05-18 quality F-2)."
+        )
+
+
 def test_plugin_spawn_calls_have_timeout_guard() -> None:
     """Any plugin that spawns a child process via `Bun.spawn` must arm a
     timeout that calls `proc.kill()` on the kill path. Without that guard a
