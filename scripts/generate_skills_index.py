@@ -188,7 +188,7 @@ def build_index() -> dict[str, Any]:
             },
         )
     return {
-        "version": 1,
+        "version": "1.0.0",
         "generated_by": "scripts/generate_skills_index.py",
         "count": len(skills),
         "skills": skills,
