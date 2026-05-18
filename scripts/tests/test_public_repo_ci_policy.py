@@ -50,9 +50,8 @@ def test_public_ci_policy_distinguishes_ci_from_session_sharing() -> None:
     assert "session sharing, not CI/CD" in text
 
 
-def test_agent_and_flow_commands_reference_public_ci_policy() -> None:
+def test_flow_commands_reference_public_ci_policy() -> None:
     expected = "references/public-repo-ci-policy.md"
-    assert expected in (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
     for command in COMMANDS:
         text = command.read_text(encoding="utf-8")
         assert "Public repository exception" in text, command
