@@ -44,11 +44,11 @@ fix candidate, not a workflow bug.
 | Workflow file | Workflow name | Job | GitHub check context |
 |---|---|---|---|
 | `validate.yml` | `Validate rldyour-opencode` | `validate` (matrix `os: [ubuntu-latest, macos-latest]`) | `Validate rldyour-opencode / validate (ubuntu-latest)` and `Validate rldyour-opencode / validate (macos-latest)` |
-| `validate.yml` | `Validate rldyour-opencode` | `shell-strict-mode` | `Validate rldyour-opencode / shell-strict-mode` |
+| `validate.yml` | `Validate rldyour-opencode` | `shell-strict-mode` | `Validate rldyour-opencode / shell-strict-mode (ubuntu-latest)` and `Validate rldyour-opencode / shell-strict-mode (macos-latest)` |
 | `typecheck-plugins.yml` | `Typecheck Plugins` | `typecheck` (matrix `os: [ubuntu-latest, macos-latest]`) | `Typecheck Plugins / typecheck (ubuntu-latest)` and `Typecheck Plugins / typecheck (macos-latest)` |
 | `lint.yml` | `Lint` | `ruff` (matrix `os: [ubuntu-latest, macos-latest]`) | `Lint / ruff (ubuntu-latest)` and `Lint / ruff (macos-latest)` |
-| `instruction-docs-check.yml` | `Instruction Docs Check` | `instruction-docs` | `Instruction Docs Check / instruction-docs` |
-| `secret-scan.yml` | `Secret Scan` | `gitleaks` | `Secret Scan / gitleaks` |
+| `instruction-docs-check.yml` | `Instruction Docs Check` | `instruction-docs` | `Instruction Docs Check / instruction-docs (ubuntu-latest)` and `Instruction Docs Check / instruction-docs (macos-latest)` |
+| `secret-scan.yml` | `Secret Scan` | `gitleaks` | `Secret Scan / gitleaks (ubuntu-latest)` and `Secret Scan / gitleaks (macos-latest)` |
 | `codeql.yml` | `CodeQL` | `analyze` (matrix `language: [javascript-typescript, python]`) | `CodeQL / Analyze (javascript-typescript)` and `CodeQL / Analyze (python)` |
 | `opencode-runtime.yml` | `OpenCode Runtime` | `runtime` (matrix `os: [ubuntu-latest, macos-latest]`) | `OpenCode Runtime / runtime (ubuntu-latest)` and `OpenCode Runtime / runtime (macos-latest)` |
 
@@ -97,13 +97,16 @@ gh api -X PUT repos/NDDev-it-com/rldyour-opencode/branches/main/protection \
   -F required_status_checks.strict=true \
   -F required_status_checks.contexts[]='Validate rldyour-opencode / validate (ubuntu-latest)' \
   -F required_status_checks.contexts[]='Validate rldyour-opencode / validate (macos-latest)' \
-  -F required_status_checks.contexts[]='Validate rldyour-opencode / shell-strict-mode' \
+  -F required_status_checks.contexts[]='Validate rldyour-opencode / shell-strict-mode (ubuntu-latest)' \
+  -F required_status_checks.contexts[]='Validate rldyour-opencode / shell-strict-mode (macos-latest)' \
   -F required_status_checks.contexts[]='Typecheck Plugins / typecheck (ubuntu-latest)' \
   -F required_status_checks.contexts[]='Typecheck Plugins / typecheck (macos-latest)' \
   -F required_status_checks.contexts[]='Lint / ruff (ubuntu-latest)' \
   -F required_status_checks.contexts[]='Lint / ruff (macos-latest)' \
-  -F required_status_checks.contexts[]='Instruction Docs Check / instruction-docs' \
-  -F required_status_checks.contexts[]='Secret Scan / gitleaks' \
+  -F required_status_checks.contexts[]='Instruction Docs Check / instruction-docs (ubuntu-latest)' \
+  -F required_status_checks.contexts[]='Instruction Docs Check / instruction-docs (macos-latest)' \
+  -F required_status_checks.contexts[]='Secret Scan / gitleaks (ubuntu-latest)' \
+  -F required_status_checks.contexts[]='Secret Scan / gitleaks (macos-latest)' \
   -F required_status_checks.contexts[]='CodeQL / Analyze (javascript-typescript)' \
   -F required_status_checks.contexts[]='CodeQL / Analyze (python)' \
   -F required_status_checks.contexts[]='OpenCode Runtime / runtime (ubuntu-latest)' \

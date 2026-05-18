@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.6] - 2026-05-18
+
+Open-source finalization and macOS parity release for public consumption. This
+release completes the final public hardening pass: CI/CD gates are now aligned for
+Linux/macOS where safe, secret scanning is portable across both runners, and
+release/documentation artifacts are synchronized with the current repository state.
+
+### Added
+
+- **Linux/macOS parity for instruction and shell-contract checks.**
+  `.github/workflows/validate.yml` now runs `shell-strict-mode` on both
+  `ubuntu-latest` and `macos-latest` so shell shebang/strict-mode checks are
+  executed uniformly across owner-supported platforms.
+- **Cross-platform `dependency-review` execution.**
+  `.github/workflows/dependency-review.yml` now runs on both
+  `ubuntu-latest` and `macos-latest`, preserving the same `dependency-review`
+  contract on both OS families.
+- **Cross-platform `instruction-docs-check` execution.**
+  `.github/workflows/instruction-docs-check.yml` now runs on both
+  `ubuntu-latest` and `macos-latest`, avoiding Linux-only blind spots for
+  instruction-doc linting and merge-gate parity.
+- **Runtime/toolchain pin snapshot preserved.**
+  This release keeps pinned runtime values aligned with baseline:
+  `opencode-ai` 1.15.4, `@opencode-ai/plugin` 1.15.4, Bun 1.3.14.
+
+### Changed
+
+- **Secret scan hardened for macOS and ARM64 Linux runners.**
+  `.github/workflows/secret-scan.yml` now fans out across Linux/macOS and
+  selects Gitleaks artifacts by runner OS/architecture, with explicit SHA checks
+  for each supported platform variant.
+- **Documentation truth refreshed to current runtime state.**
+  `README.md`, `CONTRIBUTING.md`, and `SECURITY.md` now reflect current test
+  counts and supported-version posture for this public release track.
+
+### Fixed
+
+- **Release-track hygiene for public publication.**
+  `VERSION` and `CHANGELOG.md` are now updated for a consistent final public
+  cut that explicitly carries maintainer identity:
+  `Danil Silantyev (rldyourmnd), CEO NDDev`.
+
 ## [0.12.5] - 2026-05-18
 
 Open-source hardening and release-readiness release. This wave moves the
