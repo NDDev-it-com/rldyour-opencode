@@ -38,6 +38,20 @@ OPENCODE_JSON = REPO_ROOT / "opencode.json"
 DEFAULT_TOTAL_TIMEOUT_SECONDS = 60
 PER_CHECK_TIMEOUT_SECONDS = 15
 
+# Per-check timeout budget is module-level so the main loop can shrink it
+# to the wall-clock remainder before each check fires (audit Quality-M
+# fix). Subprocess-spawning checks read `_per_check_budget()` at call
+# time, so the budget contracts naturally as `--total-timeout` is
+# consumed.
+_current_per_check_budget: int = PER_CHECK_TIMEOUT_SECONDS
+
+
+def _per_check_budget() -> int:
+    """The effective per-check timeout, dynamically narrowed by the main
+    loop to the remaining wall-clock budget so the last check never runs
+    past `--total-timeout`."""
+    return _current_per_check_budget
+
 
 _RESET = "\033[0m"
 _RED = "\033[31m"
@@ -118,7 +132,7 @@ def check_baseline() -> dict[str, Any]:
         proc = subprocess.run(
             [sys.executable, str(script)],
             cwd=REPO_ROOT,
-            timeout=PER_CHECK_TIMEOUT_SECONDS,
+            timeout=_per_check_budget(),
             capture_output=True,
             text=True,
             check=False,
@@ -126,7 +140,7 @@ def check_baseline() -> dict[str, Any]:
     except subprocess.TimeoutExpired:
         return _result(
             "config.baseline", "timeout", started,
-            [f"check_baseline_consistency.py exceeded {PER_CHECK_TIMEOUT_SECONDS}s"],
+            [f"check_baseline_consistency.py exceeded {_per_check_budget()}s"],
         )
     if proc.returncode == 0:
         return _result("config.baseline", "ok", started, [proc.stdout.strip() or "consistent"])
@@ -240,11 +254,11 @@ def check_schema() -> dict[str, Any]:
     try:
         proc = subprocess.run(
             [sys.executable, str(script)],
-            cwd=REPO_ROOT, timeout=PER_CHECK_TIMEOUT_SECONDS,
+            cwd=REPO_ROOT, timeout=_per_check_budget(),
             capture_output=True, text=True, check=False,
         )
     except subprocess.TimeoutExpired:
-        return _result("config.schema", "timeout", started, [f"validator exceeded {PER_CHECK_TIMEOUT_SECONDS}s"])
+        return _result("config.schema", "timeout", started, [f"validator exceeded {_per_check_budget()}s"])
     if proc.returncode == 0:
         return _result("config.schema", "ok", started, [proc.stdout.strip() or "valid"])
     if proc.returncode == 2:
@@ -324,6 +338,7 @@ def main(argv: list[str] | None = None) -> int:
     deadline_ns = started_total + args.total_timeout * 1_000_000_000
     results: list[dict[str, Any]] = []
     timeout_hit = False
+    global _current_per_check_budget
     for name in selected:
         if time.monotonic_ns() >= deadline_ns:
             timeout_hit = True
@@ -334,6 +349,16 @@ def main(argv: list[str] | None = None) -> int:
                 "details": [f"global doctor deadline of {args.total_timeout}s exceeded"],
             })
             continue
+        # Audit Quality-M: shrink the per-check budget to the remaining
+        # wall-clock window so the LAST check cannot overshoot the
+        # global deadline by `PER_CHECK_TIMEOUT_SECONDS`. Clamp to a
+        # 1 s minimum so checks still get a fair shot when the deadline
+        # is near; we cap by the static PER_CHECK_TIMEOUT_SECONDS so a
+        # very generous `--total-timeout` does not stretch any single
+        # check past its design budget.
+        remaining_ns = deadline_ns - time.monotonic_ns()
+        remaining_s = max(1, int(remaining_ns // 1_000_000_000))
+        _current_per_check_budget = min(PER_CHECK_TIMEOUT_SECONDS, remaining_s)
         results.append(CHECKS[name]())
 
     if args.format == "json":
