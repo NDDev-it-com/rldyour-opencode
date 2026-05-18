@@ -17,23 +17,53 @@ restore if branch protection is ever reset.
 
 ## Required status checks for `main`
 
-The following workflow names must be required for any PR targeting `main`.
-The list mirrors the `.github/workflows/` set and stays in sync with the
-roadmap in `docs/decisions/007-ci-mirrors-local-validation.md`.
+The contexts below match what GitHub emits at runtime. Audit P0-5 closed
+the previous docs/runtime drift by deriving the table from the same
+workflow files using `scripts/print_required_check_contexts.sh`. Re-run
+that script after any workflow edit and update this table verbatim — a
+required check context that does not match a real GitHub check name
+will block all merges (the protection rule waits for a context that
+never fires) or, worse, silently let a regression through (the
+required check name was a typo and never gated anything).
 
-| Workflow | Job | Required | Notes |
+### How to refresh this table
+
+```bash
+bash scripts/print_required_check_contexts.sh --json | jq -r '
+  .contexts[]
+  | [.workflow_name, .job_key, .context, (.triggers | join(","))]
+  | @tsv
+'
+```
+
+Compare the output against the rows below. Any mismatch is a docs bug
+fix candidate, not a workflow bug.
+
+### Required on every pull request to `main`
+
+| Workflow file | Workflow name | Job | GitHub check context |
 |---|---|---|---|
-| `Validate rldyour-opencode` (`validate.yml`) | `validate` | yes | runs `scripts/validate_config.sh` + pytest |
-| `Typecheck Plugins` (`typecheck-plugins.yml`) | `typecheck` | yes | strict TS against all 10 plugins |
-| `Lint` (`lint.yml`) | `ruff` | yes | Python lint for `scripts/` |
-| `Instruction Docs Check` (`instruction-docs-check.yml`) | `validate-instruction-docs` | yes | path-filtered |
-| `Dependency Freshness` (`dependency-check.yml`) | `dependency-check` | yes | weekly + dispatch; required also on PR |
-| `Secret Scan` (`secret-scan.yml`) | `gitleaks` | yes | gitleaks CLI tarball |
-| `CodeQL` (`codeql.yml`) | `analyze` | yes | artifact-only until GHAS is enabled |
-| `OpenCode Runtime` (`opencode-runtime.yml`) | `runtime` | yes (new in 0.12.0) | installs pinned opencode-ai@1.15.4 and runs `opencode debug config` |
-| `Dependency Review` (`dependency-review.yml`) | `dependency-review` | optional | skipped on private repos without GHAS |
-| `SBOM Snapshot` (`sbom.yml`) | `sbom` | optional | runs on `release` events |
-| `Release` (`release.yml`) | `release` | n/a | tag-triggered |
+| `validate.yml` | `Validate rldyour-opencode` | `validate` (matrix `os: [ubuntu-latest, macos-latest]`) | `Validate rldyour-opencode / validate (ubuntu-latest)` and `Validate rldyour-opencode / validate (macos-latest)` |
+| `validate.yml` | `Validate rldyour-opencode` | `shell-strict-mode` | `Validate rldyour-opencode / shell-strict-mode` |
+| `typecheck-plugins.yml` | `Typecheck Plugins` | `typecheck` (matrix `os: [ubuntu-latest, macos-latest]`) | `Typecheck Plugins / typecheck (ubuntu-latest)` and `Typecheck Plugins / typecheck (macos-latest)` |
+| `lint.yml` | `Lint` | `ruff` (matrix `os: [ubuntu-latest, macos-latest]`) | `Lint / ruff (ubuntu-latest)` and `Lint / ruff (macos-latest)` |
+| `instruction-docs-check.yml` | `Instruction Docs Check` | `instruction-docs` | `Instruction Docs Check / instruction-docs` |
+| `secret-scan.yml` | `Secret Scan` | `gitleaks` | `Secret Scan / gitleaks` |
+| `codeql.yml` | `CodeQL` | `analyze` (matrix `language: [javascript-typescript, python]`) | `CodeQL / Analyze (javascript-typescript)` and `CodeQL / Analyze (python)` |
+| `opencode-runtime.yml` | `OpenCode Runtime` | `runtime` (matrix `os: [ubuntu-latest, macos-latest]`) | `OpenCode Runtime / runtime (ubuntu-latest)` and `OpenCode Runtime / runtime (macos-latest)` |
+
+### Scheduled / manual / artifact only (NOT required PR contexts)
+
+These workflows do not run on PR by design, so listing them as required
+PR contexts would deadlock merges. They are tracked for visibility and
+restored separately if branch protection is reset.
+
+| Workflow file | Workflow name | Job | Trigger | Notes |
+|---|---|---|---|---|
+| `dependency-check.yml` | `Dependency Freshness` | `freshness` | schedule + workflow_dispatch | weekly pin + freshness probe + remote-head/local-launch MCP smoke; not gated on PR |
+| `dependency-review.yml` | `Dependency Review` | `dependency-review` | pull_request | requires Dependency Graph + GHAS; skipped on private repos without GHAS |
+| `sbom.yml` | `SBOM Snapshot` | `cyclonedx` | release + workflow_dispatch | optional artifact |
+| `release.yml` | `Release` | `verify` | tag push + workflow_dispatch | tag-triggered, not PR-required |
 
 ## Additional protections
 
@@ -54,6 +84,10 @@ roadmap in `docs/decisions/007-ci-mirrors-local-validation.md`.
 
 ## Restoring protection
 
+The required-context list below mirrors the PR-required rows above and
+expands every matrix axis explicitly — GitHub branch protection
+requires the FULL context name including matrix params.
+
 ```bash
 # Read-only inspection:
 gh api repos/NDDev-it-com/rldyour-opencode/branches/main/protection | jq
@@ -61,14 +95,19 @@ gh api repos/NDDev-it-com/rldyour-opencode/branches/main/protection | jq
 # Apply minimum protection (single-developer profile, contains required checks):
 gh api -X PUT repos/NDDev-it-com/rldyour-opencode/branches/main/protection \
   -F required_status_checks.strict=true \
-  -F required_status_checks.contexts[]='Validate rldyour-opencode' \
-  -F required_status_checks.contexts[]='Typecheck Plugins' \
-  -F required_status_checks.contexts[]='Lint' \
-  -F required_status_checks.contexts[]='Instruction Docs Check' \
-  -F required_status_checks.contexts[]='Dependency Freshness' \
-  -F required_status_checks.contexts[]='Secret Scan' \
-  -F required_status_checks.contexts[]='CodeQL' \
-  -F required_status_checks.contexts[]='OpenCode Runtime' \
+  -F required_status_checks.contexts[]='Validate rldyour-opencode / validate (ubuntu-latest)' \
+  -F required_status_checks.contexts[]='Validate rldyour-opencode / validate (macos-latest)' \
+  -F required_status_checks.contexts[]='Validate rldyour-opencode / shell-strict-mode' \
+  -F required_status_checks.contexts[]='Typecheck Plugins / typecheck (ubuntu-latest)' \
+  -F required_status_checks.contexts[]='Typecheck Plugins / typecheck (macos-latest)' \
+  -F required_status_checks.contexts[]='Lint / ruff (ubuntu-latest)' \
+  -F required_status_checks.contexts[]='Lint / ruff (macos-latest)' \
+  -F required_status_checks.contexts[]='Instruction Docs Check / instruction-docs' \
+  -F required_status_checks.contexts[]='Secret Scan / gitleaks' \
+  -F required_status_checks.contexts[]='CodeQL / Analyze (javascript-typescript)' \
+  -F required_status_checks.contexts[]='CodeQL / Analyze (python)' \
+  -F required_status_checks.contexts[]='OpenCode Runtime / runtime (ubuntu-latest)' \
+  -F required_status_checks.contexts[]='OpenCode Runtime / runtime (macos-latest)' \
   -F enforce_admins=false \
   -F required_pull_request_reviews.required_approving_review_count=1 \
   -F required_pull_request_reviews.dismiss_stale_reviews=true \
@@ -82,3 +121,12 @@ gh api -X PUT repos/NDDev-it-com/rldyour-opencode/branches/main/protection \
 The agent must NOT execute these commands unattended. Branch protection
 mutations require explicit user authorization in the same request (see
 AGENTS.md § CI/CD and Git Mutation Gate).
+
+## Verification
+
+`scripts/print_required_check_contexts.sh` is the authoritative source.
+The table above is generated from the workflow files; rerun the script
+after every workflow change and update this document if any context
+name has drifted. CI does not yet fail on a docs/runtime mismatch (the
+docs are operator-facing, not gated), but the script makes the drift
+trivial to spot during review.
