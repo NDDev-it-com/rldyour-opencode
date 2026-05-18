@@ -97,8 +97,10 @@ def test_json_mode_lists_known_workflow_contexts() -> None:
         "Instruction Docs Check / instruction-docs (macos-latest)",
         "Secret Scan / gitleaks (ubuntu-latest)",
         "Secret Scan / gitleaks (macos-latest)",
-        "CodeQL / Analyze (javascript-typescript)",
-        "CodeQL / Analyze (python)",
+        "CodeQL / Analyze (ubuntu-latest / javascript-typescript) (ubuntu-latest, javascript-typescript)",
+        "CodeQL / Analyze (ubuntu-latest / python) (ubuntu-latest, python)",
+        "CodeQL / Analyze (macos-latest / javascript-typescript) (macos-latest, javascript-typescript)",
+        "CodeQL / Analyze (macos-latest / python) (macos-latest, python)",
         "OpenCode Runtime / runtime (ubuntu-latest)",
         "OpenCode Runtime / runtime (macos-latest)",
     }
