@@ -5,19 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.12.9] - 2026-05-18
+## [0.12.10] - 2026-05-18
 
-Patch release removing the remaining GitHub Actions Node 20 deprecation warning
-from release and SBOM generation.
+Patch release removing the deprecated CycloneDX JavaScript Action from release
+and standalone SBOM workflows.
 
 ### Fixed
 
-- **Release/SBOM Node 24 readiness.** `release.yml` and `sbom.yml` now opt the
+- **Release/SBOM warning-free generation.** `release.yml` and `sbom.yml` now
+  generate `sbom.json` with `npm sbom --sbom-format cyclonedx` from the
+  `.opencode` package after `bun install --frozen-lockfile`. This removes the
+  `CycloneDX/gh-node-module-generatebom@v1.0.3` Action entirely, eliminating
+  the GitHub Actions Node 20 deprecation annotation instead of only forcing the
+  old action onto Node 24. Runtime/plugin baseline remains `opencode-ai` /
+  `@opencode-ai/plugin` / SDK `1.15.4`.
+
+## [0.12.9] - 2026-05-18
+
+Patch release that opted release and SBOM generation into GitHub's Node 24
+JavaScript action runtime. This was superseded by `0.12.10`, which removed the
+deprecated CycloneDX Action entirely.
+
+### Fixed
+
+- **Release/SBOM Node 24 readiness.** `release.yml` and `sbom.yml` opted the
   pinned `CycloneDX/gh-node-module-generatebom@v1.0.3` step into GitHub's Node 24
   action runtime via `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`. Upstream has no
-  newer tag beyond `v1.0.3`, so the workflow keeps the verified SHA pin while
-  avoiding the Node 20 deprecation warning. Runtime/plugin baseline remains
-  `opencode-ai` / `@opencode-ai/plugin` / SDK `1.15.4`.
+  newer tag beyond `v1.0.3`; GitHub still emitted a deprecation annotation that
+  was fully resolved in `0.12.10`. Runtime/plugin baseline remained `opencode-ai`
+  / `@opencode-ai/plugin` / SDK `1.15.4`.
 
 ## [0.12.8] - 2026-05-18
 

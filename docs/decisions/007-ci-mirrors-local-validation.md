@@ -46,7 +46,7 @@ Workflow set:
 | `codeql.yml` | push + PR + weekly + manual dispatch | Linux | javascript-typescript + python analysis using `.github/codeql/codeql-config.yml` so hidden `.opencode/plugins` TypeScript is included; SARIF is kept as a workflow artifact instead of uploaded to code scanning |
 | `secret-scan.yml` | push + PR + manual dispatch | Linux | gitleaks CLI release tarball with SHA256 verification, `.gitleaks.toml` fixture allowlist, and checkout fetch-depth: 0 |
 | `dependency-review.yml` | PR | Linux | actions/dependency-review-action, fail-on-severity: moderate |
-| `release.yml` | `v*.*.*` tag + dispatch | Linux | full validation + typecheck + tag-vs-VERSION check + SBOM generation + GitHub Release |
+| `release.yml` | `v*.*.*` tag + dispatch | Linux + macOS | full validation + typecheck + tag-vs-VERSION check + npm SBOM generation + GitHub Release on Linux |
 | `sbom.yml` | release published + dispatch | Linux | standalone CycloneDX SBOM artifact |
 
 Dependabot watches `npm` (`.opencode/`) and `github-actions` (`/`) on a weekly cadence, capped at 10 open PRs per ecosystem; both use scoped Conventional Commits prefixes (`chore(deps)`, `chore(ci)`). `scripts/check_action_pins.py` is the local guard that enforces each workflow `uses:` pin is a 40-character SHA and, in `--remote` mode, that the inline `# vX.Y.Z` comment resolves to that SHA.
@@ -58,13 +58,13 @@ Positive:
 - CI and local validation share the same scripts. A `bash scripts/validate_config.sh` pass locally is what CI runs; no divergence.
 - Owner-platform parity: Linux + macOS matrix catches script portability regressions before they hit a local checkout.
 - Supply-chain hardening explicit: SHA-pinned actions, least-privilege permissions, dependency review, gitleaks, CodeQL, SBOM.
-- Release flow is gated: tag must match `VERSION`, full test corpus + typecheck must be green, SBOM is generated and attached to the release.
+- Release flow is gated: tag must match `VERSION`, full test corpus + typecheck must be green on Linux and macOS, SBOM is generated with `npm sbom` and attached to the release.
 
 Negative:
 
 - Workflow count grew from 2 to 10. Cognitive load on contributors is higher, mitigated by the consistent hardening pattern across all files and by `CONTRIBUTING.md` documenting the gate set.
 - macOS matrix doubles the runner-minute usage on touched surfaces. Mitigation: workflows are path-filtered where possible (`typecheck-plugins`, `lint`) so unrelated PRs don't pay the macOS cost.
-- Some non-GitHub release pins (gitleaks CLI tarball, CycloneDX action) require periodic re-verification. Mitigation: keep explicit version/checksum comments in workflow docs, use dependabot's `github-actions` ecosystem watcher for action pins, and keep `scripts/check_action_pins.py --remote` green.
+- Some non-GitHub release surfaces (gitleaks CLI tarball and npm SBOM behavior) require periodic re-verification. Mitigation: keep explicit version/checksum comments where external binaries are downloaded, use dependabot's `github-actions` ecosystem watcher for action pins, keep `scripts/check_action_pins.py --remote` green, and keep the `npm sbom` release step covered by tag-triggered Linux/macOS release runs.
 - `.gitleaks.toml` is intentionally narrow: it allowlists only sanitizer regression fixture files that contain fake token/private-key strings by design; do not add broad token regex allowlists.
 - CodeQL SARIF upload to code scanning is intentionally disabled (`upload: never`) to avoid requiring repository code-scan upload policy. The workflow still runs extraction and queries, then stores SARIF as an Actions artifact.
 - GitHub Dependency Review runs on PRs and fails the check on severity policy when Dependency Graph is available; if not available, check semantics follow action output.
