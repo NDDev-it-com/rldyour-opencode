@@ -79,7 +79,7 @@ A self-contained OpenCode project configuration that provides:
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
 | Architecture decision archive | `docs/decisions/*.md` | 9 |
 | Diagnostic scripts (bash + python) | `scripts/` | 28 (14 python entry points + 13 bash entry points + 4 internal helper modules; new in v0.12.4: `check_workflow_injection.py`) |
-| Pytest suites | `scripts/tests/*.py` | 23 (498 passed + 3 skipped; new in v0.12.4+ post-tag patch: `test_deferred_shell_scripts.py` added to lock 8 deferred shell utilities) |
+| Pytest suites | `scripts/tests/*.py` | 23 (500 passed + 1 skipped; new in v0.12.4+ post-tag patch: `test_deferred_shell_scripts.py` added to lock 8 deferred shell utilities) |
 | CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
 
 ### Project structure
@@ -106,7 +106,7 @@ rldyour-opencode/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
 │   └── decisions/  001..009.md # 9 MADR-style ADRs
 ├── scripts/                    # 28 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 23 pytest suites — 498 passed + 3 skipped
+│   └── tests/  *.py            # 23 pytest suites — 500 passed + 1 skipped
 └── .github/workflows/          # 11 least-privilege, SHA-pinned CI/release workflows
 ```
 
@@ -186,7 +186,7 @@ Run `opencode models <provider>` to list every accepted ID. All current IDs are 
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
-uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/  # 498 passed + 3 skipped in 23 suites
+uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/  # 500 passed + 1 skipped in 23 suites
 bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
 python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
