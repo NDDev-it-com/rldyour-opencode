@@ -128,15 +128,15 @@ HINTS keys use the OpenCode `<server>_<tool>` tool-ID format (single underscore;
 
 `permission.ask` deny-only policy. Fires only when the static permission config (in `opencode.json` or per-agent frontmatter) sets a slot to `"ask"` — for `"allow"` / `"deny"` the runtime never calls the hook. Blocks three categorically dangerous patterns before the interactive permission dialog appears:
 
-- `git push --force` without `--force-with-lease` — data-loss risk on shared branches.
-- `rm -rf <root|$HOME|~/|cwd>` — catastrophic; `node_modules` cleanup is allowlisted.
-- `git push --no-verify` on `main` / `master` / `release` / `production` — pre-push hook bypass.
+- `git push --force` (long form) or `-f` anywhere inside a combined short-flag cluster (`-fv`, `-fq`, `-fn`) without `--force-with-lease` — data-loss risk on shared branches. The short-flag detector was broadened in the reviewer wave 2026-05-18 security F-2 closure.
+- `rm -rf <root|$HOME|~|~/|cwd|..|../>` — catastrophic; `node_modules` cleanup is allowlisted. The parent-directory traversal targets (`..`, `../`) were added by reviewer wave 2026-05-18 security F-1; `rm -rf ..` from any project subdirectory would otherwise erase the entire project tree.
+- `git push --no-verify` on any branch — pre-push hook bypass. Widened from the original product-branch-only restriction (`main` / `master` / `release` / `production`) in 0.12.0 commit `250632e`. Operators with a legitimate use case can opt out via `RY_ALLOW_NO_VERIFY=1` in their shell environment; a hardcoded bypass on the command line never wins over the env var.
 
 Never auto-allows; legitimate "ask" prompts keep user consent. Complements (not replaces) the unconditional `tool.execute.before` throws in `ry-shell-strategy.ts` — that one fires regardless of permission config; this one catches the same patterns when bash permission is statically `"ask"` (plan agent + reviewer subagents).
 
 ### Dynamic system prompt context (`.opencode/plugins/ry-system-context.ts`)
 
-`experimental.chat.system.transform` injects a one-line runtime stamp into every system prompt: `[rldyour runtime] date=YYYY-MM-DD branch=... head=<short> worktree=clean|dirty(N files)`. Probes git via `Bun.spawn` with silent fallback ("unknown" when git unavailable). Branch and HEAD are session-stable and should ideally be cached at factory init; `git status --porcelain` is the only turn-volatile probe. Grounds the LLM in "now" facts that the static AGENTS.md cannot carry.
+`experimental.chat.system.transform` injects a one-line runtime stamp into every system prompt: `[rldyour runtime] date=YYYY-MM-DD branch=... head=<short> worktree=clean|dirty(N files)`. Probes git via `Bun.spawn` with silent fallback ("unknown" when git unavailable). Branch and HEAD flow through a per-directory TTL cache (3 s; audit P1-6 + integration-review F-3 + reviewer wave closures) so an in-session `git checkout|switch|rebase` invalidates the stamp within one turn while still suppressing two of the three subprocess spawns per turn. `git status --porcelain` is the only turn-volatile probe and spawns every call. Both `branch` and `headShort` flow through a `sanitizeRuntimeStamp` allowlist `[A-Za-z0-9._/-]` with a `SAFE_STAMP_MAX_LEN` cap before reaching the system prompt — defeats indirect prompt injection through crafted branch names (reviewer wave 2026-05-18 security F-4 closure). Grounds the LLM in "now" facts that the static AGENTS.md cannot carry.
 
 ### Compaction autocontinue suppression (`.opencode/plugins/ry-bootstrap.ts`)
 
