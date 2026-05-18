@@ -118,7 +118,7 @@
     {
       "name": "design-validation",
       "path": ".opencode/skills/design-validation/SKILL.md",
-      "domain": "design",
+      "domain": "browser",
       "triggers": [
         "validate design",
         "check layout",
