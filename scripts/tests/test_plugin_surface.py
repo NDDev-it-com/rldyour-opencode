@@ -296,6 +296,29 @@ def test_flow_hooks_reads_command_from_input_args() -> None:
     )
 
 
+
+def test_cc_regex_anchored_after_branch_sha_prefix() -> None:
+    """`git commit` stdout always begins with `[<branch> <sha>] <subject>` on
+    its summary line. The legacy `^(type):` anchor with `m` flag silently
+    failed for every real commit because the type prefix is never at
+    start-of-line. Anchor must be `]\\s*(type)` so the matcher fires on
+    real git output. Regression closed by reviewer wave 2026-05-18 quality F-1.
+    """
+    src = (PLUGINS_DIR / "ry-flow-hooks.ts").read_text(encoding="utf-8")
+    assert "CC_REGEX = new RegExp(" in src, "CC_REGEX constant must remain in ry-flow-hooks.ts"
+    # New anchor: closing bracket of `[branch sha]` prefix.
+    assert "`\\\\]\\\\s*(${CC_TYPES})" in src, (
+        "CC_REGEX must anchor at `]` after the `[branch sha]` prefix that git "
+        "commit writes; the legacy `^(type):` anchor silently misses every "
+        "real commit. See reviewer wave 2026-05-18 quality F-1."
+    )
+    # Legacy buggy anchor must not be reintroduced.
+    assert "`^(${CC_TYPES})" not in src, (
+        "CC_REGEX must NOT start with `^(type)` anchor — git stdout has "
+        "`[branch sha] ` prefix before the type, so start-of-line never matches."
+    )
+
+
 def test_plugin_spawn_calls_have_timeout_guard() -> None:
     """Any plugin that spawns a child process via `Bun.spawn` must arm a
     timeout that calls `proc.kill()` on the kill path. Without that guard a
