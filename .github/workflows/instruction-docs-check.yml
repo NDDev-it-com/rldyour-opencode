@@ -35,7 +35,11 @@ concurrency:
 
 jobs:
   instruction-docs:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 8
     steps:
       - name: Checkout
