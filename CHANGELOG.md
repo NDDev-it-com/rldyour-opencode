@@ -5,6 +5,94 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.3] - 2026-05-18
+
+Patch release applying the deferred reviewer findings flagged but not
+blocked during the v0.12.2 audit-followup wave, plus the single CI
+Lint fix that surfaced on the v0.12.2 push. No new features; the wave
+is pure hardening + symmetry polish. Plugin SDK pin stays at
+`@opencode-ai/plugin@1.15.4` (no upstream changes since v0.12.2).
+
+### Fixed
+
+- **CI Lint failure on v0.12.2 push.** ruff F541 flagged a stray
+  f-prefix on `[ERR] baseline.baseline must be an object` in
+  `scripts/check_baseline_consistency.py` (no placeholders in the
+  string). Dropped the prefix so `Lint / ruff` returns green.
+- **`scripts/doctor_opencode.py` --total-timeout could overrun by
+  PER_CHECK_TIMEOUT_SECONDS.** The previous main loop only checked the
+  wall-clock deadline BEFORE each check fired; once a check started, it
+  could run for the full 15 s even if `--total-timeout` had only 1 s
+  left. The fix exposes the per-check budget through a module-level
+  getter (`_per_check_budget()`) that the main loop narrows to
+  `min(PER_CHECK_TIMEOUT_SECONDS, remaining_wall_clock_s)` with a 1 s
+  floor before every invocation. Subprocess-spawning checks already
+  read the budget at call time, so the new tighter value takes effect
+  immediately. Closes Quality-review M.
+- **`.opencode/plugins/ry-system-context.ts` cache not directory-keyed.**
+  The TTL cache held a single module-level slot (`cachedBranchHead`),
+  so an OpenCode session that spans multiple worktrees / project roots
+  would serve a stale `branch=` stamp from the wrong tree. Swapped for
+  `cacheByDirectory: Map<string, BranchHeadCache>` so per-tree readouts
+  are correct without changing the hot-path cost for single-directory
+  sessions. Closes integration-review F-3.
+
+### Added
+
+- **`scripts/tests/test_doctor_opencode.py::test_doctor_exit_3_when_
+  total_timeout_zero`** asserts the actual exit-3 emission when the
+  total timeout trips, replacing the previous test which accepted
+  `{0, 1, 3}` and silently passed when the timeout never tripped.
+  Closes verification-review M.
+- **`scripts/tests/test_print_required_check_contexts.py`** (5 cases)
+  pins the extractor's output contract: script exists + is executable,
+  text mode header layout, JSON envelope shape, every PR-required
+  context from `docs/github/branch-protection.md` appears in the
+  output, and the disk-vs-output count invariant. The extractor was
+  the only script in `scripts/` without test coverage. Closes
+  architecture-review L.
+- **`scripts/validate_config.sh log_fail()`** helper for the 5th
+  canonical log tag (`[FAIL]`) introduced by the 0.12.2 validators
+  (`check_baseline_consistency.py`, `validate_mcp_profiles.py`). The
+  helper is reserved for future bash-level fail tagging
+  (`shellcheck disable=SC2329` annotated); today's red `[FAIL]` lines
+  come straight from validator stderr. Closes consistency-review L.
+
+### Changed
+
+- **`references/mcp-profiles.json`** `version` field: integer `1` →
+  string `"1.0.0"` so the JSON shape mirrors
+  `references/opencode-baseline.json` (string SemVer). Consumers were
+  not type-checking the field; this is purely shape parity. Closes
+  consistency-review L.
+- **`scripts/tests/test_mcp_profiles.py`** drops the `import shutil` +
+  `_ = shutil` placeholder anti-pattern; the import was never
+  exercised after the fixture refactor. Closes consistency-review I.
+
+### Test coverage
+
+- Total pytest cases: **455 passed + 1 skipped** across **21 suites**
+  (was 447 / 20 at v0.12.2; +8 new cases). New suite
+  `test_print_required_check_contexts.py` (5). New cases in existing
+  suites: `test_doctor_opencode.py` (+1 exit-3 forced timeout),
+  `test_check_baseline_consistency.py` (+2 invalid-JSON-operational
+  + trailing-pin-drift), and trailing-pin coverage on the referencing
+  package.
+
+### CI pipeline state at HEAD
+
+All green at HEAD `5377bd0` (post-follow-up push):
+
+- `validate` (Linux + macOS) — green
+- `typecheck-plugins` (Linux + macOS) — green
+- `lint` (Linux + macOS) — green (was red on v0.12.2; F541 fix)
+- `opencode-runtime` (Linux + macOS) — green
+- `instruction-docs-check` — green
+- `dependency-check` — green (manual + scheduled smoke envelopes)
+- `codeql` — green
+- `secret-scan` — green
+- `release` — will fire on v0.12.3 tag push
+
 ## [0.12.2] - 2026-05-18
 
 Patch release closing every blocker raised by the 2026-05-17 external
