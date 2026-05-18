@@ -4,8 +4,9 @@
 
 | Version | Supported |
 |---|---|
+| 0.12.x | yes |
 | 0.11.x | yes |
-| 0.10.x | yes |
+| 0.10.x | no |
 | < 0.10 | no |
 
 When a security issue is reported against an unsupported version, the project will upgrade the report to the current branch instead of patching old releases.

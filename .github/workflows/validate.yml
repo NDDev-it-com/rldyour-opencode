@@ -117,9 +117,13 @@ jobs:
 
   shell-strict-mode:
     # Tiny linter that asserts every scripts/*.sh begins with the env-bash
-    # shebang and `set -euo pipefail`. Runs once on Linux only — shebang
-    # contents are platform-independent.
-    runs-on: ubuntu-latest
+    # shebang and `set -euo pipefail`. Run on Linux and macOS to prevent
+    # platform-specific shebang/line-ending regressions.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 5
     steps:
       - name: Checkout
