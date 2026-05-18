@@ -16,6 +16,11 @@ jobs:
   cyclonedx:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # GitHub Actions is deprecating Node 20 for JavaScript actions. The
+      # latest CycloneDX action tag is still v1.0.3, so opt this job into
+      # Node 24 execution now and keep SBOM runs warning-free.
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
