@@ -108,7 +108,14 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Injects [rldyour runtime] date/branch/head/worktree-dirty stamp "
             "into every system prompt via experimental.chat.system.transform. "
-            "Branch and HEAD cached at factory init; status spawn has 800ms timeout."
+            "Branch and HEAD served from a per-directory TTL cache (3 s) so "
+            "in-session git checkout/switch/rebase invalidates the stamp "
+            "within one turn (audit P1-6 + integration-review F-3 + reviewer "
+            "wave 2026-05-18 closures). Status spawn has 800ms timeout. "
+            "Branch and HEAD values are sanitized via sanitizeRuntimeStamp "
+            "before the system-prompt push to defeat indirect prompt "
+            "injection through crafted branch names (reviewer wave security "
+            "F-4 closure)."
         ),
         "category": "context-injection",
         "writes_files": False,
