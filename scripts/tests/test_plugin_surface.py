@@ -444,6 +444,25 @@ def test_short_force_regex_catches_combined_flags() -> None:
         )
 
 
+
+def test_env_protection_blocks_envrc_and_netrc() -> None:
+    """`.envrc` (direnv) and `.netrc` (curl/wget) commonly hold secrets in
+    real developer setups but were missed by `.env$` / `.env\\.` patterns.
+    Reviewer wave 2026-05-18 security F-5 closure.
+    """
+    src = (PLUGINS_DIR / "ry-env-protection.ts").read_text(encoding="utf-8")
+    # New patterns must be path-component-bounded so subdirectories and
+    # absolute paths both match.
+    assert "(^|\\/)\\.envrc$" in src, (
+        "ry-env-protection.ts must block `.envrc` (direnv) via a path-"
+        "component-bounded regex; reviewer wave security F-5."
+    )
+    assert "(^|\\/)\\.netrc$" in src, (
+        "ry-env-protection.ts must block `.netrc` (curl/wget credentials) "
+        "via a path-component-bounded regex."
+    )
+
+
 def test_plugin_spawn_calls_have_timeout_guard() -> None:
     """Any plugin that spawns a child process via `Bun.spawn` must arm a
     timeout that calls `proc.kill()` on the kill path. Without that guard a
