@@ -86,10 +86,17 @@ jobs:
         working-directory: .opencode
         run: bunx --bun tsc --noEmit -p tsconfig.json
       - name: VERSION matches release tag
+        # Map workflow_dispatch inputs through env so untrusted strings
+        # never reach the shell parser via `${{ ... }}` interpolation.
+        # GitHub Actions security hardening guide:
+        # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        # Reviewer wave 2026-05-18 security F-3 closure.
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
           ver="$(cat VERSION)"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            tag_input="${{ inputs.tag }}"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            tag_input="$INPUT_TAG"
           else
             tag_input="${GITHUB_REF##*/}"
           fi
@@ -101,9 +108,13 @@ jobs:
           echo "[OK] tag $tag_input matches VERSION $ver"
       - name: Resolve release tag
         id: release_tag
+        # Same env-mapped pattern as the VERSION check above; reviewer
+        # wave 2026-05-18 security F-3 closure.
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            printf 'tag=%s\n' "${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            printf 'tag=%s\n' "$INPUT_TAG" >> "$GITHUB_OUTPUT"
           else
             printf 'tag=%s\n' "${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"
           fi
