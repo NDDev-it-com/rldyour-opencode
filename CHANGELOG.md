@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Public repository CI/CD policy.** OpenCode now loads
+  `references/public-repo-ci-policy.md` through `opencode.json.instructions`,
+  making public repositories automatic-CI/CD by default while preserving
+  `share: "manual"` for session sharing only. `/ry-start`, `/ry-sync`, and
+  `/ry-deploy` now document the public-repo exception for running existing
+  workflow surfaces.
+- **Policy regression tests.** `test_public_repo_ci_policy.py` locks the
+  OpenCode instruction wiring, the `share`/CI distinction, command-template
+  references, and the invariant that public-repo workflows are not
+  manual-only by default.
+
 ## [0.12.11] - 2026-05-18
 
 Patch release tightening public `fullrepo` hygiene before final open-source

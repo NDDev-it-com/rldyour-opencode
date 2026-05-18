@@ -62,12 +62,12 @@ The `opencode.json` file follows the OpenCode configuration schema (`https://ope
 - `model`: default model ID (e.g., `"opencode-go/glm-5.1"`).
 - `small_model`: lightweight model for fast tasks.
 - `autoupdate`: boolean.
-- `share`: `"manual"` | `"auto"` | `"disabled"`.
+- `share`: `"manual"` | `"auto"` | `"disabled"`; controls OpenCode session sharing only, not CI/CD execution.
 - `snapshot`: boolean — enable conversation snapshots.
 - `shell`: shell path (e.g., `"/bin/zsh"`).
 - `lsp`: boolean or object with per-server overrides.
 - `permission`: global permission map (keys: `read`, `edit`, `bash`, `glob`, `grep`, `webfetch`, `websearch`, `lsp`, `skill`, `task`, `todowrite`, `question`; values: `"allow"`, `"ask"`, `"deny"`, or object with glob patterns).
-- `instructions`: array of instruction file paths (e.g., `["AGENTS.md"]`).
+- `instructions`: array of instruction file paths (currently `["AGENTS.md", "references/public-repo-ci-policy.md"]`).
 - `compaction`: object with `auto` and `prune` booleans.
 - `watcher`: object with `ignore` glob patterns.
 

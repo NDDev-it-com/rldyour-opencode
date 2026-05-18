@@ -13,6 +13,7 @@ This reference defines the executable workflow behind `ry-init`, `ry-start`, `ry
 - UI/browser-visible changes use browser-tool-routing and browser-validation skills.
 - Security-sensitive changes use `owasp-top-10-implementation` and `@flow-security-review`.
 - Implementation favors quality, consistency, maintainability, and scale over speed.
+- Public repositories use automatic CI/CD by default through `references/public-repo-ci-policy.md`; private repositories keep manual CI/CD triggering unless explicitly requested.
 
 ## ry-init
 
@@ -51,7 +52,7 @@ Core order:
 10. Run quality gates and fix all issues in touched scope plus integration path.
 11. Run reviewer workflow. Use parallel subagents (`@flow-*-review`) when the `ry-start` workflow calls for parallel review.
 12. Run browser/security/design/LSP workflows when triggered by the change type.
-13. Synchronize Serena memories, agent-only files, AGENTS.md, git, GitHub, `fullrepo`, and worktree cleanup through post-task sync.
+13. Synchronize Serena memories, agent-only files, AGENTS.md, git, GitHub, `fullrepo`, and worktree cleanup through post-task sync. For public repositories, verify GitHub Actions for the final pushed HEAD and trigger existing dispatch-only readiness/release workflows when required by the public CI/CD policy.
 
 ## ry-newp
 
