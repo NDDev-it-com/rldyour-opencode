@@ -33,6 +33,7 @@ RUNTIME_EXCLUDE_PATTERNS=(
   # excluding them keeps `publish` deterministic.
   ".serena/reviews/"
   ".serena/diagnostics/"
+  ".claude/scheduled_tasks.lock"
   ".opencode/local.json"
   ".opencode/node_modules/"
   "browser/"
