@@ -17,6 +17,9 @@ public upstream publication and release.
 - **Project license changed to AGPL-3.0-only.** `LICENSE` now contains the full
   GNU Affero General Public License, version 3.0, and includes project
   attribution for `Danil Silantyev (rldyourmnd), CEO NDDev`.
+- **Runtime and baseline versions aligned.** `@opencode-ai/plugin` is pinned to
+  `1.15.4` in `.opencode/package.json` and `.opencode/bun.lock`, matching
+  `references/opencode-baseline.json` and `opencode-runtime.yml` checks.
 - **Public-facing repository metadata aligned to the canonical org/owner.**
   `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, and `docs/observability.md`
   now use the `NDDev-it-com/rldyour-opencode` publish target plus maintainer
