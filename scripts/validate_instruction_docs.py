@@ -35,6 +35,7 @@ DOCS: list[dict[str, Any]] = [
     {
         "path": PROJECT_ROOT / "AGENTS.md",
         "min_bytes": 4096,
+        "agent": True,
         "required_headings": (
             "## Project Purpose",
             "## Source Of Truth",
@@ -46,6 +47,7 @@ DOCS: list[dict[str, Any]] = [
     {
         "path": PROJECT_ROOT / ".claude" / "CLAUDE.md",
         "min_bytes": 1024,
+        "agent": True,
         "required_headings": (
             "## Where canonical project knowledge lives",
             "## What Claude Code should NOT do",
@@ -58,7 +60,14 @@ DOCS: list[dict[str, Any]] = [
 def check_doc(spec: dict[str, Any]) -> dict[str, Any]:
     path: Path = spec["path"]
     rel = str(path.relative_to(PROJECT_ROOT)) if path.is_relative_to(PROJECT_ROOT) else str(path)
+    is_agent_doc = bool(spec.get("agent", False))
     if not path.exists():
+        if is_agent_doc and not getattr(check_doc, "require_agent_docs", False):
+            return {
+                "path": rel,
+                "status": "skip",
+                "reason": "missing (agent doc)",
+            }
         return {"path": rel, "status": "fail", "reason": "missing"}
     raw = path.read_bytes()
     if len(raw) < spec["min_bytes"]:
@@ -87,18 +96,40 @@ def check_doc(spec: dict[str, Any]) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    parser.add_argument(
+        "--require-agent-docs",
+        action="store_true",
+        help="require agent instruction docs (AGENTS.md + .claude/CLAUDE.md)",
+    )
     args = parser.parse_args()
 
+    setattr(check_doc, "require_agent_docs", args.require_agent_docs)
+
     results = [check_doc(spec) for spec in DOCS]
+    skipped = [r for r in results if r["status"] == "skip"]
     failed = [r for r in results if r["status"] == "fail"]
 
     if args.json:
-        json.dump({"results": results, "failed": len(failed), "total": len(results)}, sys.stdout, indent=2)
+        json.dump(
+            {
+                "results": results,
+                "failed": len(failed),
+                "skipped": len(skipped),
+                "total": len(results),
+            },
+            sys.stdout,
+            indent=2,
+        )
         sys.stdout.write("\n")
     else:
-        print(f"Instruction docs: {len(results)} checked, {len(failed)} failed")
+        summary = f"Instruction docs: {len(results)} checked, {len(failed)} failed"
+        if skipped:
+            summary += f", {len(skipped)} skipped"
+        print(summary)
         for r in results:
             tag = "[OK]" if r["status"] == "ok" else "[FAIL]"
+            if r["status"] == "skip":
+                tag = "[SKIP]"
             if r["status"] == "ok":
                 detail = f"bytes={r['bytes']} headings={r['headings']}"
             else:

@@ -95,4 +95,4 @@ def test_invalid_config_rejected(tmp_path: Path) -> None:
 def test_missing_jsonschema_returns_two() -> None:
     result = _run([])
     assert result.returncode == 2
-    assert "jsonschema library not available" in result.stderr
+    assert "library not available" in result.stderr
