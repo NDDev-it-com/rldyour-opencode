@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-05-18
+
+Patch release synchronizing the public documentation baseline after the release
+validator gained one regression test.
+
+### Fixed
+
+- **Documentation test-count drift.** `README.md`, `AGENTS.md`, and
+  `.claude/CLAUDE.md` now cite the current release suite baseline:
+  `506 passed + 1 skipped` across 24 pytest suites. Runtime/plugin baseline
+  remains `opencode-ai` / `@opencode-ai/plugin` / SDK `1.15.4`.
+
 ## [0.13.0] - 2026-05-18
 
 Minor release establishing the production policy for public-repository CI/CD
