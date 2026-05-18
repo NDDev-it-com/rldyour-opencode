@@ -75,11 +75,11 @@ A self-contained OpenCode project configuration that provides:
 | Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
 | MCP servers | `opencode.json` → `mcp` | 13 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
-| Reference docs (skill/agent contracts) | `references/*.md` | 16 |
+| Reference docs (skill/agent contracts) | `references/*.md` | 17 |
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
 | Architecture decision archive | `docs/decisions/*.md` | 9 |
 | Diagnostic scripts (bash + python) | `scripts/` | 28 (14 python entry points + 13 bash entry points + 4 internal helper modules; new in v0.12.4: `check_workflow_injection.py`) |
-| Pytest suites | `scripts/tests/*.py` | 23 (500 passed + 1 skipped; new in v0.12.4+ post-tag patch: `test_deferred_shell_scripts.py` added to lock 8 deferred shell utilities) |
+| Pytest suites | `scripts/tests/*.py` | 24 (505 passed + 1 skipped; includes `test_public_repo_ci_policy.py` for public-repo CI/CD automation policy) |
 | CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
 
 ### Project structure
@@ -101,12 +101,12 @@ rldyour-opencode/
 ├── .serena/
 │   ├── memories/  *.md         # 6 verified knowledge files (AREA-NN-SLUG.md taxonomy)
 │   └── project.yml             # Serena project config
-├── references/   *.md          # 16 durable contracts (consumed by skills/agents)
+├── references/   *.md          # 17 durable contracts (consumed by skills/agents)
 ├── docs/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
 │   └── decisions/  001..009.md # 9 MADR-style ADRs
 ├── scripts/                    # 28 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 23 pytest suites — 500 passed + 1 skipped
+│   └── tests/  *.py            # 24 pytest suites — 505 passed + 1 skipped
 └── .github/workflows/          # 11 least-privilege, SHA-pinned CI/release workflows
 ```
 
@@ -186,7 +186,7 @@ Run `opencode models <provider>` to list every accepted ID. All current IDs are 
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
-uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/  # 500 passed + 1 skipped in 23 suites
+uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/  # 505 passed + 1 skipped in 24 suites
 bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
 python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
@@ -198,6 +198,11 @@ opencode debug config                                      # native resolved con
 opencode debug agent <name>                                # validate individual agent
 opencode models anthropic                                  # list available models for the active provider
 ```
+
+Public repositories use automatic CI/CD by default. `opencode.json` loads
+`references/public-repo-ci-policy.md` through `instructions`; keep
+`share: "manual"` unchanged because it controls OpenCode session sharing, not
+GitHub Actions execution.
 
 CI mirrors the core checks via `.github/workflows/validate.yml` on every push/PR to `main`. `.github/workflows/dependency-check.yml` runs weekly to surface MCP pin freshness via `GITHUB_STEP_SUMMARY`.
 

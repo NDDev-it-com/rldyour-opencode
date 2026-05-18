@@ -26,13 +26,14 @@ A second concern emerged from the audit: when CI logic diverges from local scrip
 
 ## Decision Outcome
 
-CI baseline is a 10-workflow set under `.github/workflows/` plus `.github/dependabot.yml`. Each workflow follows the same hardening contract:
+CI baseline is an 11-workflow set under `.github/workflows/` plus `.github/dependabot.yml`. Each workflow follows the same hardening contract:
 
 - Actions pinned to commit SHA with an inline `# vN.M.K` comment naming the resolved tag.
 - Workflow-level `permissions:` block declares minimal scope (typically `contents: read`); job-level overrides only where strictly required (`contents: write` for release). CodeQL uses read-only `actions: read` + `security-events: read` for its own metadata/API lookups while keeping local SARIF artifacts for compatibility with repositories where direct code-scanning upload is not enabled.
 - `concurrency:` group on workflow + ref, with `cancel-in-progress: true` for non-release flows.
 - `timeout-minutes:` on every job (5-20 minutes depending on scope).
 - For surfaces that can portably express it, `strategy.matrix.os: [ubuntu-latest, macos-latest]` so script regressions are caught on the owner's actual development matrix.
+- Public repositories use automatic CI/CD by default. The runtime policy lives in `references/public-repo-ci-policy.md` and is loaded by OpenCode through `opencode.json.instructions`. Private repositories keep the manual trigger default.
 
 Workflow set:
 
@@ -48,6 +49,7 @@ Workflow set:
 | `dependency-review.yml` | PR | Linux | actions/dependency-review-action, fail-on-severity: moderate |
 | `release.yml` | `v*.*.*` tag + dispatch | Linux + macOS | full validation + typecheck + tag-vs-VERSION check + npm SBOM generation + GitHub Release on Linux |
 | `sbom.yml` | release published + dispatch | Linux | standalone CycloneDX SBOM artifact |
+| `opencode-runtime.yml` | push + PR + dispatch | Linux + macOS | installs the pinned OpenCode CLI and verifies `opencode debug config` / runtime resolver behavior |
 
 Dependabot watches `npm` (`.opencode/`) and `github-actions` (`/`) on a weekly cadence, capped at 10 open PRs per ecosystem; both use scoped Conventional Commits prefixes (`chore(deps)`, `chore(ci)`). `scripts/check_action_pins.py` is the local guard that enforces each workflow `uses:` pin is a 40-character SHA and, in `--remote` mode, that the inline `# vX.Y.Z` comment resolves to that SHA.
 

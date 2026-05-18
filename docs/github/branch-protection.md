@@ -15,6 +15,15 @@ restore if branch protection is ever reset.
   branch is `--force-with-lease`-pushed by `scripts/fullrepo_sync.sh`
   from a verified `main` snapshot.
 
+## Public repository CI/CD
+
+`NDDev-it-com/rldyour-opencode` is public, so existing CI/CD workflows are
+automatic by default. `references/public-repo-ci-policy.md` is loaded by
+OpenCode through `opencode.json.instructions`; it authorizes running existing
+workflow surfaces for public-repo verification while keeping workflow edits,
+branch protection changes, repository rulesets, environments, secrets, and
+variables owner-restricted.
+
 ## Required status checks for `main`
 
 The contexts below match what GitHub emits at runtime. Audit P0-5 closed
@@ -123,9 +132,11 @@ gh api -X PUT repos/NDDev-it-com/rldyour-opencode/branches/main/protection \
   -F restrictions=null
 ```
 
-The agent must NOT execute these commands unattended. Branch protection
-mutations require explicit user authorization in the same request (see
-AGENTS.md § CI/CD and Git Mutation Gate).
+The agent must NOT execute these branch-protection mutation commands
+unattended. Branch protection mutations require explicit user authorization in
+the same request (see AGENTS.md § CI/CD and Git Mutation Gate). This remains
+true even though public-repo CI workflow execution itself is automatic by
+policy.
 
 ## Verification
 

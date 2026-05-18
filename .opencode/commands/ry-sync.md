@@ -19,4 +19,6 @@ Never commit secrets, runtime markers, browser artifacts, local env files, or ac
 
 `/ry-sync` may commit on feature branches and push to upstream when an upstream exists. It must NOT create or modify workflows, branch protection rules, GitHub environments, secrets, tags, or release artifacts unless the user explicitly asks for that mutation. Force-push, `git push --no-verify`, and product-branch (`main`/`master`/`release`/`production`) direct pushes require explicit user authorization in the same request. See AGENTS.md § CI/CD and Git Mutation Gate.
 
+Public repository exception: when the current repository is verified public, existing CI/CD workflows are automatic by default. After public-repo sync pushes, verify the GitHub Actions runs for the same HEAD; if a required readiness/release workflow did not run because it is `workflow_dispatch`, scheduled, or release-only, trigger that existing workflow with `gh workflow run` and wait for completion. Do not edit workflows or GitHub governance surfaces without explicit owner request. See `references/public-repo-ci-policy.md`.
+
 Reference: references/post-task-sync.md, references/project-instructions-and-adrs.md

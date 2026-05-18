@@ -12,6 +12,12 @@ Post-task sync is the last phase of meaningful work. It prevents forgotten chang
 6. Fullrepo branch sync sixth.
 7. Merged branch/worktree cleanup last.
 
+For public repositories, GitHub sync includes verifying the GitHub Actions runs
+for the pushed HEAD/tag. If an existing readiness or release workflow is
+dispatch-only, scheduled, or release-only and did not run automatically for the
+public-repo change, trigger it with `gh workflow run` and wait for completion.
+Private repositories keep the manual trigger default.
+
 ## Session And Commit Advice
 
 OpenCode loads instruction docs at session start. Treat this context as an input to planning: inspect dirty files, ahead/behind state, worktree count, docs, and Serena freshness before making assumptions.
