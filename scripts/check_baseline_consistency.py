@@ -41,7 +41,7 @@ def _load_baseline() -> dict[str, Any]:
         sys.exit(2)
     baseline = data.get("baseline")
     if not isinstance(baseline, dict):
-        print(f"[ERR] baseline.baseline must be an object", file=sys.stderr)
+        print("[ERR] baseline.baseline must be an object", file=sys.stderr)
         sys.exit(2)
     return baseline
 
