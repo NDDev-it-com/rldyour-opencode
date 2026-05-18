@@ -395,6 +395,31 @@ def test_ry_system_context_logs_session_start_deterministically() -> None:
     )
 
 
+
+def test_env_protection_notify_block_logs_before_toast() -> None:
+    """The defense-in-depth tripod (ry-env-protection + ry-shell-strategy +
+    ry-permission-policy) must follow the log-first invariant: `client.app
+    .log` must be called before `client.tui.showToast` inside any notify
+    helper so the audit trail records the block reason even when the toast
+    UI is unavailable. Reviewer wave 2026-05-18 consistency F-1 closed the
+    last outlier in `ry-env-protection.ts::notifyBlock`.
+    """
+    src = (PLUGINS_DIR / "ry-env-protection.ts").read_text(encoding="utf-8")
+    # Locate the notifyBlock body.
+    match = re.search(r"async function notifyBlock\(.*?\n  \}\n", src, re.DOTALL)
+    assert match is not None, "notifyBlock helper not found in ry-env-protection.ts"
+    body = match.group(0)
+    log_idx = body.find("client.app.log")
+    toast_idx = body.find("client.tui.showToast")
+    assert log_idx > 0, "notifyBlock must call client.app.log"
+    assert toast_idx > 0, "notifyBlock must call client.tui.showToast"
+    assert log_idx < toast_idx, (
+        "notifyBlock must call client.app.log BEFORE client.tui.showToast so "
+        "the audit trail records the block reason even when the toast UI is "
+        "unavailable. Mirrors ry-shell-strategy.ts and ry-permission-policy.ts."
+    )
+
+
 def test_plugin_spawn_calls_have_timeout_guard() -> None:
     """Any plugin that spawns a child process via `Bun.spawn` must arm a
     timeout that calls `proc.kill()` on the kill path. Without that guard a
