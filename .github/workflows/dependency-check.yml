@@ -56,17 +56,34 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # MCP capability smoke probe. Remote MCP outage / URL drift would
+      # MCP capability smoke probes. Remote MCP outage / URL drift would
       # otherwise be invisible until a live OpenCode session noticed.
-      - name: Smoke MCP capabilities (remote reachability)
-        id: smoke_mcp
+      # Audit P1-4: split modes — remote-head exercises network-only,
+      # local-launch exercises spawnable launchers. Both are continue-on-
+      # error so a transient registry outage cannot block the scheduled
+      # report. The full envelope is still published as a workflow summary.
+      - name: Smoke MCP capabilities (remote-head)
+        id: smoke_mcp_remote
         continue-on-error: true
         timeout-minutes: 3
         run: |
-          python3 scripts/smoke_mcp_capabilities.py --json | tee mcp-smoke.json
+          python3 scripts/smoke_mcp_capabilities.py --mode remote-head --json | tee mcp-smoke-remote.json
           {
-            echo "## MCP smoke probe"
+            echo "## MCP smoke probe (remote-head)"
             echo '```json'
-            cat mcp-smoke.json
+            cat mcp-smoke-remote.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Smoke MCP capabilities (local-launch)
+        id: smoke_mcp_local
+        continue-on-error: true
+        timeout-minutes: 3
+        run: |
+          python3 scripts/smoke_mcp_capabilities.py --mode local-launch --json | tee mcp-smoke-local.json
+          {
+            echo "## MCP smoke probe (local-launch)"
+            echo '```json'
+            cat mcp-smoke-local.json
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"

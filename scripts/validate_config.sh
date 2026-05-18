@@ -52,6 +52,28 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+log_step "Baseline consistency (opencode-baseline.json)"
+# Audit P0-1: docs / package.json / bun.lock / workflows must agree on the
+# single OpenCode baseline. Hard-fail when they drift; soft warnings (e.g.
+# CHANGELOG not yet mentioning the bumped plugin pin) print to stderr but
+# do not flunk the gate.
+if python3 "${PROJECT_ROOT}/scripts/check_baseline_consistency.py"; then
+    log_ok "Baseline consistency passed"
+else
+    ERRORS=$((ERRORS + 1))
+fi
+
+log_step "MCP profile graph (mcp-profiles.json)"
+# Audit P1-3: every server in opencode.json.mcp must belong to exactly one
+# profile in references/mcp-profiles.json; every skill.requires_mcp must
+# resolve to a declared MCP server; high-context dependencies emit a soft
+# warning.
+if python3 "${PROJECT_ROOT}/scripts/validate_mcp_profiles.py"; then
+    log_ok "MCP profile graph passed"
+else
+    ERRORS=$((ERRORS + 1))
+fi
+
 log_step "Skills"
 SKILLS_DIR="${PROJECT_ROOT}/.opencode/skills"
 if [ -d "$SKILLS_DIR" ]; then
