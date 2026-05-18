@@ -14,6 +14,13 @@ import type { Plugin } from "@opencode-ai/plugin"
 const BLOCKED_PATTERNS = [
   /\.env$/i,
   /\.env\./i,
+  // direnv (.envrc) and netrc (.netrc) hold credentials in many setups:
+  // `export AWS_ACCESS_KEY_ID=...`, `machine api.host login ... password ...`.
+  // Neither matches the .env* patterns above because they lack a trailing
+  // dot or `$` separator (`envrc`, `netrc` are word characters following
+  // `env` / `net`). Reviewer wave 2026-05-18 security F-5 closure.
+  /(^|\/)\.envrc$/i,
+  /(^|\/)\.netrc$/i,
   /credentials/i,
   // Path-component bounded matchers for the canonical sensitive directories:
   // `(^|/)\.foo/` matches `.foo/` at the start of a relative path AND `/.foo/`
