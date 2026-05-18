@@ -183,6 +183,11 @@ cmd_restore() {
 
   local tmp_dir
   tmp_dir=$(mktemp -d)
+  # Reviewer wave 2026-05-18 quality F-5 / S-2 closure: cmd_restore had no
+  # EXIT trap, so a failure between `mktemp -d` and the explicit cleanup
+  # would orphan the temp dir plus its worktree registration. Mirror the
+  # cmd_publish trap pattern so set -e exits cannot strand artefacts.
+  trap '_restore_cleanup "${tmp_dir:-}"' EXIT
   git worktree add "$tmp_dir" "origin/$FULLREPO_BRANCH" --detach 2>/dev/null
 
   for pattern in "${AGENT_ONLY_PATTERNS[@]}"; do
@@ -192,10 +197,28 @@ cmd_restore() {
     fi
   done
 
-  git worktree remove "$tmp_dir" 2>/dev/null
-  rm -rf "$tmp_dir"
+  # Explicit success-path cleanup (mirrors cmd_publish pattern; EXIT trap
+  # remains as the failure-path safety net).
+  _restore_cleanup "$tmp_dir"
+  trap - EXIT
 
   echo "[fullrepo] Restore complete."
+}
+
+_restore_cleanup() {
+  # Defensive: every arg may be empty under `set -u` if the trap fires
+  # before its variables were bound (e.g. mktemp failed).
+  local tmp_dir="${1:-}"
+  if [ -n "$tmp_dir" ] && [ -d "$tmp_dir" ]; then
+    # Best-effort worktree de-registration. `git worktree remove --force`
+    # is idempotent enough: it errors loudly if `$tmp_dir` was never a
+    # registered worktree, but we suppress that — the rm -rf below catches
+    # the dangling tmp dir regardless.
+    if command -v git >/dev/null 2>&1; then
+      git worktree remove --force "$tmp_dir" 2>/dev/null || true
+    fi
+    rm -rf "$tmp_dir"
+  fi
 }
 
 cmd_publish() {
