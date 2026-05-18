@@ -52,6 +52,11 @@ function isSensitivePath(filePath: string): boolean {
 // the toast the user only sees an opaque "tool failed" with no explanation.
 // Notify is best-effort: if either client call throws, we still raise the
 // block — preventing a UX failure from turning into a security failure.
+//
+// Order matters: log BEFORE toast so the audit trail records the block
+// reason even when the toast UI is unavailable or itself throws. Mirrors
+// the log-first invariant in ry-shell-strategy.ts and ry-permission-
+// policy.ts; reviewer wave 2026-05-18 consistency F-1 closure.
 export const RyEnvProtection: Plugin = async ({ client }) => {
   async function notifyBlock(path: string, kind: "read" | "bash"): Promise<void> {
     const message =
@@ -59,14 +64,14 @@ export const RyEnvProtection: Plugin = async ({ client }) => {
         ? `Blocked read of sensitive file: ${path}`
         : `Blocked bash command that reads sensitive files: ${path}`
     try {
-      await client.tui.showToast({ body: { variant: "error", message } })
-    } catch {
-      // tui unavailable; carry on
-    }
-    try {
       await client.app.log({ body: { service: "ry-env-protection", level: "warn", message } })
     } catch {
       // server log unavailable; carry on
+    }
+    try {
+      await client.tui.showToast({ body: { variant: "error", message } })
+    } catch {
+      // tui unavailable; carry on
     }
   }
 
