@@ -39,9 +39,11 @@ echo ""
 
 # Stale branches (merged into main)
 if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
-  stale=$(git branch --merged HEAD 2>/dev/null | grep -v '^\*\|main\|master' | wc -l | tr -d ' ')
-  if [ "$stale" -gt 0 ]; then
-    echo "Stale branches (merged into $branch): $stale"
+  stale_lines=$(git branch --merged HEAD 2>/dev/null || true)
+  stale=$(printf '%s\n' "$stale_lines" | grep -v '^\*\|main\|master' || true)
+  stale_count=$(printf '%s\n' "$stale" | awk 'NF' | wc -l | tr -d ' ')
+  if [ "$stale_count" -gt 0 ]; then
+    echo "Stale branches (merged into $branch): $stale_count"
     git branch --merged HEAD 2>/dev/null | grep -v '^\*\|main\|master'
   else
     echo "No stale branches."
