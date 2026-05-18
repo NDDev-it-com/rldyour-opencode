@@ -69,7 +69,12 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
       const longForce = new RegExp(`${FLAG_BOUNDARY_PRE}--force${FLAG_BOUNDARY_POST}`, "i")
       const lease = new RegExp(`${FLAG_BOUNDARY_PRE}--force-with-lease${FLAG_BOUNDARY_POST}`, "i")
       const noVerify = new RegExp(`${FLAG_BOUNDARY_PRE}--no-verify${FLAG_BOUNDARY_POST}`, "i")
-      const shortForce = /(?:^|\s)-f(?:\s|$)/
+      // `-f` may be combined with other short flags into a cluster:
+      // `git push -fv` (force + verbose), `-fq`, `-fn`, `-fvv`, `-vf`.
+      // The narrow `(?:^|\s)-f(?:\s|$)/` only matched the standalone form.
+      // Allow `f` anywhere inside an alpha-only flag cluster. Reviewer
+      // wave 2026-05-18 security F-2 closure.
+      const shortForce = /(?:^|\s)-[A-Za-z]*f[A-Za-z]*(?:\s|$)/
       const branchAlt = /\b(main|master|release|production)\b/i
 
       const isPush = /\bgit\s+push\b/i.test(command)

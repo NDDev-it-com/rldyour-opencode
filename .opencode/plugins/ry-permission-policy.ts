@@ -79,7 +79,10 @@ export const RyPermissionPolicy: Plugin = async ({ client }) => {
 
       const isPush = /\bgit\s+push\b/i.test(cmd)
       const hasLongForce = longForce.test(cmd)
-      const hasShortForce = /(?:^|\s)-f(?:\s|$)/.test(cmd)
+      // Mirrors ry-shell-strategy.ts shortForce: detect `f` anywhere inside
+      // a short-flag alpha cluster (`-fv`, `-fq`, `-fn`, `-vf`). Reviewer
+      // wave 2026-05-18 security F-2 closure.
+      const hasShortForce = /(?:^|\s)-[A-Za-z]*f[A-Za-z]*(?:\s|$)/.test(cmd)
       const hasLease = lease.test(cmd)
       if (isPush && (hasLongForce || hasShortForce) && !hasLease) {
         output.status = "deny"
