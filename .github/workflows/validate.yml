@@ -44,24 +44,47 @@ jobs:
           # Restore only instruction docs needed by tests; do not run
           # bootstrap-init here because it would replace scripts/.opencode
           # from fullrepo and could mask the exact PR/main files under test.
-          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo
+          # Audit P1-5: restore is a FALLBACK, not an overwrite — a PR with a
+          # branch-local AGENTS.md or .claude/CLAUDE.md must keep its own
+          # copy so the workflow validates the PR contents, not the stale
+          # fullrepo snapshot.
+          set -euo pipefail
+          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo || true
           bash scripts/fullrepo_sync.sh install-exclude
-          git show origin/fullrepo:AGENTS.md > AGENTS.md
-          mkdir -p .claude
-          git show origin/fullrepo:.claude/CLAUDE.md > .claude/CLAUDE.md
+          for path in AGENTS.md .claude/CLAUDE.md; do
+            if [ ! -f "${path}" ] && git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
+              mkdir -p "$(dirname "${path}")"
+              git show "origin/fullrepo:${path}" > "${path}"
+            fi
+          done
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:
           python-version: "3.13"
 
-      - name: Install pytest + PyYAML + jsonschema (pinned)
-        run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0"
+      - name: Install pytest + PyYAML + jsonschema + referencing (pinned)
+        # `referencing` is a transitive dependency of jsonschema 4.x; pinning
+        # it explicitly insulates the validator from a future PyPI resolver
+        # change that drops the transitive include (integration-review F-1).
+        run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0" "referencing==0.36.2"
 
       - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
         run: bash scripts/validate_config.sh
 
-      - name: Validate opencode.json against vendored JSON Schema (v1.15.4)
+      - name: Validate opencode.json against vendored JSON Schema (v1.15.4, offline)
+        # Audit P0-2: schema validator resolves external $refs through a
+        # vendored Registry (references/models.dev-model-schema.json), so
+        # this gate never requires network reachability.
         run: python3 scripts/validate_opencode_schema.py
+
+      - name: Verify baseline consistency (docs/package/lock/workflows on one pin)
+        # Audit P0-1: hard-fail on plugin SDK / CLI / Bun / pytest pin drift.
+        run: python3 scripts/check_baseline_consistency.py
+
+      - name: Validate MCP profile graph (mcp-profiles.json + skill.requires_mcp)
+        # Audit P1-3: every MCP server belongs to exactly one profile and
+        # every skill.requires_mcp resolves to a declared server.
+        run: python3 scripts/validate_mcp_profiles.py
 
       - name: Verify skills index is in sync with SKILL.md files
         run: python3 scripts/generate_skills_index.py --check --strict
@@ -71,6 +94,18 @@ jobs:
 
       - name: Verify plugins index is in sync with plugin .ts files
         run: python3 scripts/generate_plugins_index.py --check --strict
+
+      - name: MCP smoke (static — parse only, no spawn, no network)
+        # Audit P1-4: PR runs always validate the MCP roster statically;
+        # local-launch + remote-head probes live in dependency-check.yml.
+        run: python3 scripts/smoke_mcp_capabilities.py --mode static --json
+
+      - name: Doctor (Python core, JSON envelope, --total-timeout 30)
+        # Audit P0-3: deterministic doctor with per-check + wall-clock
+        # timeouts. Soft-fail (continue-on-error) so a single doctor regression
+        # never blocks merge, but the JSON envelope is published for triage.
+        continue-on-error: true
+        run: python3 scripts/doctor_opencode.py --format json --total-timeout 30 | tee doctor.json
 
       - name: Run validator unit tests
         run: python3 -m pytest scripts/tests/ -v
