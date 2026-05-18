@@ -29,7 +29,7 @@ A second concern emerged from the audit: when CI logic diverges from local scrip
 CI baseline is a 10-workflow set under `.github/workflows/` plus `.github/dependabot.yml`. Each workflow follows the same hardening contract:
 
 - Actions pinned to commit SHA with an inline `# vN.M.K` comment naming the resolved tag.
-- Workflow-level `permissions:` block declares minimal scope (typically `contents: read`); job-level overrides only where strictly required (`contents: write` for release). CodeQL uses local SARIF artifacts to keep compatibility with repositories where direct code-scanning upload is not enabled.
+- Workflow-level `permissions:` block declares minimal scope (typically `contents: read`); job-level overrides only where strictly required (`contents: write` for release). CodeQL uses read-only `actions: read` + `security-events: read` for its own metadata/API lookups while keeping local SARIF artifacts for compatibility with repositories where direct code-scanning upload is not enabled.
 - `concurrency:` group on workflow + ref, with `cancel-in-progress: true` for non-release flows.
 - `timeout-minutes:` on every job (5-20 minutes depending on scope).
 - For surfaces that can portably express it, `strategy.matrix.os: [ubuntu-latest, macos-latest]` so script regressions are caught on the owner's actual development matrix.
