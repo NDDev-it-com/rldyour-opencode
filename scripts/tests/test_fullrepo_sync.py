@@ -55,6 +55,12 @@ def test_runtime_exclude_patterns_cover_command_audit_log() -> None:
     assert '".serena/.command_audit.log"' in text
 
 
+def test_runtime_exclude_patterns_cover_claude_scheduled_tasks_lock() -> None:
+    """Claude Code scheduler locks are runtime-only and must not publish to fullrepo."""
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert '".claude/scheduled_tasks.lock"' in text
+
+
 def test_status_json_uses_python_escape() -> None:
     """Audit finding 4MUSTHAVE-PA-015: status-json output must go through
     a real JSON serializer (python json.dumps) instead of heredoc
@@ -257,6 +263,10 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
     (tmp_path / "AGENTS.md").write_text("# Agent Instructions\n", encoding="utf-8")
     (tmp_path / ".claude").mkdir()
     (tmp_path / ".claude" / "CLAUDE.md").write_text("# Claude Instructions\n", encoding="utf-8")
+    (tmp_path / ".claude" / "scheduled_tasks.lock").write_text(
+        '{"sessionId":"fixture","pid":123}\n',
+        encoding="utf-8",
+    )
     (tmp_path / ".serena" / "memories").mkdir(parents=True)
     (tmp_path / ".serena" / "memories" / "CORE-01-INDEX.md").write_text("Last commit: fixture\n", encoding="utf-8")
     (tmp_path / ".serena" / ".flow_sync_marker").write_text("runtime-marker\n", encoding="utf-8")
@@ -289,6 +299,7 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
     assert "references/tracked.md" in tree
     assert "AGENTS.md" in tree
     assert ".claude/CLAUDE.md" in tree
+    assert ".claude/scheduled_tasks.lock" not in tree
     assert ".serena/memories/CORE-01-INDEX.md" in tree
     assert ".serena/.flow_sync_marker" not in tree
     assert "docs/local-only.md" not in tree
