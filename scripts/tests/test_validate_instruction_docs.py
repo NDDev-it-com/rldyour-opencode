@@ -146,6 +146,62 @@ def test_main_json_mode_emits_envelope(capsys: pytest.CaptureFixture[str], tmp_p
     out = capsys.readouterr().out
     payload = json.loads(out)
     assert rc == 1
-    assert set(payload.keys()) >= {"results", "failed", "total"}
+    assert set(payload.keys()) >= {"results", "failed", "skipped", "total"}
     assert payload["failed"] == 1
     assert payload["total"] == 1
+
+
+def test_agent_docs_are_skipped_without_strict_flag(tmp_path: Path) -> None:
+    """Missing docs with ``agent=True`` become [SKIP] only in non-strict mode."""
+    agent_docs = {
+        "path": tmp_path / "AGENTS.md",
+        "min_bytes": 100,
+        "agent": True,
+        "required_headings": ("## Required",),
+    }
+    fake_docs = [{"path": agent_docs["path"], "min_bytes": 100, "agent": True, "required_headings": ("## Required",)}]
+    with mock.patch.object(validator, "DOCS", fake_docs):
+        result = validator.check_doc(agent_docs)
+    assert result["status"] == "skip"
+    assert result["reason"] == "missing (agent doc)"
+
+
+def test_require_agent_docs_flag_enforces_agent_paths(tmp_path: Path) -> None:
+    """--require-agent-docs turns agent doc skips into hard failures."""
+    missing_agent_doc = {
+        "path": tmp_path / "AGENTS.md",
+        "min_bytes": 100,
+        "agent": True,
+        "required_headings": ("## Required",),
+    }
+    with mock.patch.object(sys, "argv", ["validate_instruction_docs.py", "--require-agent-docs"]):
+        with mock.patch.object(validator, "DOCS", [missing_agent_doc]):
+            rc = validator.main()
+    assert rc == 1
+
+
+def test_main_json_mode_marks_skipped_count(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    """JSON envelope must reflect non-fatal agent-doc skips separately from failures."""
+    fake_docs = [
+        {
+            "path": tmp_path / "AGENTS.md",
+            "min_bytes": 100,
+            "agent": True,
+            "required_headings": ("## Required",),
+        },
+        {
+            "path": tmp_path / "missing.md",
+            "min_bytes": 100,
+            "required_headings": ("## Required",),
+        },
+    ]
+    with mock.patch.object(sys, "argv", ["validate_instruction_docs.py", "--json"]):
+        with mock.patch.object(validator, "DOCS", fake_docs):
+            rc = validator.main()
+    out = capsys.readouterr().out
+    assert rc == 1
+    payload = json.loads(out or "")
+    assert payload["failed"] == 1
+    assert payload["skipped"] == 1
