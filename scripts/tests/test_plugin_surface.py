@@ -341,6 +341,60 @@ def test_catastrophic_rm_blocks_parent_dir_traversal() -> None:
         )
 
 
+
+def test_ry_system_context_sanitizes_branch_before_prompt_injection() -> None:
+    """`ry-system-context.ts` injects `branch` (from git rev-parse) into
+    every system prompt. Reviewer wave 2026-05-18 security F-4 flagged
+    this as indirect prompt injection via crafted branch names. The
+    plugin must sanitize via `sanitizeRuntimeStamp` (allow only
+    [A-Za-z0-9._/-], cap length at SAFE_STAMP_MAX_LEN) before pushing.
+    """
+    src = (PLUGINS_DIR / "ry-system-context.ts").read_text(encoding="utf-8")
+    assert "sanitizeRuntimeStamp" in src, (
+        "ry-system-context.ts must define `sanitizeRuntimeStamp` to strip "
+        "newline/shell/prompt-override bytes from git-controlled fields."
+    )
+    assert "[^\\w.\\-/]" in src, (
+        "Sanitization allowlist must be the canonical git branch char set "
+        "[A-Za-z0-9._/-]; everything else replaced with `_`."
+    )
+    assert "SAFE_STAMP_MAX_LEN" in src, (
+        "Sanitizer must enforce a length cap to prevent prompt bloat from "
+        "adversarial branch names."
+    )
+    assert "const safeBranch" in src and "const safeHead" in src, (
+        "Handler must use sanitized values, not raw `branch` / `headShort`."
+    )
+    # Regression guard: unsanitized template-literal interpolation of `branch`
+    # must not return.
+    assert "branch=${branch}" not in src, (
+        "Raw `branch` must not appear in the system-prompt template literal "
+        "after sanitization; use `safeBranch`."
+    )
+
+
+def test_ry_system_context_logs_session_start_deterministically() -> None:
+    """The session-start audit log must fire on the first turn deterministically.
+    The legacy `Math.random() < 0.05` sampler dropped the first turn 95% of the
+    time despite the comment claiming "log once per session start". Reviewer
+    wave 2026-05-18 quality F-10 / S-13 closure.
+    """
+    src = (PLUGINS_DIR / "ry-system-context.ts").read_text(encoding="utf-8")
+    assert "sessionStartLogged" in src, (
+        "ry-system-context.ts must use a `sessionStartLogged` boolean instead "
+        "of a probabilistic sampler for the session-start anchor log."
+    )
+    # Strip comments before scanning: the new commentary explains the
+    # legacy bug verbatim, so a raw substring match would find the
+    # documentation reference too.
+    no_line_comments = re.sub(r"^\s*//.*$", "", src, flags=re.MULTILINE)
+    code_only = re.sub(r"/\*.*?\*/", "", no_line_comments, flags=re.DOTALL)
+    assert "Math.random()" not in code_only, (
+        "Probabilistic sampler `Math.random()` must not be reintroduced in "
+        "production code; use the deterministic per-session boolean."
+    )
+
+
 def test_plugin_spawn_calls_have_timeout_guard() -> None:
     """Any plugin that spawns a child process via `Bun.spawn` must arm a
     timeout that calls `proc.kill()` on the kill path. Without that guard a
