@@ -77,9 +77,9 @@ A self-contained OpenCode project configuration that provides:
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
 | Reference docs (skill/agent contracts) | `references/*.md` | 16 |
 | Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
-| Architecture decision archive | `docs/decisions/*.md` | 8 |
-| Diagnostic scripts (bash + python) | `scripts/` | 23 (16 wrappers including new `generate_skills_index`, `generate_commands_index`, `generate_plugins_index`, `validate_opencode_schema` + 4 helper modules) |
-| Pytest suites | `scripts/tests/*.py` | 18 (412 cases — adds 6 cases each for `test_validate_opencode_schema`, `test_skills_index`, `test_commands_index`, `test_plugins_index` plus +3 plugin-surface regression locks) |
+| Architecture decision archive | `docs/decisions/*.md` | 9 |
+| Diagnostic scripts (bash + python) | `scripts/` | 28 (14 python entry points + 13 bash entry points + 4 internal helper modules; new in v0.12.4: `check_workflow_injection.py`) |
+| Pytest suites | `scripts/tests/*.py` | 22 (473 cases + 1 skipped; new in v0.12.4: `test_check_workflow_injection` (10) plus +6 plugin-surface regression locks for CC_REGEX, rm-parent-dir, system-context sanitization, log/toast order, shortForce, .envrc, before-hook output.args lock) |
 | CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
 
 ### Project structure
@@ -104,9 +104,9 @@ rldyour-opencode/
 ├── references/   *.md          # 16 durable contracts (consumed by skills/agents)
 ├── docs/
 │   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
-│   └── decisions/  001..008.md # 8 MADR-style ADRs
-├── scripts/                    # 19 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 18 pytest suites — 412 cases
+│   └── decisions/  001..009.md # 9 MADR-style ADRs
+├── scripts/                    # 28 bash + python diagnostic / validation / smoke scripts
+│   └── tests/  *.py            # 22 pytest suites — 473 cases + 1 skipped
 └── .github/workflows/          # 11 least-privilege, SHA-pinned CI/release workflows
 ```
 
@@ -186,7 +186,7 @@ Run `opencode models <provider>` to list every accepted ID. All current IDs are 
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
-uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" pytest scripts/tests/  # 412 cases in 18 suites
+uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/  # 473 cases + 1 skipped in 22 suites
 bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
 python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
