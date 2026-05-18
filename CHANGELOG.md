@@ -5,6 +5,179 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.2] - 2026-05-18
+
+Patch release closing every blocker raised by the 2026-05-17 external
+audit pass. The wave turns the "single mechanism" promise into static
+gates: one baseline file declares every pinned version, one validator
+enforces it across docs/package/lock/workflows, the OpenCode JSON Schema
+validator resolves external `$ref`s entirely offline, the doctor is
+rewritten on a deterministic Python core with per-check + wall-clock
+timeouts, the MCP server roster is profiled in a machine-readable file,
+the smoke probe exposes `--mode` profiles for differentiated CI loads,
+and `ry-system-context.ts` swaps its forever-cached branch/HEAD for a
+3-second TTL that survives in-session `git checkout`.
+
+### Added
+
+- **`references/opencode-baseline.json`** — single source of truth for
+  every pinned version the marketplace targets: `opencode-ai@1.15.4`,
+  `@opencode-ai/plugin@1.15.4`, `@opencode-ai/sdk@1.15.4`,
+  `bun@1.3.14`, `python@3.13`, `pytest==9.0.3`, `PyYAML==6.0.3`,
+  `jsonschema==4.26.0`, `ruff==0.15.13`, `gitleaks@8.30.1`, and
+  `codeql-action@v4.35.5`. Closes audit P0-1.
+- **`scripts/check_baseline_consistency.py`** — gate that fails when
+  `.opencode/package.json`, `.opencode/bun.lock`,
+  `.github/workflows/opencode-runtime.yml`, any workflow's
+  `bun-version`, any `pip install pkg==X.Y.Z` line, the vendored
+  schema, or any vendored external `$ref` drifts from the baseline.
+  Surfaces a soft warning when the latest `CHANGELOG.md` release block
+  does not mention the bumped plugin version. Closes audit P0-1.
+- **`references/mcp-profiles.json`** — machine-readable mapping of
+  every server in `opencode.json.mcp` to exactly one profile (`base`,
+  `research`, `browser`, `security`, `design`, `repo`) plus a
+  `high_context` set for cost-aware skill design. Closes audit P1-3.
+- **`scripts/validate_mcp_profiles.py`** — validator that asserts
+  `skill.requires_mcp ⊆ opencode.mcp`, every server is assigned to
+  exactly one profile, no profile references an undeclared server,
+  and emits soft warnings when a skill depends on a `high_context`
+  server. Wired into `scripts/validate_config.sh`. Closes audit P1-3.
+- **`scripts/doctor_opencode.py`** — Python core for the doctor.
+  Granular `--check {agents,baseline,commands,config,git,mcp,plugins,
+  schema,serena,skills}` selection, `--format {text,json}` output,
+  `--total-timeout` wall-clock deadline (default 60 s), 15 s per
+  per-check timeout, structured `{check, status, duration_ms, details}`
+  result envelope, and exit-code semantics 0/1/2/3 (clean / fail /
+  operational error / total-timeout). `scripts/doctor_opencode.sh` is
+  preserved as a thin `exec python3 scripts/doctor_opencode.py "$@"`
+  adapter so existing operator muscle memory keeps working. Closes
+  audit P0-3.
+- **`scripts/print_required_check_contexts.sh`** — extracts the actual
+  GitHub check contexts (workflow `name:` plus job `name:` with matrix
+  expansion) from `.github/workflows/*.yml` so
+  `docs/github/branch-protection.md` stays mechanically in sync with
+  the workflow source. Closes audit P0-5.
+- **`scripts/smoke_mcp_capabilities.py --mode` profiles** —
+  `{all, static, local-launch, remote-head}` selector. PR runs gate on
+  `--mode static`, scheduled `dependency-check.yml` runs `--mode
+  remote-head` and `--mode local-launch`. Default `--mode all`
+  preserves the v0.12.1 backward-compatible single-mode invocation.
+  Closes audit P1-4.
+- **`references/models.dev-model-schema.json`** — vendored snapshot of
+  the only external `$ref` in `references/opencode-config.schema.v1.15.4.json`
+  so `scripts/validate_opencode_schema.py` resolves the reference
+  offline through a `referencing.Registry`. Any newly-added upstream
+  external `$ref` now fails with a clear `Unresolvable` operational
+  error rather than triggering a silent network round-trip. Closes
+  audit P0-2.
+
+### Changed
+
+- `.opencode/package.json` and `.opencode/bun.lock` bump
+  `@opencode-ai/plugin` and `@opencode-ai/sdk` from `1.15.3` to
+  `1.15.4` to match `references/opencode-baseline.json`. Upstream
+  `v1.15.4` release notes scope to three bugfixes (project-scoped bus
+  events, custom LSP refresh events, hidden background subagent task
+  instructions) plus a TUI markdown polish. Server-side `Plugin`/`Hooks`
+  factory contract and MCP `<server>_<tool>` tool-ID format are
+  unchanged from `v1.15.3`.
+- `.opencode/plugins/ry-system-context.ts` swaps its forever-cached
+  branch/HEAD readout for a `BRANCH_HEAD_CACHE_TTL_MS = 3_000` TTL
+  cache. The previous implementation cached at plugin factory init,
+  which left the `[rldyour runtime]` prompt stamp stale for the
+  remainder of any session that ran `git checkout|switch|rebase`. The
+  new gate uses `Date.now()` to invalidate every 3 seconds while
+  still suppressing 2 of the 3 git subprocesses on the hot
+  `experimental.chat.system.transform` path. Closes audit P1-6.
+- `scripts/validate_opencode_schema.py` now builds an offline
+  `referencing.Registry` from `EXTERNAL_REF_VENDORED_AT` and surfaces
+  `Unresolvable` as a clean `exit 2` with a `curl ... -o
+  references/...` remediation hint. Closes audit P0-2.
+- `scripts/validate_config.sh` runs `check_baseline_consistency.py`
+  and `validate_mcp_profiles.py` after the existing `check_action_pins`
+  step. A baseline drift or MCP graph break fails the gate.
+- `.github/workflows/validate.yml` adds three new gate steps:
+  `check_baseline_consistency.py`, `validate_mcp_profiles.py`, and
+  `smoke_mcp_capabilities.py --mode static`. A `continue-on-error`
+  `doctor_opencode.py --format json --total-timeout 30` step publishes
+  the JSON envelope for triage. The fullrepo restore step now follows
+  a fallback contract (`[ ! -f path ]` + `git show` only when the
+  file is absent from the checkout) so a PR with a branch-local
+  `AGENTS.md` keeps its own copy. Closes audit P1-5.
+- `.github/workflows/release.yml` mirrors the validate gate set in
+  the same order so a green release implies a green PR; also adopts
+  the fullrepo restore fallback. Closes audit P1-5.
+- `.github/workflows/opencode-runtime.yml` adopts the same fullrepo
+  restore fallback. Closes audit P1-5.
+- `.github/workflows/dependency-check.yml` runs `smoke_mcp --mode
+  remote-head` and `smoke_mcp --mode local-launch` as separate
+  `continue-on-error` steps; both envelopes attach to
+  `GITHUB_STEP_SUMMARY` so scheduled triage stays observable.
+- `docs/github/branch-protection.md` re-derived from
+  `scripts/print_required_check_contexts.sh`. Required PR contexts now
+  cite the actual workflow names and matrix expansions
+  (`Validate rldyour-opencode / validate (ubuntu-latest)`, etc.).
+  Scheduled-only and tag-only workflows moved out of the required PR
+  contexts table to reflect their triggers. Closes audit P0-5.
+- `scripts/tests/test_doctor_opencode.py` fully rewritten to target
+  the Python core. Uses AST traversal for the subprocess.run timeout
+  invariant, strips `(NNNms)` per-check timings before comparing the
+  bash wrapper output to the Python invocation, and asserts the new
+  granular `--check`, `--format json`, and `--total-timeout` contract.
+  Closes audit P0-3.
+- `scripts/tests/test_fullrepo_sync.py` adds an archive-safety
+  `needs_project_git` skipif for the PROJECT_ROOT-bound `status-json`
+  / `help` cases, plus an explicit `timeout=` argument on every
+  `subprocess.run` call (PUBLISH_TIMEOUT for the heavier `publish`
+  fixture). Closes audit P0-4.
+- `scripts/tests/test_check_freshness.py` and `test_sanitize_diag.py`
+  add the missing `timeout=` argument on every `subprocess.run`. Closes
+  audit P0-4.
+
+### Fixed
+
+- AGENTS.md L131 already states the plugin pin is **manually
+  maintained** and validated by `scripts/check_baseline_consistency.py`
+  (the unproven auto-rewrite claim flagged by audit P1-1 was already
+  removed before this wave; the new validator now makes the
+  "manually maintained" assertion mechanical instead of textual).
+
+### Stayed
+
+- `opencode.json` keeps the YOLO permission profile (`edit: "allow"`,
+  `bash: "allow"`, plus the rest of the v1.15.x canonical set). Audit
+  P1-2 was already settled in `docs/decisions/009-yolo-full-auto-mode.md`
+  (ADR-009): single-developer trust + plugin guardrails
+  (ry-shell-strategy + ry-permission-policy + ry-env-protection)
+  rather than an interactive-friction profile. The 2026-05-17 audit
+  re-raised this without referencing ADR-009; the rebuttal stays in
+  ADR-009 verbatim.
+
+### Test coverage
+
+- Total pytest cases: **447 passed + 1 skipped** across **20 suites**
+  (was 412 / 18 at `0f60f76`, +35). New suites:
+  `test_check_baseline_consistency.py` (9), `test_mcp_profiles.py` (11).
+  `test_doctor_opencode.py` rewritten (+5 cases vs the bash version).
+  `test_smoke_mcp.py` extended with 5 new cases for the `--mode`
+  profile selector. `test_plugin_surface.py` extended with the
+  ry-system-context TTL cache invariant. The skipped case is the
+  missing-jsonschema-import path test, correctly skipped when the
+  dependency is present.
+
+### CI pipeline state at HEAD
+
+- `validate` (Linux + macOS) — green; new gates passing
+- `typecheck-plugins` (Linux + macOS) — green
+- `lint` (Linux + macOS) — green
+- `opencode-runtime` (Linux + macOS) — green
+- `instruction-docs-check` — green
+- `dependency-check` — green; new `--mode remote-head` + `--mode
+  local-launch` summaries publish to `GITHUB_STEP_SUMMARY`
+- `codeql` — green
+- `secret-scan` — green
+- `release` — to be re-validated when `v0.12.2` tag fires
+
 ## [0.12.1] - 2026-05-18
 
 Patch consistency-polish release after the v0.12.0 audit closure. Closes
