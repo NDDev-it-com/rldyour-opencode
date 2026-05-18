@@ -67,12 +67,17 @@ DOMAIN_BY_SKILL: dict[str, str] = {
     "browser-tool-routing": "browser",
     "browser-validation": "browser",
     "browser-debug": "browser",
-    # Design (5)
+    # design-validation is single-purpose browser validation that depends on
+    # Playwright + Chrome DevTools MCP. AGENTS.md L48 reserves those MCPs for
+    # the Browser domain, so the skill belongs to Browser despite its name.
+    # Reviewer wave 2026-05-18 architecture F-1 closure. `ry-design` keeps a
+    # composite multi-domain exception (see AGENTS.md § Domain Boundaries).
+    "design-validation": "browser",
+    # Design (4)
     "ry-design": "design",
     "figma-to-code": "design",
     "design-system-implementation": "design",
     "fsd-frontend-architecture": "design",
-    "design-validation": "design",
     # Security (2)
     "owasp-top-10-implementation": "security",
     "ry-sec-review": "security",
