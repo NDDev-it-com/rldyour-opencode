@@ -18,7 +18,13 @@ import type { Plugin } from "@opencode-ai/plugin"
 // `scripts/tests/test_plugin_surface.py::test_flow_hooks_reads_command_from_input`.
 
 const CC_TYPES = "feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
-const CC_REGEX = new RegExp(`^(${CC_TYPES})(\\(.+\\))?:\\s.{10,}`, "m")
+// `git commit` stdout begins with `[<branch> <sha>] <subject>` on the first
+// summary line, so the type prefix is NEVER at start-of-line. The legacy
+// `^(type):` anchor with `m` flag silently failed for every real commit
+// (reviewer 2026-05-18 quality F-1). Anchor at the closing `]` of the
+// `[branch sha]` prefix instead and tolerate the variable whitespace that
+// git uses between the bracket and the subject across locales.
+const CC_REGEX = new RegExp(`\\]\\s*(${CC_TYPES})(\\(.+\\))?:\\s.{10,}`, "m")
 
 function getBashCommand(input: { tool: string; args?: unknown }): string {
   if (input.tool !== "bash") return ""
