@@ -285,10 +285,15 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     for warning in soft_warnings:
         print(f"[WARN] {warning}", file=sys.stderr)
+    # Reviewer wave 2026-05-18 integration F-8 closure: include every pin
+    # the validator actually checks in the OK summary so operators see the
+    # full per-key freshness state at a glance, not just the seven pins the
+    # original line printed.
     print(
         f"[OK] baseline consistent: opencode-cli={cli_version}, "
         f"plugin={plugin_version}, sdk={sdk_version}, bun={bun_version}, "
-        f"pytest={pytest_ver}, pyyaml={pyyaml_ver}, jsonschema={jsonschema_ver}"
+        f"pytest={pytest_ver}, pyyaml={pyyaml_ver}, jsonschema={jsonschema_ver}, "
+        f"referencing={referencing_ver or 'n/a'}, ruff={ruff_ver or 'n/a'}"
     )
     return 0
 
