@@ -39,11 +39,19 @@ jobs:
           # instruction docs and exclude marker; do not bootstrap fullrepo over
           # the release checkout because that could mask the tagged tree under
           # validation.
-          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo
+          # Audit P1-5: restore is a FALLBACK, not an overwrite — a tag built
+          # from a branch that already contains AGENTS.md / .claude/CLAUDE.md
+          # must keep its own copy so the release validates the tagged
+          # contents, not the published fullrepo snapshot.
+          set -euo pipefail
+          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo || true
           bash scripts/fullrepo_sync.sh install-exclude
-          git show origin/fullrepo:AGENTS.md > AGENTS.md
-          mkdir -p .claude
-          git show origin/fullrepo:.claude/CLAUDE.md > .claude/CLAUDE.md
+          for path in AGENTS.md .claude/CLAUDE.md; do
+            if [ ! -f "${path}" ] && git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
+              mkdir -p "$(dirname "${path}")"
+              git show "origin/fullrepo:${path}" > "${path}"
+            fi
+          done
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:
@@ -55,15 +63,24 @@ jobs:
       - name: Install plugin deps
         working-directory: .opencode
         run: bun install --frozen-lockfile
-      - name: Install pytest + PyYAML + jsonschema
-        run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0"
-      - name: Validate config + schema + all indices + tests
+      - name: Install pytest + PyYAML + jsonschema + referencing (pinned)
+        # `referencing` pinned explicitly per integration-review F-1 so the
+        # release gate cannot silently lose this transitive dependency.
+        run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0" "referencing==0.36.2"
+      - name: Validate config + baseline + schema + profiles + indices + tests
+        # Release gate mirrors validate.yml ordering so a green release
+        # implies the same offline-safe gate set. New entries since v0.12.1:
+        # check_baseline_consistency.py (P0-1) and validate_mcp_profiles.py
+        # (P1-3). validate_opencode_schema.py is offline-safe (P0-2).
         run: |
           bash scripts/validate_config.sh
+          python3 scripts/check_baseline_consistency.py
           python3 scripts/validate_opencode_schema.py
+          python3 scripts/validate_mcp_profiles.py
           python3 scripts/generate_skills_index.py --check --strict
           python3 scripts/generate_commands_index.py --check --strict
           python3 scripts/generate_plugins_index.py --check --strict
+          python3 scripts/smoke_mcp_capabilities.py --mode static --json
           python3 -m pytest scripts/tests/ -q
       - name: Typecheck plugins
         working-directory: .opencode

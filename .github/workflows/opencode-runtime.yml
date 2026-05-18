@@ -55,12 +55,16 @@ jobs:
 
       - name: Prepare agent-only validation context
         run: |
+          # Audit P1-5: restore is a FALLBACK, not an overwrite. A push that
+          # already carries AGENTS.md / .claude/CLAUDE.md must keep its own
+          # copy so the runtime resolver sees the same instruction docs the
+          # operator authored.
           set -euo pipefail
           git fetch --no-tags --depth=1 origin fullrepo || true
           bash scripts/fullrepo_sync.sh install-exclude
           if git rev-parse --verify origin/fullrepo >/dev/null 2>&1; then
             for path in AGENTS.md .claude/CLAUDE.md; do
-              if git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
+              if [ ! -f "${path}" ] && git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
                 mkdir -p "$(dirname "${path}")"
                 git show "origin/fullrepo:${path}" > "${path}"
               fi
