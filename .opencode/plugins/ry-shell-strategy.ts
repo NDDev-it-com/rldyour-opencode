@@ -102,7 +102,11 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
           /\brm\s+(-rf?|-fr|--recursive)\s+\/\s*$/i.test(command) ||
           /\brm\s+(-rf?|-fr|--recursive)\s+\$HOME\b/i.test(command) ||
           /\brm\s+(-rf?|-fr|--recursive)\s+~\/?\s*$/i.test(command) ||
-          /\brm\s+(-rf?|-fr|--recursive)\s+\.\s*$/i.test(command)
+          /\brm\s+(-rf?|-fr|--recursive)\s+\.\s*$/i.test(command) ||
+          // Parent-dir traversal: `rm -rf ..` from any project subdirectory
+          // erases the entire project tree. Reviewer wave 2026-05-18 security
+          // F-1 closed this symmetric gap (both rm guards missed `..`).
+          /\brm\s+(-rf?|-fr|--recursive)\s+\.\.\/?\s*$/i.test(command)
         const isNodeModulesCleanup =
           /\brm\s+(-rf?|-fr|--recursive)\s+\S*\/?node_modules\/?\s*$/i.test(command)
         if (dangerous && !isNodeModulesCleanup) {
