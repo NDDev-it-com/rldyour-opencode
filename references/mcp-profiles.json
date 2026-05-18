@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Machine-readable MCP server profiles. Each server in opencode.json.mcp belongs to exactly one profile. Profiles are used by scripts/validate_mcp_profiles.py to enforce skill.requires_mcp coverage and by scripts/smoke_mcp_capabilities.py --mode to bound CI smoke probes. The descriptive trust matrix lives in docs/security/mcp-trust-boundaries.md and stays in sync via the validator.",
+  "version": 1,
+  "updated": "2026-05-18",
+  "profiles": {
+    "base": {
+      "description": "Always-on lightweight servers. Low context cost, no required secrets, safe to spawn on every session. Skills in any domain may rely on these without justification.",
+      "members": [
+        "serena",
+        "sequential-thinking",
+        "dart-flutter"
+      ]
+    },
+    "research": {
+      "description": "Read-only documentation and source-search servers. Network calls only. No write surface. Higher context cost than `base` but bounded by skill design.",
+      "members": [
+        "context7",
+        "deepwiki",
+        "grep",
+        "openai-docs"
+      ]
+    },
+    "browser": {
+      "description": "Browser automation servers spawned via bunx. Required by skills in the Browser and Design domains for UI validation and debugging.",
+      "members": [
+        "playwright",
+        "chrome-devtools"
+      ]
+    },
+    "security": {
+      "description": "Defensive-only static analysis. Skills in the Security domain depend on this profile; other domains must not call security tools without an explicit security-review skill in scope.",
+      "members": [
+        "semgrep"
+      ]
+    },
+    "design": {
+      "description": "Design-system MCP surface (Figma frame context, shadcn registry). Skills in the Design domain depend on this profile.",
+      "members": [
+        "shadcn",
+        "figma"
+      ]
+    },
+    "repo": {
+      "description": "GitHub MCP for repository / PR / issue / actions surface. Listed separately because the GitHub MCP can pull very large context payloads (per OpenCode docs); skills must justify dependency.",
+      "members": [
+        "github"
+      ]
+    }
+  },
+  "high_context": {
+    "description": "Servers known to bring large context payloads — usually because they expose paginated GitHub / Drive / corp-tool data. Including these in a skill's `requires_mcp` is allowed but should be intentional. Audited as a soft warning by scripts/validate_mcp_profiles.py.",
+    "members": [
+      "github"
+    ]
+  }
+}
