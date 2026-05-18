@@ -1,4 +1,18 @@
-"""Integration tests for scripts/fullrepo_sync.sh."""
+"""Integration tests for scripts/fullrepo_sync.sh.
+
+Two test classes live here:
+
+- **Structural / parsing assertions** read the script source directly and
+  do not require git. They always run.
+- **Runtime tests** invoke the script. Those that need PROJECT_ROOT to be
+  a real git checkout (`status-json`, `help` against the live tree) are
+  gated behind `needs_project_git` for archive safety (audit P0-4 —
+  a release tarball extracted without `.git` must not fail this suite).
+  Tests that build their own temp git repos are unconditional.
+
+Every `subprocess.run` call here arms an explicit `timeout=` argument
+per audit P0-4 — no test may rely on an unbounded subprocess.
+"""
 from __future__ import annotations
 
 import json
@@ -9,6 +23,19 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 SCRIPT = PROJECT_ROOT / "scripts" / "fullrepo_sync.sh"
+
+# Default subprocess timeout for git plumbing calls in this suite. Most calls
+# complete in well under 1 s on local checkouts; 10 s is a comfortable upper
+# bound that still catches a hang. Heavier operations (`publish`, full
+# pytest fixtures with `git push`) override this with a larger budget.
+DEFAULT_TIMEOUT = 10
+PUBLISH_TIMEOUT = 60
+
+PROJECT_ROOT_HAS_GIT = (PROJECT_ROOT / ".git").exists()
+needs_project_git = pytest.mark.skipif(
+    not PROJECT_ROOT_HAS_GIT,
+    reason="test requires PROJECT_ROOT to be a git checkout (archive-safe skip)",
+)
 
 
 # ---------- Script structural contract ----------
@@ -48,7 +75,7 @@ def test_secret_scan_uses_recursive_text_grep() -> None:
     assert "--include='*.md'" not in text
 
 
-# ---------- status-json runtime ----------
+# ---------- status-json runtime (require PROJECT_ROOT git) ----------
 
 
 def _run_status_json() -> subprocess.CompletedProcess:
@@ -57,6 +84,7 @@ def _run_status_json() -> subprocess.CompletedProcess:
         check=True,
         capture_output=True,
         cwd=str(PROJECT_ROOT),
+        timeout=DEFAULT_TIMEOUT,
     )
 
 
@@ -65,12 +93,29 @@ def _copy_script_to_tmp_repo(tmp_path: Path) -> Path:
     scripts_dir.mkdir()
     tmp_script = scripts_dir / "fullrepo_sync.sh"
     tmp_script.write_text(SCRIPT.read_text(encoding="utf-8"), encoding="utf-8")
-    subprocess.run(["git", "init", "--initial-branch=main"], check=True, capture_output=True, cwd=tmp_path)
-    subprocess.run(["git", "config", "user.email", "test@example.invalid"], check=True, cwd=tmp_path)
-    subprocess.run(["git", "config", "user.name", "Fullrepo Test"], check=True, cwd=tmp_path)
+    subprocess.run(
+        ["git", "init", "--initial-branch=main"],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
+    subprocess.run(
+        ["git", "config", "user.email", "test@example.invalid"],
+        check=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Fullrepo Test"],
+        check=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
     return tmp_script
 
 
+@needs_project_git
 def test_status_json_emits_well_formed_json() -> None:
     """The wrapper must always produce parsable JSON regardless of
     the local branch/dirty state."""
@@ -79,6 +124,7 @@ def test_status_json_emits_well_formed_json() -> None:
     assert isinstance(parsed, dict)
 
 
+@needs_project_git
 @pytest.mark.parametrize(
     "field,expected_type",
     [
@@ -103,6 +149,7 @@ def test_status_json_field_types(field: str, expected_type: type) -> None:
     )
 
 
+@needs_project_git
 def test_status_json_dirty_is_clean_or_dirty() -> None:
     result = _run_status_json()
     parsed = json.loads(result.stdout.decode("utf-8"))
@@ -121,6 +168,7 @@ def test_status_json_handles_missing_serena_memories(tmp_path: Path) -> None:
         check=True,
         capture_output=True,
         cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
     )
     parsed = json.loads(result.stdout.decode("utf-8"))
     assert parsed["serena_memory_count"] == 0
@@ -145,6 +193,7 @@ def test_install_exclude_writes_canonical_marker(tmp_path: Path) -> None:
         check=True,
         capture_output=True,
         cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
     )
     exclude_text = exclude_file.read_text(encoding="utf-8")
     assert "# >>> rldyour fullrepo agent-only files >>>" in exclude_text
@@ -169,13 +218,41 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
     (tmp_path / "docs" / "tracked.md").write_text("# Tracked docs\n", encoding="utf-8")
     (tmp_path / "references").mkdir()
     (tmp_path / "references" / "tracked.md").write_text("# Tracked refs\n", encoding="utf-8")
-    subprocess.run(["git", "add", "opencode.json", "VERSION", "README.md", ".github", "docs", "references", "scripts"], check=True, cwd=tmp_path)
-    subprocess.run(["git", "commit", "-m", "test: seed main"], check=True, capture_output=True, cwd=tmp_path)
+    subprocess.run(
+        ["git", "add", "opencode.json", "VERSION", "README.md", ".github", "docs", "references", "scripts"],
+        check=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
+    subprocess.run(
+        ["git", "commit", "-m", "test: seed main"],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
 
     origin = tmp_path.parent / f"{tmp_path.name}-origin.git"
-    subprocess.run(["git", "init", "--bare", str(origin)], check=True, capture_output=True, cwd=tmp_path)
-    subprocess.run(["git", "remote", "add", "origin", str(origin)], check=True, cwd=tmp_path)
-    subprocess.run(["git", "push", "-u", "origin", "main"], check=True, capture_output=True, cwd=tmp_path)
+    subprocess.run(
+        ["git", "init", "--bare", str(origin)],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
+    subprocess.run(
+        ["git", "remote", "add", "origin", str(origin)],
+        check=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
+    subprocess.run(
+        ["git", "push", "-u", "origin", "main"],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
 
     (tmp_path / "AGENTS.md").write_text("# Agent Instructions\n", encoding="utf-8")
     (tmp_path / ".claude").mkdir()
@@ -189,7 +266,13 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
     with (tmp_path / ".git" / "info" / "exclude").open("a", encoding="utf-8") as exclude:
         exclude.write("\ndocs/local-only.md\nreferences/local-only.md\nscripts/local-only.sh\n")
 
-    subprocess.run(["bash", str(tmp_script), "publish"], check=True, capture_output=True, cwd=tmp_path)
+    subprocess.run(
+        ["bash", str(tmp_script), "publish"],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+        timeout=PUBLISH_TIMEOUT,
+    )
 
     tree = subprocess.run(
         ["git", "ls-tree", "-r", "--name-only", "origin/fullrepo"],
@@ -197,6 +280,7 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
         capture_output=True,
         text=True,
         cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
     ).stdout.splitlines()
     assert "opencode.json" in tree
     assert "VERSION" in tree
@@ -217,6 +301,7 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
         capture_output=True,
         text=True,
         cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
     )
     parsed = json.loads(status.stdout)
     assert parsed["local_fullrepo_matches_worktree"] is True
@@ -228,6 +313,7 @@ def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> No
         capture_output=True,
         text=True,
         cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
     ).stdout.splitlines()
     paths = [Path(line.split(" ", 1)[1]).resolve() for line in worktrees if line.startswith("worktree ")]
     assert paths == [tmp_path.resolve()]
@@ -241,6 +327,7 @@ def test_help_flag_is_recognised() -> None:
         ["bash", str(SCRIPT), "-h"],
         capture_output=True,
         cwd=str(PROJECT_ROOT),
+        timeout=DEFAULT_TIMEOUT,
     )
     assert result.returncode == 0
     assert b"bootstrap-init" in result.stdout
@@ -252,5 +339,6 @@ def test_unknown_command_returns_nonzero() -> None:
         ["bash", str(SCRIPT), "no-such-cmd"],
         capture_output=True,
         cwd=str(PROJECT_ROOT),
+        timeout=DEFAULT_TIMEOUT,
     )
     assert result.returncode != 0

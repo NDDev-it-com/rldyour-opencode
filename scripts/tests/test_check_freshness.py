@@ -331,6 +331,7 @@ def test_wrapper_default_emits_pin_report() -> None:
         check=True,
         capture_output=True,
         cwd=str(PROJECT_ROOT),
+        timeout=30,
     )
     out = result.stdout.decode("utf-8")
     assert "Pinned dependencies" in out
@@ -343,6 +344,7 @@ def test_wrapper_json_envelope_shape() -> None:
         check=True,
         capture_output=True,
         cwd=str(PROJECT_ROOT),
+        timeout=30,
     )
     env = json.loads(result.stdout.decode("utf-8"))
     assert "pins" in env
@@ -356,6 +358,7 @@ def test_wrapper_unknown_flag_returns_2() -> None:
         ["bash", str(WRAPPER_SH), "--no-such-flag"],
         capture_output=True,
         cwd=str(PROJECT_ROOT),
+        timeout=10,
     )
     assert result.returncode == 2
     assert b"unknown flag" in result.stderr
