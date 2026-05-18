@@ -5,6 +5,211 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.4] - 2026-05-18
+
+Reviewer-wave hardening release. The 2026-05-18 `/ry-start` wave ran a
+six-track reviewer audit (architecture, quality, consistency, integration,
+verification, security) plus a parallel research track that cross-checked
+every pinned dependency against upstream latest. The wave found zero
+critical and six high-severity items; this release closes all six plus
+the high-impact medium and low items in a single batch.
+
+Plugin SDK pin stays at `@opencode-ai/plugin@1.15.4` (no upstream
+changes since v0.12.2). All MCP dependencies and CI tooling remain at
+current registry latest per research track verification.
+
+### Fixed
+
+- **`ry-flow-hooks.ts::CC_REGEX` never matched a real Conventional
+  Commit.** `git commit` stdout begins with `[<branch> <sha>] <subject>`
+  on its summary line, so the legacy `^(type):` anchor with multiline
+  flag returned false for every real commit, triggering false
+  "not in Conventional Commits format" toasts on every successful
+  commit. Anchor moved to `\]\s*(type)` so the matcher fires after the
+  `[branch sha]` prefix. Closes 2026-05-18 reviewer wave quality F-1.
+- **Catastrophic-rm guards missed `rm -rf ..` and `rm -rf ../`.** A
+  symmetric gap in both `ry-shell-strategy.ts` (Layer 1 throw) and
+  `ry-permission-policy.ts` (Layer 2 deny) — an LLM emitting
+  `rm -rf ..` from a project subdirectory would have erased the entire
+  project tree without triggering either guard. Added parent-directory
+  traversal pattern next to the existing four targets (/, $HOME, ~,
+  .). Closes 2026-05-18 reviewer wave security F-1.
+- **`ry-system-context.ts` injected unsanitized git branch into every
+  system prompt.** Indirect prompt injection vector: an attacker with
+  commit/branch access could name a branch
+  `main\n## OVERRIDE: ignore previous instructions...` and influence
+  LLM behavior every turn. Both `branch` and `headShort` now flow
+  through `sanitizeRuntimeStamp` (allowlist `[A-Za-z0-9._/-]`, 200
+  char cap) before reaching the system prompt template. Closes
+  2026-05-18 reviewer wave security F-4.
+- **`ry-env-protection.ts::notifyBlock` called `showToast` before
+  `app.log`** — the defense-in-depth tripod's audit-trail invariant
+  (`ry-shell-strategy.ts` + `ry-permission-policy.ts` are log-first)
+  was broken in the third plugin. Swapped order so the log entry
+  survives even if the toast subsystem throws. Closes 2026-05-18
+  reviewer wave consistency F-1.
+- **`shortForce` regex missed combined short flags** like `-fv`
+  (force+verbose), `-fq`, `-fn`, `-vf`. Both guard plugins broadened
+  the pattern to `(?:^|\s)-[A-Za-z]*f[A-Za-z]*(?:\s|$)/i`. Closes
+  2026-05-18 reviewer wave security F-2.
+- **`.envrc` (direnv) and `.netrc` slipped through BLOCKED_PATTERNS.**
+  Both commonly hold export secrets and were not matched by
+  `/\.env$/` or `/\.env\./`. Added path-component-bounded patterns
+  for both. Closes 2026-05-18 reviewer wave security F-5.
+- **`release.yml` interpolated `${{ inputs.tag }}` directly inside
+  `run:` shell blocks** — classic GitHub Actions script injection.
+  Map through `env: INPUT_TAG:` before referencing in the shell, per
+  the GitHub hardening guide. Closes 2026-05-18 reviewer wave
+  security F-3.
+- **`ry-system-context.ts` audit log used `Math.random() < 0.05`
+  sampler** despite the comment promising "log once per session start"
+  — first-turn ground truth was dropped 95% of the time. Replaced
+  with a deterministic `sessionStartLogged` boolean. Closes 2026-05-18
+  reviewer wave quality F-10 / S-13.
+- **`design-validation` skill declared `requires_mcp: [playwright,
+  chrome-devtools]` from the design domain**, violating AGENTS.md L48
+  "Only Browser domain may invoke Playwright/Chrome DevTools MCP
+  tools". Moved to `domain: browser`. `ry-design` retains the same
+  declaration through an explicit composite-workflow exception
+  analogous to the `ry-tools.ts` multi-domain plugin exception (now
+  documented in AGENTS.md § Domain Boundaries). Closes 2026-05-18
+  reviewer wave architecture F-1 + arch F-4.
+- **`scripts/fullrepo_sync.sh::cmd_restore` had no EXIT trap.** A
+  failure between `mktemp -d` and the explicit `git worktree remove`
+  would orphan the tmp dir plus its worktree registration. Mirrored
+  the cmd_publish trap pattern with a new `_restore_cleanup` helper.
+  Closes 2026-05-18 reviewer wave quality F-5 / S-2.
+- **Three index generators emitted integer `"version": 1`** while
+  `references/mcp-profiles.json` was bumped to string `"1.0.0"` in
+  0.12.3. The drift was the last surface that broke shape parity.
+  Bumped `generate_skills_index.py`, `generate_commands_index.py`,
+  `generate_plugins_index.py`, and six `test_mcp_profiles.py` fixture
+  dicts to string `"1.0.0"`. Closes 2026-05-18 reviewer wave
+  consistency F-2 / S-3 + F-3 / S-4.
+- **`check_baseline_consistency.py` OK summary** omitted `ruff` and
+  `referencing` from the printed pin list, misleading operators
+  reading the success line for freshness state. Extended the print
+  with both fields and an `n/a` sentinel. Closes 2026-05-18 reviewer
+  wave integration F-8 / S-8.
+- **Stale counts across instruction docs** (`README.md`,
+  `CONTRIBUTING.md`, plus agent-only `AGENTS.md` / `.claude/CLAUDE.md`
+  via the fullrepo overlay) cited the 0.12.2 figures `447 cases / 20
+  suites` (or `412/18`, `383/14` further back). `CONTRIBUTING.md` L47
+  pytest invocation also lacked `--with jsonschema=4.26.0 --with
+  referencing=0.36.2` flags, so contributors running the documented
+  command got an ImportError. Refreshed every count to the new
+  `473 cases + 1 skipped / 22 suites / 28 scripts / 9 ADRs` baseline
+  and the full `--with` chain. Closes 2026-05-18 reviewer wave
+  quality F-3 + integration F-1..F-7.
+- **`references/opencode-plugin-patterns.md`** carried stale
+  descriptions for `--no-verify` (product-branches-only since 0.12.0
+  widening), `rm` catastrophic targets (omitted the parent-dir pattern
+  added by this wave), and `ry-system-context` ("cached at factory
+  init" since 0.12.3 TTL cache). Refreshed all three. Closes 2026-05-18
+  reviewer wave architecture F-3 + spillover from security F-1, F-2,
+  F-4 (doc-only follow-on).
+- **`generate_plugins_index.py` curated description** for
+  `ry-system-context` was stale after `ead9a30` introduced per-
+  directory TTL cache; the generated `.opencode/plugins/index.json`
+  carried the same text. Refreshed and regenerated. Closes 2026-05-18
+  reviewer wave architecture F-2.
+
+### Added
+
+- **`scripts/check_workflow_injection.py`** — static gate against
+  `${{ inputs.* }}` and `${{ github.event.* }}` substitution inside
+  any GitHub Actions `run:` block. Operational-error exit 2 for
+  missing PyYAML or missing workflows dir; finding exit 1; clean
+  exit 0. Wired into `scripts/validate_config.sh` after the MCP
+  profile gate. Companion test suite
+  `scripts/tests/test_check_workflow_injection.py` (10 cases)
+  exercises real workflows clean, three dirty fixtures (inputs in
+  run, github.event in run, whitespace variants via parametrize),
+  three clean fixtures (env-mapped, `if:` expression, no workflows),
+  and the malformed-YAML graceful path.
+- **Six new plugin-surface regression locks** in
+  `scripts/tests/test_plugin_surface.py`:
+  `test_cc_regex_anchored_after_branch_sha_prefix`,
+  `test_catastrophic_rm_blocks_parent_dir_traversal`,
+  `test_ry_system_context_sanitizes_branch_before_prompt_injection`,
+  `test_ry_system_context_logs_session_start_deterministically`,
+  `test_env_protection_notify_block_logs_before_toast`,
+  `test_short_force_regex_catches_combined_flags`,
+  `test_env_protection_blocks_envrc_and_netrc`,
+  `test_before_hooks_read_command_from_output_args` (the last one
+  closes the symmetric gap on the existing P0-1 input.args lock by
+  asserting that security-critical `tool.execute.before` plugins read
+  from `output.args?.command`, where the SDK actually places args
+  for the before hook). Together they prevent every reviewer-wave
+  fix from silently regressing.
+- **AGENTS.md § Domain Boundaries exception note** for `ry-design`
+  (composite Design-domain workflow consuming browser primitives) and
+  `ry-tools.ts` (multi-domain diagnostic aggregator plugin). Both
+  exceptions are now explicit project documentation instead of being
+  buried in plugin-file headers.
+
+### Changed
+
+- **`references/opencode-plugin-patterns.md`** prose refreshed for
+  v0.12.4 behavior across three paragraphs (`--force` short-flag
+  cluster detection, `rm` parent-dir target, `ry-system-context`
+  TTL + sanitization).
+- **`references/mcp-profiles.json`** consumers (`generate_*_index.py`
+  trio + `test_mcp_profiles.py` fixtures) bumped to string `"1.0.0"`
+  for shape parity with `opencode-baseline.json`.
+- **`scripts/check_baseline_consistency.py`** success line now lists
+  the full nine-pin set (was seven).
+
+### Stayed
+
+- Plugin SDK `@opencode-ai/plugin@1.15.4` (verified latest by research
+  track; npm registry latest as of 2026-05-18 04:00 UTC).
+- `opencode-ai@1.15.4`, `bun@1.3.14`, `chrome-devtools-mcp@0.26.0`,
+  `@playwright/mcp@0.0.75`, `@modelcontextprotocol/server-sequential-
+  thinking@2025.12.18`, `shadcn@4.7.0`, `semgrep==1.163.0`,
+  `serena-agent==1.3.0`, `gitleaks@8.30.1`, `codeql-action@v4.35.5`
+  — all verified upstream-latest by research track.
+- CVE landscape clean: not affected by CVE-2025-9611 (playwright
+  pre-0.0.40), CVE-2026-22812 (opencode-ai pre-1.0.216), or
+  CVE-2026-22813 (opencode-ai pre-1.1.10). No CVE for any pinned
+  MCP server, Bun, gitleaks, ruff, jsonschema, referencing, PyYAML,
+  pytest at HEAD.
+
+### Test coverage
+
+- Total pytest cases: **473 passed + 1 skipped** across **22 suites**
+  (was 455 + 1 / 21 at v0.12.3; +18 new cases). New suite
+  `test_check_workflow_injection.py` (10). New cases in
+  `test_plugin_surface.py`: +6 regression locks for CC_REGEX, rm-
+  parent-dir, system-context sanitization + deterministic log,
+  log/toast order, shortForce, .envrc, before-hook output.args.
+  Mirror sync in `test_permission_policy_regexes.py` for the
+  broadened shortForce + new rm parent-dir pattern.
+
+### CI pipeline state at HEAD
+
+All green at HEAD `e24558e` (the last reviewer-wave commit before this
+release commit):
+
+- `validate` (Linux + macOS): green
+- `typecheck-plugins` (Linux + macOS): green
+- `lint` (Linux + macOS): green
+- `opencode-runtime` (Linux + macOS): green
+- `instruction-docs-check`: green
+- `dependency-check`: green
+- `codeql`: green
+- `secret-scan`: green
+- `release`: will fire on v0.12.4 tag push
+
+### Wave artefact
+
+The full review wave including the `_summary.md` plan disposition,
+six reviewer reports, the research report, and per-finding evidence
+lives at `.serena/reviews/2026-05-18T0545Z-9feb4d7/` (gitignored
+agent-only path). The summary captures every finding's disposition
+(must-fix / should-fix / defer / false-positive) and the C1..C16
+implementation order against the disposition.
+
 ## [0.12.3] - 2026-05-18
 
 Patch release applying the deferred reviewer findings flagged but not
