@@ -357,6 +357,35 @@ def test_soft_warning_surfaces_when_changelog_omits_plugin_version(tmp_path: Pat
     assert any("1.15.4" in w for w in payload["warnings"])
 
 
+def test_changelog_soft_check_skips_unreleased_block(tmp_path: Path) -> None:
+    _copy_script_with_fixture_baseline(tmp_path, _BASELINE_OK)
+    _seed_files(
+        tmp_path,
+        {
+            ".opencode/package.json": json.dumps(
+                {"dependencies": {"@opencode-ai/plugin": "1.15.4"}}
+            ),
+            ".opencode/bun.lock": (
+                '"@opencode-ai/plugin": ["@opencode-ai/plugin@1.15.4"\n'
+                '"@opencode-ai/sdk": ["@opencode-ai/sdk@1.15.4"\n'
+            ),
+            "references/opencode-config.schema.v1.15.4.json": "{}",
+            "CHANGELOG.md": (
+                "## [Unreleased]\n\n"
+                "## [0.13.0] - 2026-05-18\n"
+                "@opencode-ai/plugin@1.15.4\n"
+            ),
+            ".github/workflows/opencode-runtime.yml": (
+                'install -g opencode-ai@1.15.4\nbun-version: "1.3.14"\n'
+            ),
+        },
+    )
+    proc = _run_fixture(tmp_path, "--json")
+    assert proc.returncode == 0, proc.stdout
+    payload = json.loads(proc.stdout)
+    assert payload["warnings"] == []
+
+
 def test_missing_baseline_returns_operational_error(tmp_path: Path) -> None:
     (tmp_path / "scripts").mkdir()
     (tmp_path / "references").mkdir()
