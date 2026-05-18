@@ -226,6 +226,24 @@ def test_doctor_total_timeout_short_value_completes_quickly() -> None:
     )
 
 
+def test_doctor_exit_3_when_total_timeout_zero() -> None:
+    """Verification-review F-2 closure: `--total-timeout 0` must actually
+    EMIT exit code 3 (total-timeout exceeded), not just allow it. The
+    previous test accepted exit codes {0, 1, 3} which silently passed
+    when the timeout never tripped. Forcing the deadline to 0 makes
+    every check report `timeout` and the process exits 3.
+    """
+    proc = _run_doctor("--total-timeout", "0", "--format", "json")
+    assert proc.returncode == 3, (
+        f"--total-timeout 0 must exit 3 (got {proc.returncode}); "
+        f"stderr={proc.stderr[:500]}"
+    )
+    payload = json.loads(proc.stdout)
+    assert payload["summary"]["timeout"] >= 1, payload["summary"]
+    for r in payload["results"]:
+        assert r["status"] == "timeout", r
+
+
 def test_doctor_baseline_check_passes_when_in_flight_present() -> None:
     """When the baseline-consistency in-flight feature is present, the
     `baseline` check must pass (P0-1 closure verification)."""
