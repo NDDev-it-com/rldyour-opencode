@@ -82,6 +82,17 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+log_step "GitHub Actions script injection scan"
+# Reviewer wave 2026-05-18 security F-3: `${{ inputs.* }}` and
+# `${{ github.event.* }}` in `run:` blocks must be mapped through `env:`
+# before reaching the shell; otherwise an attacker-controlled token can
+# inject shell commands into the runner.
+if python3 "${PROJECT_ROOT}/scripts/check_workflow_injection.py"; then
+    log_ok "Workflow injection scan passed"
+else
+    ERRORS=$((ERRORS + 1))
+fi
+
 log_step "Skills"
 SKILLS_DIR="${PROJECT_ROOT}/.opencode/skills"
 if [ -d "$SKILLS_DIR" ]; then
