@@ -211,8 +211,12 @@ def _check_changelog_release_anchor(plugin_version: str) -> list[str]:
     if not path.exists():
         return [f"CHANGELOG.md missing at {path}"]
     text = path.read_text(encoding="utf-8")
-    # Find the first `## [X.Y.Z]` block and read until the next `## [`.
-    first_release = re.search(r"^## \[[^\]]+\][^\n]*$", text, flags=re.MULTILINE)
+    # Find the first concrete SemVer release block, skipping `[Unreleased]`.
+    first_release = re.search(
+        r"^## \[\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?\][^\n]*$",
+        text,
+        flags=re.MULTILINE,
+    )
     if not first_release:
         return ["CHANGELOG.md has no [X.Y.Z] release header"]
     start = first_release.start()
