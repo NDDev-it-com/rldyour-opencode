@@ -319,6 +319,28 @@ def test_cc_regex_anchored_after_branch_sha_prefix() -> None:
     )
 
 
+
+def test_catastrophic_rm_blocks_parent_dir_traversal() -> None:
+    """Symmetric catastrophic-rm guards in ry-shell-strategy.ts and
+    ry-permission-policy.ts must block `rm -rf ..` and `rm -rf ../`.
+    Reviewer wave 2026-05-18 security F-1 found both guards missed parent-
+    directory traversal. Mirrors the four existing patterns (/, $HOME, ~, .).
+    """
+    for name in ("ry-shell-strategy.ts", "ry-permission-policy.ts"):
+        src = (PLUGINS_DIR / name).read_text(encoding="utf-8")
+        assert "\\.\\.\\/?" in src, (
+            f"{name} must include the `\\.\\.\\/?` pattern to block "
+            f"`rm -rf ..` and `rm -rf ../` (reviewer wave security F-1)."
+        )
+        # Verify pattern positioned inside the dangerous-pattern alternation
+        # (next to the existing `.` pattern), so it benefits from the
+        # node_modules allowlist exception.
+        assert "rm\\s+(-rf?|-fr|--recursive)\\s+\\.\\.\\/?\\s*$" in src, (
+            f"{name} parent-dir traversal pattern must match the canonical "
+            f"shape used by the four sibling rm patterns (anchored at $)."
+        )
+
+
 def test_plugin_spawn_calls_have_timeout_guard() -> None:
     """Any plugin that spawns a child process via `Bun.spawn` must arm a
     timeout that calls `proc.kill()` on the kill path. Without that guard a
