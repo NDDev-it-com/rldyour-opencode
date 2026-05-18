@@ -29,11 +29,6 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     timeout-minutes: 20
     runs-on: ${{ matrix.os }}
-    env:
-      # GitHub Actions is deprecating Node 20 for JavaScript actions. The
-      # latest CycloneDX action tag is still v1.0.3, so opt this job into
-      # Node 24 execution now and keep the release workflow warning-free.
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
@@ -128,10 +123,8 @@ jobs:
             printf 'tag=%s\n' "${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"
           fi
       - name: Generate CycloneDX SBOM
-        uses: CycloneDX/gh-node-module-generatebom@27e13c2bf0fae78d66387b35ca9749d8cc853060  # v1.0.3
-        with:
-          path: .opencode
-          output: sbom.json
+        working-directory: .opencode
+        run: npm sbom --sbom-format cyclonedx > ../sbom.json
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
