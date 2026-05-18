@@ -213,6 +213,36 @@ def test_ry_system_context_injects_runtime_fields() -> None:
     )
 
 
+def test_ry_system_context_uses_ttl_cache_for_branch_and_head() -> None:
+    """Audit P1-6 closure: branch/head must be cached with a TTL rather
+    than computed once at plugin factory init. Otherwise an in-session
+    `git checkout|switch|rebase` leaves the prompt-injected `branch=` and
+    `head=` stamps stale for the rest of the session.
+
+    Pin the structural shape: a numeric TTL constant + a `Date.now()`
+    age comparison gate every read, and a single shared cache slot
+    keyed off the directory.
+    """
+    src = (PLUGINS_DIR / "ry-system-context.ts").read_text(encoding="utf-8")
+    assert "BRANCH_HEAD_CACHE_TTL_MS" in src, (
+        "ry-system-context.ts must define a named TTL constant for the branch/head cache"
+    )
+    assert "Date.now()" in src, (
+        "ry-system-context.ts must compare cache age with Date.now() — "
+        "otherwise the TTL gate is missing"
+    )
+    assert "cachedBranchHead" in src, (
+        "ry-system-context.ts must hold the cache in a named slot for invalidation"
+    )
+    # Regression guard: the legacy 'cache at factory init' pattern stored the
+    # values in `const cachedBranch = await readGitOutput(...)`. The replacement
+    # is a function getter — assert the const-await form is gone.
+    assert "const cachedBranch = " not in src, (
+        "ry-system-context.ts must NOT cache branch/head at factory init; "
+        "use the TTL-cached getter so in-session checkout invalidates correctly"
+    )
+
+
 def test_no_console_log_in_plugin_production_code() -> None:
     """Defensive: 0.10.0 migrated every plugin from `console.log` (server-
     log-only; invisible to the user) to `client.app.log` + `client.tui

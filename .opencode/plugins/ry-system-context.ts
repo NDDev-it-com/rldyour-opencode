@@ -59,6 +59,49 @@ async function readGitOutput(
   }
 }
 
+// TTL cache for branch / HEAD probes (audit P1-6 closure).
+//
+// The previous implementation cached branch / HEAD ONCE at plugin
+// factory init. That worked while every checkout spawned a new OpenCode
+// session, but `/ry-start` and any in-session `git checkout|switch|rebase|
+// worktree add` would leave the cache stale for the remainder of the
+// session — the LLM kept seeing the original branch name long after it
+// had moved.
+//
+// 3 s TTL is short enough that any cross-turn drift is invisible in
+// practice (a chat turn usually takes >> 3 s), yet long enough to dampen
+// the hot path: `experimental.chat.system.transform` fires per completion
+// turn and would otherwise spawn three `git` subprocesses every time.
+// `git status --porcelain` is still spawned per call because dirty count
+// is the most volatile of the three signals.
+const BRANCH_HEAD_CACHE_TTL_MS = 3_000
+
+interface BranchHeadCache {
+  ts: number
+  branch: string
+  headShort: string
+}
+
+let cachedBranchHead: BranchHeadCache | null = null
+
+async function getBranchAndHead(directory: string): Promise<{ branch: string; headShort: string }> {
+  const now = Date.now()
+  if (cachedBranchHead && now - cachedBranchHead.ts < BRANCH_HEAD_CACHE_TTL_MS) {
+    return { branch: cachedBranchHead.branch, headShort: cachedBranchHead.headShort }
+  }
+  const [branch, headShort] = await Promise.all([
+    readGitOutput(directory, ["rev-parse", "--abbrev-ref", "HEAD"]),
+    readGitOutput(directory, ["rev-parse", "--short=7", "HEAD"]),
+  ])
+  const next: BranchHeadCache = {
+    ts: now,
+    branch: branch || "unknown",
+    headShort: headShort || "unknown",
+  }
+  cachedBranchHead = next
+  return { branch: next.branch, headShort: next.headShort }
+}
+
 export const RySystemContext: Plugin = async ({ client, directory }) => {
   async function log(message: string): Promise<void> {
     try {
@@ -68,22 +111,14 @@ export const RySystemContext: Plugin = async ({ client, directory }) => {
     }
   }
 
-  // Performance: `branch` and `headShort` are session-stable in any normal
-  // workflow (a checkout creates a new OpenCode session via /ry-init).
-  // Cache them once at factory init so the hot path (`experimental.chat
-  // .system.transform` fires per chat completion turn) only spawns the
-  // turn-volatile `git status --porcelain` probe — saves 2 subprocess
-  // spawns per turn × N turns per session.
-  const cachedBranch = (await readGitOutput(directory, ["rev-parse", "--abbrev-ref", "HEAD"])) || "unknown"
-  const cachedHeadShort = (await readGitOutput(directory, ["rev-parse", "--short=7", "HEAD"])) || "unknown"
-
   return {
     "experimental.chat.system.transform": async (_input, output) => {
       const today = new Date().toISOString().slice(0, 10)
+      const { branch, headShort } = await getBranchAndHead(directory)
       const status = await readGitOutput(directory, ["status", "--porcelain"])
       const dirty = status.length > 0 ? `dirty (${status.split("\n").length} files)` : "clean"
 
-      const line = `[rldyour runtime] date=${today} branch=${cachedBranch} head=${cachedHeadShort} worktree=${dirty}`
+      const line = `[rldyour runtime] date=${today} branch=${branch} head=${headShort} worktree=${dirty}`
       output.system.push(line)
 
       // Log once per session start ground truth so the audit trail records
