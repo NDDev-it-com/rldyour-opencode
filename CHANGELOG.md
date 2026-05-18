@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-05-18
+
+Minor release establishing the production policy for public-repository CI/CD
+automation.
+
 ### Added
 
 - **Public repository CI/CD policy.** OpenCode now loads
@@ -19,6 +24,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   OpenCode instruction wiring, the `share`/CI distinction, command-template
   references, and the invariant that public-repo workflows are not
   manual-only by default.
+
+### Changed
+
+- **Flow commands now verify public-repo CI/CD by default.** `/ry-start`,
+  `/ry-sync`, and `/ry-deploy` now treat existing GitHub Actions workflows as
+  the default remote verification surface for verified public repositories,
+  while workflow edits, branch protection, environments, secrets, variables,
+  tags, and release governance remain explicit owner-controlled mutations.
+  Runtime/plugin baseline remains `opencode-ai` / `@opencode-ai/plugin` / SDK
+  `1.15.4`.
+
+### Fixed
+
+- **Baseline checker skips the Unreleased placeholder.**
+  `scripts/check_baseline_consistency.py` now anchors the soft plugin-version
+  check to the latest concrete SemVer release block instead of the
+  `[Unreleased]` placeholder, keeping release validation warning-free while the
+  changelog remains ready for the next development cycle.
 
 ## [0.12.11] - 2026-05-18
 
