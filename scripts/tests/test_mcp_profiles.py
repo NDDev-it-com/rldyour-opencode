@@ -10,7 +10,6 @@ Every `subprocess.run` here arms an explicit `timeout=` per audit P0-4.
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -299,6 +298,3 @@ def test_validator_missing_profiles_file_returns_two(tmp_path: Path) -> None:
     assert "required file missing" in proc.stderr
 
 
-# Use shutil so the import is not flagged unused on platforms where the
-# fixture-based tests do not exercise it.
-_ = shutil
