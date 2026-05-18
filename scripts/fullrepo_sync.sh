@@ -23,6 +23,16 @@ RUNTIME_EXCLUDE_PATTERNS=(
   ".serena/.dirty_stop_ack"
   ".serena/.gitignore"
   ".serena/.command_audit.log"
+  # Review wave artefacts (created by /ry-start + /ry-review reviewer phase)
+  # and diagnostic bundles (scripts/collect_diagnostics.sh) are per-run
+  # transient evidence files — they are namely kept visible in the worktree
+  # via `!/.serena/reviews/**` and `!/.serena/diagnostics/**` in
+  # .git/info/exclude so the owner can audit them, but they MUST not enter
+  # the fullrepo snapshot. Their contents (CVE numbers, attack paths,
+  # finding bodies) also trip the publish-time secret-scan heuristic, so
+  # excluding them keeps `publish` deterministic.
+  ".serena/reviews/"
+  ".serena/diagnostics/"
   ".opencode/local.json"
   ".opencode/node_modules/"
   "browser/"
