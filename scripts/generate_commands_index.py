@@ -128,7 +128,7 @@ def build_index() -> dict[str, Any]:
             },
         )
     return {
-        "version": 1,
+        "version": "1.0.0",
         "generated_by": "scripts/generate_commands_index.py",
         "count": len(commands),
         "commands": commands,

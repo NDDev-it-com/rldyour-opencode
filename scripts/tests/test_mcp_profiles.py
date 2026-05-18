@@ -136,7 +136,7 @@ def test_validator_detects_unassigned_server(tmp_path: Path) -> None:
         "mcp": {"serena": {"type": "local"}, "ghost": {"type": "remote", "url": "https://x"}},
     }
     profiles = {
-        "version": 1,
+        "version": "1.0.0",
         "profiles": {"base": {"description": "x", "members": ["serena"]}},
     }
     (tmp_path / "opencode.json").write_text(json.dumps(cfg), encoding="utf-8")
@@ -167,7 +167,7 @@ def test_validator_detects_unassigned_server(tmp_path: Path) -> None:
 def test_validator_detects_duplicate_membership(tmp_path: Path) -> None:
     cfg = {"mcp": {"serena": {"type": "local"}}}
     profiles = {
-        "version": 1,
+        "version": "1.0.0",
         "profiles": {
             "base": {"description": "x", "members": ["serena"]},
             "research": {"description": "y", "members": ["serena"]},
@@ -202,11 +202,11 @@ def test_validator_skill_requires_unknown_mcp(tmp_path: Path) -> None:
     """A skill requiring an MCP server not in opencode.json must fail."""
     cfg = {"mcp": {"serena": {"type": "local"}}}
     profiles = {
-        "version": 1,
+        "version": "1.0.0",
         "profiles": {"base": {"description": "x", "members": ["serena"]}},
     }
     skills_index = {
-        "version": 1,
+        "version": "1.0.0",
         "skills": [
             {"name": "bogus-skill", "domain": "flow", "requires_mcp": ["ghost"], "network": False}
         ],
@@ -241,12 +241,12 @@ def test_validator_high_context_soft_warning(tmp_path: Path) -> None:
     """A skill that depends on a high_context server emits a soft warning."""
     cfg = {"mcp": {"github": {"type": "remote", "url": "https://x"}}}
     profiles = {
-        "version": 1,
+        "version": "1.0.0",
         "profiles": {"repo": {"description": "x", "members": ["github"]}},
         "high_context": {"description": "heavy", "members": ["github"]},
     }
     skills_index = {
-        "version": 1,
+        "version": "1.0.0",
         "skills": [
             {"name": "uses-github", "domain": "flow", "requires_mcp": ["github"], "network": True}
         ],
