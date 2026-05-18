@@ -23,6 +23,14 @@ log_ok()   { echo -e "${GREEN}[OK]${NC} $1"; }
 log_err()  { echo -e "${RED}[ERR]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_info() { echo -e "${YELLOW}[INFO]${NC} $1"; }
+# Consistency review: [FAIL] is the 5th canonical tag introduced by the
+# 0.12.2 validators (check_baseline_consistency.py, validate_mcp_profiles.py).
+# Wrapping it here so shell-rendered lines pick up the same red color the
+# validators emit on stderr, keeping the operator visual contract symmetric.
+# shellcheck disable=SC2329  # helper reserved for future bash-level fail
+#                            # tagging; today's [FAIL] lines come straight
+#                            # from Python validator stderr.
+log_fail() { echo -e "${RED}[FAIL]${NC} $1"; }
 
 if [ ! -f "$HELPER" ]; then
     log_err "Missing Python helper: ${HELPER}"
