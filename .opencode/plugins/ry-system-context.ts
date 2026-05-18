@@ -59,7 +59,8 @@ async function readGitOutput(
   }
 }
 
-// TTL cache for branch / HEAD probes (audit P1-6 closure).
+// TTL cache for branch / HEAD probes (audit P1-6 closure +
+// integration-review F-3 hardening).
 //
 // The previous implementation cached branch / HEAD ONCE at plugin
 // factory init. That worked while every checkout spawned a new OpenCode
@@ -74,6 +75,11 @@ async function readGitOutput(
 // turn and would otherwise spawn three `git` subprocesses every time.
 // `git status --porcelain` is still spawned per call because dirty count
 // is the most volatile of the three signals.
+//
+// The cache is keyed by `directory` so an OpenCode session that spans
+// multiple worktrees / project roots (rare today but possible with
+// experimental workspace mode) never serves a `branch=` stamp from the
+// wrong tree. Single-directory invocations still hit the same entry.
 const BRANCH_HEAD_CACHE_TTL_MS = 3_000
 
 interface BranchHeadCache {
@@ -82,12 +88,13 @@ interface BranchHeadCache {
   headShort: string
 }
 
-let cachedBranchHead: BranchHeadCache | null = null
+const cacheByDirectory = new Map<string, BranchHeadCache>()
 
 async function getBranchAndHead(directory: string): Promise<{ branch: string; headShort: string }> {
   const now = Date.now()
-  if (cachedBranchHead && now - cachedBranchHead.ts < BRANCH_HEAD_CACHE_TTL_MS) {
-    return { branch: cachedBranchHead.branch, headShort: cachedBranchHead.headShort }
+  const entry = cacheByDirectory.get(directory)
+  if (entry && now - entry.ts < BRANCH_HEAD_CACHE_TTL_MS) {
+    return { branch: entry.branch, headShort: entry.headShort }
   }
   const [branch, headShort] = await Promise.all([
     readGitOutput(directory, ["rev-parse", "--abbrev-ref", "HEAD"]),
@@ -98,7 +105,7 @@ async function getBranchAndHead(directory: string): Promise<{ branch: string; he
     branch: branch || "unknown",
     headShort: headShort || "unknown",
   }
-  cachedBranchHead = next
+  cacheByDirectory.set(directory, next)
   return { branch: next.branch, headShort: next.headShort }
 }
 

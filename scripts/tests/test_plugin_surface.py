@@ -231,9 +231,15 @@ def test_ry_system_context_uses_ttl_cache_for_branch_and_head() -> None:
         "ry-system-context.ts must compare cache age with Date.now() — "
         "otherwise the TTL gate is missing"
     )
-    assert "cachedBranchHead" in src, (
-        "ry-system-context.ts must hold the cache in a named slot for invalidation"
-    )
+    # Integration-review F-3 closure: the cache is keyed by `directory`
+    # via a Map so multi-worktree sessions cannot serve a stale entry
+    # from the wrong tree. Catch either the old singleton name
+    # (cachedBranchHead) or the new Map (cacheByDirectory) — both are
+    # acceptable, but the cache must exist in a named slot the
+    # invalidation contract can talk about.
+    assert (
+        "cacheByDirectory" in src or "cachedBranchHead" in src
+    ), "ry-system-context.ts must hold the cache in a named slot for invalidation"
     # Regression guard: the legacy 'cache at factory init' pattern stored the
     # values in `const cachedBranch = await readGitOutput(...)`. The replacement
     # is a function getter — assert the const-await form is gone.
