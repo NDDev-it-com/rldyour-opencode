@@ -185,6 +185,102 @@ def test_main_json_mode_emits_envelope(capsys: pytest.CaptureFixture[str]) -> No
     out = capsys.readouterr().out
     payload = json.loads(out)
     assert rc == 0
-    assert set(payload.keys()) >= {"results", "failed", "indeterminate", "total"}
+    assert set(payload.keys()) >= {"results", "failed", "indeterminate", "total", "mode"}
     assert payload["failed"] == 0
     assert payload["indeterminate"] >= 1
+    assert payload["mode"] == "all"
+
+
+# ---------------------------------------------------------------------------
+# --mode profiles (audit P1-4 closure)
+# ---------------------------------------------------------------------------
+
+
+def test_mode_static_emits_descriptors_without_spawning(capsys: pytest.CaptureFixture[str]) -> None:
+    """static mode must NOT call probe_remote / probe_local — it only parses."""
+    with mock.patch.object(smoke, "probe_remote") as remote_mock:
+        with mock.patch.object(smoke, "probe_local") as local_mock:
+            with mock.patch.object(
+                sys, "argv", ["smoke_mcp_capabilities.py", "--mode", "static", "--json"]
+            ):
+                rc = smoke.main()
+    out = capsys.readouterr().out
+    payload = json.loads(out)
+    assert rc == 0
+    assert payload["mode"] == "static"
+    # Probes are not invoked in static mode.
+    remote_mock.assert_not_called()
+    local_mock.assert_not_called()
+    for r in payload["results"]:
+        assert r["status"] == "static"
+        assert "profile" in r, r
+
+
+def test_mode_local_launch_skips_remote_entries(capsys: pytest.CaptureFixture[str]) -> None:
+    """local-launch mode only spawns local entries; remote entries are skipped_by_mode."""
+    with mock.patch.object(smoke, "probe_remote") as remote_mock:
+        with mock.patch.object(
+            smoke, "probe_local", side_effect=lambda n, c: {"name": n, "kind": "local", "status": "skip", "reason": "x"}
+        ):
+            with mock.patch.object(
+                sys, "argv", ["smoke_mcp_capabilities.py", "--mode", "local-launch", "--json"]
+            ):
+                rc = smoke.main()
+    out = capsys.readouterr().out
+    payload = json.loads(out)
+    assert rc == 0
+    assert payload["mode"] == "local-launch"
+    remote_mock.assert_not_called()
+    # Every emitted result is for a local server
+    for r in payload["results"]:
+        assert r["kind"] == "local"
+    assert payload["skipped_by_mode"], (
+        "local-launch must mark remote servers as skipped_by_mode"
+    )
+
+
+def test_mode_remote_head_skips_local_entries(capsys: pytest.CaptureFixture[str]) -> None:
+    with mock.patch.object(smoke, "probe_local") as local_mock:
+        with mock.patch.object(
+            smoke, "probe_remote", side_effect=lambda n, u: {"name": n, "kind": "remote", "status": "alive"}
+        ):
+            with mock.patch.object(
+                sys, "argv", ["smoke_mcp_capabilities.py", "--mode", "remote-head", "--json"]
+            ):
+                rc = smoke.main()
+    out = capsys.readouterr().out
+    payload = json.loads(out)
+    assert rc == 0
+    assert payload["mode"] == "remote-head"
+    local_mock.assert_not_called()
+    for r in payload["results"]:
+        assert r["kind"] == "remote"
+    assert payload["skipped_by_mode"], (
+        "remote-head must mark local servers as skipped_by_mode"
+    )
+
+
+def test_mode_all_remains_default_behaviour(capsys: pytest.CaptureFixture[str]) -> None:
+    with mock.patch.object(
+        smoke, "probe_remote", side_effect=lambda n, u: {"name": n, "kind": "remote", "status": "alive"}
+    ):
+        with mock.patch.object(
+            smoke, "probe_local", side_effect=lambda n, c: {"name": n, "kind": "local", "status": "skip", "reason": "x"}
+        ):
+            with mock.patch.object(sys, "argv", ["smoke_mcp_capabilities.py", "--json"]):
+                rc = smoke.main()
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["mode"] == "all"
+    assert rc == 0
+    kinds = {r["kind"] for r in payload["results"]}
+    assert "remote" in kinds and "local" in kinds
+
+
+def test_invalid_mode_rejected_by_argparse(capsys: pytest.CaptureFixture[str]) -> None:
+    """Argparse choices must reject unknown mode names with exit 2."""
+    with mock.patch.object(sys, "argv", ["smoke_mcp_capabilities.py", "--mode", "bogus"]):
+        with pytest.raises(SystemExit) as excinfo:
+            smoke.main()
+    assert excinfo.value.code == 2
+    err = capsys.readouterr().err
+    assert "invalid choice" in err or "usage" in err
