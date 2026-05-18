@@ -16,7 +16,11 @@ concurrency:
 
 jobs:
   freshness:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
       # Actions pinned to commit SHA — see validate.yml header for rationale.

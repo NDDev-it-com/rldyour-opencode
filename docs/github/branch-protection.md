@@ -61,7 +61,7 @@ restored separately if branch protection is reset.
 | Workflow file | Workflow name | Job | Trigger | Notes |
 |---|---|---|---|---|
 | `dependency-check.yml` | `Dependency Freshness` | `freshness` | schedule + workflow_dispatch | weekly pin + freshness probe + remote-head/local-launch MCP smoke; not gated on PR |
-| `dependency-review.yml` | `Dependency Review` | `dependency-review` | pull_request | requires Dependency Graph + GHAS; skipped on private repos without GHAS |
+| `dependency-review.yml` | `Dependency Review` | `dependency-review` | pull_request | runs on pull requests; pass/fail follows repository Dependency Graph availability and action outcome |
 | `sbom.yml` | `SBOM Snapshot` | `cyclonedx` | release + workflow_dispatch | optional artifact |
 | `release.yml` | `Release` | `verify` | tag push + workflow_dispatch | tag-triggered, not PR-required |
 

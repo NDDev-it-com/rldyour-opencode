@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.5] - 2026-05-18
+
+Open-source hardening and release-readiness release. This wave moves the
+repository to AGPL-3.0-only licensing, marks explicit authorship, and
+normalizes CI/CD behavior for public Linux/macOS operation before preparing the
+public upstream publication and release.
+
+### Added
+
+- **Project license changed to AGPL-3.0-only.** `LICENSE` now contains the full
+  GNU Affero General Public License, version 3.0, and includes project
+  attribution for `Danil Silantyev (rldyourmnd), CEO NDDev`.
+- **Public-facing repository metadata aligned to the canonical org/owner.**
+  `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, and `docs/observability.md`
+  now use the `NDDev-it-com/rldyour-opencode` publish target plus maintainer
+  identity.
+
+### Changed
+
+- **CI/CD Linux/macOS parity improved.**
+  `.github/workflows/dependency-check.yml` now runs on `ubuntu-latest` and
+  `macos-latest` via matrix.
+- **Dependency Review behavior normalized for public repos.**
+  `.github/workflows/dependency-review.yml` no longer short-circuits for
+  private-repository execution mode and always runs the dependency-review action
+  on PR paths where it is present in the workflow trigger.
+- **Version bump for release track.** `VERSION` advanced to `0.12.5`.
+
+### Fixed
+
+- **Documentation consistency for maintainer identity and licensing contract.**
+  `README`, `CONTRIBUTING`, `.claude/CLAUDE.md`, `SECURITY`, and
+  `docs/observability` no longer carry stale identity and ownership references
+  before the public release cut.
+
+
 ## [0.12.4] - 2026-05-18
 
 Reviewer-wave hardening release. The 2026-05-18 `/ry-start` wave ran a

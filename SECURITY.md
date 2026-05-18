@@ -16,7 +16,7 @@ When a security issue is reported against an unsupported version, the project wi
 
 ### Private disclosure channels
 
-1. **GitHub Security Advisories (preferred)**: Open a private advisory at https://github.com/rldyourmnd/rldyour-opencode/security/advisories/new. This automatically grants the maintainer access without exposing the report publicly.
+1. **GitHub Security Advisories (preferred)**: Open a private advisory at https://github.com/NDDev-it-com/rldyour-opencode/security/advisories/new. This automatically grants the maintainer access without exposing the report publicly.
 2. **Email**: Send a PGP-encrypted message to the email address listed in the repository owner's GitHub profile. If PGP is not practical, plain email is acceptable for low-severity reports.
 
 ### What to include

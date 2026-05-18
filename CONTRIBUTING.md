@@ -27,7 +27,7 @@ The `fullrepo` branch is managed via `scripts/fullrepo_sync.sh`. Do not commit a
 
 ```bash
 # Prerequisites: Python 3.13, Bun 1.2+, uvx (uv), bash, git
-git clone https://github.com/rldyourmnd/rldyour-opencode.git
+git clone https://github.com/NDDev-it-com/rldyour-opencode.git
 cd rldyour-opencode
 
 # Install plugin SDK dependencies (used by typecheck workflow)
@@ -130,4 +130,4 @@ Memory files at `.serena/memories/AREA-NN-SLUG.md` contain verified durable fact
 
 - Operational: open a GitHub issue using the `config_question.md` template.
 - Security: see [SECURITY.md](./SECURITY.md). Do not file public issues for vulnerabilities.
-- Repository owner: `rldyourmnd`.
+- Repository owner: `NDDev` (`rldyourmnd`), maintainer: `Danil Silantyev`.
