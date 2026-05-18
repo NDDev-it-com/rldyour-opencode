@@ -96,7 +96,11 @@ export const RyPermissionPolicy: Plugin = async ({ client }) => {
           /\brm\s+(-rf?|-fr|--recursive)\s+\/\s*$/i.test(cmd) ||
           /\brm\s+(-rf?|-fr|--recursive)\s+\$HOME\b/i.test(cmd) ||
           /\brm\s+(-rf?|-fr|--recursive)\s+~\/?\s*$/i.test(cmd) ||
-          /\brm\s+(-rf?|-fr|--recursive)\s+\.\s*$/i.test(cmd)
+          /\brm\s+(-rf?|-fr|--recursive)\s+\.\s*$/i.test(cmd) ||
+          // Parent-dir traversal: `rm -rf ..` from any project subdirectory
+          // erases the entire project tree. Mirrors ry-shell-strategy.ts
+          // Layer 1; reviewer wave 2026-05-18 security F-1 closure.
+          /\brm\s+(-rf?|-fr|--recursive)\s+\.\.\/?\s*$/i.test(cmd)
         const isNodeModulesCleanup = /\brm\s+(-rf?|-fr|--recursive)\s+\S*\/?node_modules\/?\s*$/i.test(cmd)
         if (dangerous && !isNodeModulesCleanup) {
           output.status = "deny"
