@@ -33,7 +33,7 @@ class PolicyRegexes:
 
     is_push: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\bgit\s+push\b", re.IGNORECASE))
     long_force: re.Pattern[str] = field(default_factory=lambda: re.compile(r"(?<![A-Za-z0-9-])--force(?![A-Za-z0-9-])", re.IGNORECASE))
-    short_force: re.Pattern[str] = field(default_factory=lambda: re.compile(r"(?:^|\s)-f(?:\s|$)"))
+    short_force: re.Pattern[str] = field(default_factory=lambda: re.compile(r"(?:^|\s)-[A-Za-z]*f[A-Za-z]*(?:\s|$)"))
     lease: re.Pattern[str] = field(default_factory=lambda: re.compile(r"(?<![A-Za-z0-9-])--force-with-lease(?![A-Za-z0-9-])", re.IGNORECASE))
     rm_root: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\brm\s+(-rf?|-fr|--recursive)\s+/\s*$", re.IGNORECASE))
     rm_home_var: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\brm\s+(-rf?|-fr|--recursive)\s+\$HOME\b", re.IGNORECASE))
@@ -208,12 +208,18 @@ def test_typescript_source_uses_same_regexes() -> None:
         r"(?<![A-Za-z0-9-])",
         r"(?![A-Za-z0-9-])",
         r"--force",
-        r"(?:^|\s)-f(?:\s|$)",
+        # shortForce regex widened by reviewer wave 2026-05-18 security F-2
+        # to catch combined-flag clusters like `-fv`, `-fq`, `-fn`, `-vf`.
+        r"(?:^|\s)-[A-Za-z]*f[A-Za-z]*(?:\s|$)",
         r"--force-with-lease",
         r"\brm\s+(-rf?|-fr|--recursive)\s+\/\s*$",
         r"\brm\s+(-rf?|-fr|--recursive)\s+\$HOME\b",
         r"\brm\s+(-rf?|-fr|--recursive)\s+~\/?\s*$",
         r"\brm\s+(-rf?|-fr|--recursive)\s+\.\s*$",
+        # Parent-dir traversal pattern added by reviewer wave 2026-05-18
+        # security F-1: `rm -rf ..` from a project subdirectory would
+        # otherwise erase the entire tree.
+        r"\brm\s+(-rf?|-fr|--recursive)\s+\.\.\/?\s*$",
         r"\brm\s+(-rf?|-fr|--recursive)\s+\S*\/?node_modules\/?\s*$",
         r"--no-verify",
         r"\b(main|master|release|production)\b",
