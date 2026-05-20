@@ -34,6 +34,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Default shell is portable Bash.** `opencode.json.shell` now uses
   `/bin/bash`, and `_validate_helpers.py` validates absolute/relative shell
   executables.
+- **Local plugin package metadata is explicit.** `.opencode/package.json` now
+  declares AGPL-3.0-only licensing and canonical authorship for Danil Silantyev
+  (`github:rldyourmnd`), CEO & Engineer NDDev. The baseline validator fails if
+  this package metadata drifts.
+- **OpenCode runtime baseline updated to 1.15.5.** Local runtime resolution
+  reported `opencode --version` as `1.15.5`; `.opencode/package.json`,
+  `.opencode/bun.lock`, `references/opencode-baseline.json`, and the runtime
+  workflow now align on `opencode-ai` / `@opencode-ai/plugin` / SDK `1.15.5`.
+- **Generated fullrepo commits use owner identity by default.**
+  `scripts/fullrepo_sync.sh` now falls back to Danil Silantyev
+  (`rldyourmnd@users.noreply.github.com`) for author and committer identity
+  instead of a repository-local placeholder.
 
 ## [0.13.1] - 2026-05-18
 
@@ -235,7 +247,7 @@ release/documentation artifacts are synchronized with the current repository sta
 - **Release-track hygiene for public publication.**
   `VERSION` and `CHANGELOG.md` are now updated for a consistent final public
   cut that explicitly carries maintainer identity:
-  `Danil Silantyev (rldyourmnd), CEO NDDev`.
+  `Danil Silantyev (rldyourmnd), CEO & Engineer NDDev`.
 
 ## [0.12.5] - 2026-05-18
 
@@ -248,7 +260,7 @@ public upstream publication and release.
 
 - **Project license changed to AGPL-3.0-only.** `LICENSE` now contains the full
   GNU Affero General Public License, version 3.0, and includes project
-  attribution for `Danil Silantyev (rldyourmnd), CEO NDDev`.
+  attribution for `Danil Silantyev (rldyourmnd), CEO & Engineer NDDev`.
 - **Runtime and baseline versions aligned.** `@opencode-ai/plugin` is pinned to
   `1.15.4` in `.opencode/package.json` and `.opencode/bun.lock`, matching
   `references/opencode-baseline.json` and `opencode-runtime.yml` checks.

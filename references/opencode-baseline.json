@@ -2,22 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Single source of truth for every pinned dependency the marketplace targets. Validators read this file and compare against opencode.json, .opencode/package.json, .opencode/bun.lock, workflow installations, and README/CHANGELOG text. Any drift fails CI. Bump these values in one place and let `scripts/check_baseline_consistency.py` find every reference that needs updating.",
   "version": "1.0.0",
-  "updated": "2026-05-18",
+  "updated": "2026-05-21",
   "baseline": {
     "opencode_cli": {
-      "version": "1.15.4",
+      "version": "1.15.5",
       "npm_package": "opencode-ai",
-      "ref": "https://github.com/sst/opencode/releases/tag/v1.15.4"
+      "ref": "https://github.com/sst/opencode/releases/tag/v1.15.5"
     },
     "plugin_sdk": {
-      "version": "1.15.4",
+      "version": "1.15.5",
       "npm_package": "@opencode-ai/plugin",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.15.4"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.15.5"
     },
     "sdk": {
-      "version": "1.15.4",
+      "version": "1.15.5",
       "npm_package": "@opencode-ai/sdk",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.15.4"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.15.5"
     },
     "config_schema": {
       "version": "v1.15.4",

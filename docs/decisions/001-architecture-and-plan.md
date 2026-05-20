@@ -119,7 +119,7 @@ rldyour-opencode/
 ---
 name: skill-name
 description: 1-1024 char description
-license: MIT (optional)
+license: AGPL-3.0-only
 compatibility: opencode (optional)
 metadata: (optional string-to-string map)
 ---
