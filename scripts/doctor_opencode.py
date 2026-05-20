@@ -189,6 +189,38 @@ def check_plugins() -> dict[str, Any]:
     return _result("plugins.index", "ok", started, [f"{count} plugins, index present"])
 
 
+def _run_script_check(name: str, script_name: str) -> dict[str, Any]:
+    started = time.monotonic_ns()
+    script = REPO_ROOT / "scripts" / script_name
+    if not script.exists():
+        return _result(name, "skip", started, [f"{script_name} not present"])
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(script)],
+            cwd=REPO_ROOT,
+            timeout=_per_check_budget(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return _result(name, "timeout", started, [f"{script_name} exceeded {_per_check_budget()}s"])
+    if proc.returncode == 0:
+        lines = [line for line in proc.stdout.splitlines() if line.strip()]
+        return _result(name, "ok", started, lines[-3:] or [f"{script_name} passed"])
+    return _result(name, "fail", started, [
+        line for line in (proc.stderr.splitlines() or proc.stdout.splitlines()) if line.strip()
+    ][:10])
+
+
+def check_plugin_hooks() -> dict[str, Any]:
+    return _run_script_check("plugins.hooks", "check_plugin_hooks.py")
+
+
+def check_contract() -> dict[str, Any]:
+    return _run_script_check("contract.adapter", "validate_contract.py")
+
+
 def check_agents() -> dict[str, Any]:
     started = time.monotonic_ns()
     count = _count_files(".opencode/agents", "*.md")
@@ -276,6 +308,8 @@ CHECKS: dict[str, Callable[[], dict[str, Any]]] = {
     "skills": check_skills,
     "commands": check_commands,
     "plugins": check_plugins,
+    "plugin-hooks": check_plugin_hooks,
+    "contract": check_contract,
     "agents": check_agents,
     "mcp": check_mcp,
     "serena": check_serena,

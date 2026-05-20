@@ -58,10 +58,10 @@ Out of scope:
 
 The marketplace ships several defense-in-depth controls that vulnerability reports should be aware of:
 
-- **`.opencode/plugins/ry-shell-strategy.ts`** + **`.opencode/plugins/ry-permission-policy.ts`** unconditionally block `git push --force` without lease, catastrophic `rm -rf` targets (root / `$HOME` / `~` / cwd), and `git push --no-verify` on product branches. Two layers (unconditional `tool.execute.before` and deny-only `permission.ask`) cover both `bash: allow` and `bash: ask` permission profiles.
+- **`.opencode/plugins/ry-shell-strategy.ts`** unconditionally blocks `git push --force` without lease, catastrophic `rm -rf` targets (root / `$HOME` / `~` / cwd / parent dir), and `git push --no-verify` unless `RY_ALLOW_NO_VERIFY=1` is explicitly set. Dynamic enforcement uses `tool.execute.before`; `permission.ask` is forbidden as a security boundary by `scripts/check_plugin_hooks.py`.
 - **`.opencode/plugins/ry-env-protection.ts`** blocks reading sensitive paths (`.env`, `.pem`, `.key`, `.p12`, `.pfx`, `.ssh/`, `.gnupg/`, `.aws/credentials`, generic `secret` / `private_key` / `service_account`) through `read` and an extended set of bash dumping / scripting / redirect patterns. `.env.example`, `.env.template`, `.env.sample` remain allowlisted.
 - **`.opencode/plugins/ry-command-audit.ts`** + **`scripts/_sanitize_diag.py`** redact credential-shaped substrings (Context7 / OpenAI / Anthropic / GitHub PATs / GitLab PATs / AWS / Slack / JWT / PEM) before any text is persisted to local logs or diagnostic bundles.
 - **`scripts/_validate_helpers.py`** rejects unknown permission keys against the v1.15.x canonical set; project-side defense against upstream issue `sst/opencode#15507`.
-- **CI hardens** all workflows with SHA-pinned actions, least-privilege `permissions:` blocks, concurrency cancel-in-progress groups, per-job timeouts, and a CodeQL + gitleaks + dependency-review trio.
+- **CI hardens** all workflows with SHA-pinned actions, least-privilege `permissions:` blocks, concurrency cancel-in-progress groups, per-job timeouts, CodeQL code-scanning upload on the public repo, and a gitleaks + dependency-review trio.
 
 If you find a way around any of these, the report is in-scope and high priority.

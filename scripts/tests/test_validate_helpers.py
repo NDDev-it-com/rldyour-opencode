@@ -72,6 +72,20 @@ def test_opencode_json_handles_bom(tmp_path: Path) -> None:
     assert vh.validate_opencode_json(cfg) == 0
 
 
+def test_opencode_json_rejects_missing_absolute_shell(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text('{"model": "x", "shell": "/definitely/missing/shell"}', encoding="utf-8")
+    assert vh.validate_opencode_json(cfg) == 1
+    captured = capsys.readouterr()
+    assert "shell absolute path does not exist" in captured.out
+
+
+def test_opencode_json_accepts_resolvable_shell_command(tmp_path: Path) -> None:
+    cfg = tmp_path / "opencode.json"
+    cfg.write_text('{"model": "x", "shell": "sh"}', encoding="utf-8")
+    assert vh.validate_opencode_json(cfg) == 0
+
+
 # ---------- VERSION ----------
 
 

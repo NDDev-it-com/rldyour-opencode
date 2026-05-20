@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -109,6 +110,27 @@ def validate_opencode_json(path: Path) -> int:
 
     # Top-level permission block.
     errors += _check_permission_block("opencode.json.permission", cfg.get("permission"))
+
+    shell = cfg.get("shell")
+    if shell is not None:
+        if not isinstance(shell, str) or not shell.strip():
+            print(f"[ERR] opencode.json.shell must be a non-empty string, got {type(shell).__name__}")
+            errors += 1
+        elif shell.startswith("/"):
+            shell_path = Path(shell)
+            if not shell_path.is_file():
+                print(f"[ERR] opencode.json.shell absolute path does not exist: {shell}")
+                errors += 1
+            elif (shell_path.stat().st_mode & 0o111) == 0:
+                print(f"[ERR] opencode.json.shell is not executable: {shell}")
+                errors += 1
+            else:
+                print(f"[OK] shell executable exists: {shell}")
+        elif shutil.which(shell) is None:
+            print(f"[ERR] opencode.json.shell command not found on PATH: {shell}")
+            errors += 1
+        else:
+            print(f"[OK] shell command resolves on PATH: {shell}")
 
     for name, agent in (cfg.get("agent") or {}).items():
         mode = agent.get("mode")

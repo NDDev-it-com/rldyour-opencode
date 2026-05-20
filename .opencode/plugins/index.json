@@ -50,29 +50,27 @@
       "network": false
     },
     {
-      "name": "ry-permission-policy",
-      "path": ".opencode/plugins/ry-permission-policy.ts",
-      "category": "guardrail",
-      "description": "Dynamic deny-only policy on permission.ask. Blocks force-push without lease, catastrophic rm -rf, and --no-verify pushes. Honours RY_ALLOW_NO_VERIFY=1 opt-out for symmetric coverage.",
+      "name": "ry-permission-events",
+      "path": ".opencode/plugins/ry-permission-events.ts",
+      "category": "observability",
+      "description": "Permission event observer. Logs permission.asked and permission.replied bus events via the generic event hook. Observability only; enforcement stays in ry-shell-strategy.",
       "hooks": [
-        "permission.ask"
+        "event"
       ],
       "writes_files": false,
-      "network": false,
-      "defense_in_depth_pair": "ry-shell-strategy"
+      "network": false
     },
     {
       "name": "ry-shell-strategy",
       "path": ".opencode/plugins/ry-shell-strategy.ts",
       "category": "guardrail",
-      "description": "Unconditional shell guardrail on tool.execute.before. Same three patterns as ry-permission-policy plus shell.env hardening (GIT_TERMINAL_PROMPT=0, NO_UPDATE_NOTIFIER=1, conditional CI=1).",
+      "description": "Unconditional shell guardrail on tool.execute.before. Blocks force-push without lease, catastrophic rm -rf, and --no-verify pushes plus shell.env hardening (GIT_TERMINAL_PROMPT=0, NO_UPDATE_NOTIFIER=1, conditional CI=1).",
       "hooks": [
         "shell.env",
         "tool.execute.before"
       ],
       "writes_files": false,
-      "network": false,
-      "defense_in_depth_pair": "ry-permission-policy"
+      "network": false
     },
     {
       "name": "ry-sync-reminder",

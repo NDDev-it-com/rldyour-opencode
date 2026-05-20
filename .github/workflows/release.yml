@@ -84,6 +84,8 @@ jobs:
           python3 scripts/generate_skills_index.py --check --strict
           python3 scripts/generate_commands_index.py --check --strict
           python3 scripts/generate_plugins_index.py --check --strict
+          python3 scripts/check_plugin_hooks.py
+          python3 scripts/validate_contract.py
           python3 scripts/smoke_mcp_capabilities.py --mode static --json
           python3 -m pytest scripts/tests/ -q
       - name: Typecheck plugins

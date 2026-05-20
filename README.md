@@ -14,10 +14,10 @@ A self-contained OpenCode project configuration that provides:
   - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
   - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
 - **13 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, Semgrep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
-- **10 TypeScript plugins** for session lifecycle, LLM augmentation, and dynamic policy:
+- **10 TypeScript plugins** for session lifecycle, LLM augmentation, guardrails, and observability:
   - lifecycle: `ry-bootstrap` (session banner + compaction context + autocontinue), `ry-env-protection` (block sensitive reads with toast), `ry-shell-strategy` (shell env + git push guardrails), `ry-sync-reminder` (idle toast), `ry-flow-hooks` (commit advice + post-commit nudge)
   - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
-  - Dynamic policy: `ry-permission-policy` (deny-only `permission.ask` for force-push without lease, catastrophic `rm`, --no-verify on product branches), `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt)
+  - Runtime context + permission events: `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt), `ry-permission-events` (observability-only `permission.asked` / `permission.replied` event audit)
 - **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
 - **Granular permissions** per agent (reviewer subagents are read-only with git-only bash allowlist; `task` and `external_directory` explicitly denied).
 
@@ -75,11 +75,11 @@ A self-contained OpenCode project configuration that provides:
 | Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
 | MCP servers | `opencode.json` → `mcp` | 13 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
-| Reference docs (skill/agent contracts) | `references/*.md` | 17 |
-| Operator guides | `docs/*.md` | 4 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`) |
+| Reference docs (skill/agent contracts + machine contracts) | `references/*` | 22 |
+| Operator guides | `docs/*.md` | 5 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`, `contract-matrix`) |
 | Architecture decision archive | `docs/decisions/*.md` | 9 |
-| Diagnostic scripts (bash + python) | `scripts/` | 28 (14 python entry points + 13 bash entry points + 4 internal helper modules; new in v0.12.4: `check_workflow_injection.py`) |
-| Pytest suites | `scripts/tests/*.py` | 24 (506 passed + 1 skipped; includes `test_public_repo_ci_policy.py` for public-repo CI/CD automation policy and the release-baseline changelog regression) |
+| Diagnostic scripts (bash + python) | `scripts/` | 30 (17 python files + 13 bash entry points; new in Unreleased: `check_plugin_hooks.py`, `validate_contract.py`) |
+| Pytest suites | `scripts/tests/*.py` | 26 (includes plugin hook and adapter contract validators, public-repo CI/CD automation policy, and the release-baseline changelog regression) |
 | CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
 
 ### Project structure
@@ -101,12 +101,12 @@ rldyour-opencode/
 ├── .serena/
 │   ├── memories/  *.md         # 6 verified knowledge files (AREA-NN-SLUG.md taxonomy)
 │   └── project.yml             # Serena project config
-├── references/   *.md          # 17 durable contracts (consumed by skills/agents)
+├── references/   *             # durable contracts + machine-readable adapter metadata
 ├── docs/
-│   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md
+│   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md, contract-matrix.md
 │   └── decisions/  001..009.md # 9 MADR-style ADRs
-├── scripts/                    # 28 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 24 pytest suites — 506 passed + 1 skipped
+├── scripts/                    # 30 bash + python diagnostic / validation / smoke scripts
+│   └── tests/  *.py            # 26 pytest suites
 └── .github/workflows/          # 11 least-privilege, SHA-pinned CI/release workflows
 ```
 
@@ -165,6 +165,10 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 
 The marketplace ships with `opencode-go/glm-5.1` as the top-level default — owner's working provider. Subagents inherit this model (no per-agent override at HEAD). Switch any field to a different provider via `provider/model-id` format.
 
+Versioning note: root `VERSION` is the marketplace/product release version.
+`.opencode/package.json.version` is a private local plugin package version for
+Bun dependency resolution and intentionally does not mirror root `VERSION`.
+
 | Slot | Default in this repo | Common Anthropic alternative |
 |---|---|---|
 | `model` (primary) | `opencode-go/glm-5.1` | `anthropic/claude-sonnet-4-6` |
@@ -186,9 +190,11 @@ Run `opencode models <provider>` to list every accepted ID. All current IDs are 
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
-uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/  # 506 passed + 1 skipped in 24 suites
+uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/
 bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
 python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
+python3 scripts/check_plugin_hooks.py                      # verify plugin hook contract; forbids permission.ask as enforcement
+python3 scripts/validate_contract.py                       # verify canonical rldyour adapter contract
 python3 scripts/smoke_mcp_capabilities.py                  # probe every MCP server for reachability
 python3 scripts/validate_instruction_docs.py               # verify AGENTS.md + .claude/CLAUDE.md anchor headings
 bash scripts/doctor_opencode.sh                            # full diagnostics: MCP, LSP binaries, agent/skill/command discovery, git

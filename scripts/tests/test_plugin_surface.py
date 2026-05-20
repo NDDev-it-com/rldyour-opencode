@@ -26,7 +26,7 @@ EXPECTED_PLUGINS = {
     "ry-tools.ts",
     "ry-command-audit.ts",
     "ry-tool-hints.ts",
-    "ry-permission-policy.ts",
+    "ry-permission-events.ts",
     "ry-system-context.ts",
 }
 
@@ -321,24 +321,22 @@ def test_cc_regex_anchored_after_branch_sha_prefix() -> None:
 
 
 def test_catastrophic_rm_blocks_parent_dir_traversal() -> None:
-    """Symmetric catastrophic-rm guards in ry-shell-strategy.ts and
-    ry-permission-policy.ts must block `rm -rf ..` and `rm -rf ../`.
-    Reviewer wave 2026-05-18 security F-1 found both guards missed parent-
+    """The dynamic shell guard must block `rm -rf ..` and `rm -rf ../`.
+    Reviewer wave 2026-05-18 security F-1 found the guard missed parent-
     directory traversal. Mirrors the four existing patterns (/, $HOME, ~, .).
     """
-    for name in ("ry-shell-strategy.ts", "ry-permission-policy.ts"):
-        src = (PLUGINS_DIR / name).read_text(encoding="utf-8")
-        assert "\\.\\.\\/?" in src, (
-            f"{name} must include the `\\.\\.\\/?` pattern to block "
-            f"`rm -rf ..` and `rm -rf ../` (reviewer wave security F-1)."
-        )
-        # Verify pattern positioned inside the dangerous-pattern alternation
-        # (next to the existing `.` pattern), so it benefits from the
-        # node_modules allowlist exception.
-        assert "rm\\s+(-rf?|-fr|--recursive)\\s+\\.\\.\\/?\\s*$" in src, (
-            f"{name} parent-dir traversal pattern must match the canonical "
-            f"shape used by the four sibling rm patterns (anchored at $)."
-        )
+    src = (PLUGINS_DIR / "ry-shell-strategy.ts").read_text(encoding="utf-8")
+    assert "\\.\\.\\/?" in src, (
+        "ry-shell-strategy.ts must include the `\\.\\.\\/?` pattern to block "
+        "`rm -rf ..` and `rm -rf ../` (reviewer wave security F-1)."
+    )
+    # Verify pattern positioned inside the dangerous-pattern alternation
+    # (next to the existing `.` pattern), so it benefits from the
+    # node_modules allowlist exception.
+    assert "rm\\s+(-rf?|-fr|--recursive)\\s+\\.\\.\\/?\\s*$" in src, (
+        "ry-shell-strategy.ts parent-dir traversal pattern must match the "
+        "canonical shape used by the sibling rm patterns (anchored at $)."
+    )
 
 
 
@@ -397,8 +395,8 @@ def test_ry_system_context_logs_session_start_deterministically() -> None:
 
 
 def test_env_protection_notify_block_logs_before_toast() -> None:
-    """The defense-in-depth tripod (ry-env-protection + ry-shell-strategy +
-    ry-permission-policy) must follow the log-first invariant: `client.app
+    """The security guard plugins (ry-env-protection + ry-shell-strategy)
+    must follow the log-first invariant: `client.app
     .log` must be called before `client.tui.showToast` inside any notify
     helper so the audit trail records the block reason even when the toast
     UI is unavailable. Reviewer wave 2026-05-18 consistency F-1 closed the
@@ -416,32 +414,31 @@ def test_env_protection_notify_block_logs_before_toast() -> None:
     assert log_idx < toast_idx, (
         "notifyBlock must call client.app.log BEFORE client.tui.showToast so "
         "the audit trail records the block reason even when the toast UI is "
-        "unavailable. Mirrors ry-shell-strategy.ts and ry-permission-policy.ts."
+        "unavailable. Mirrors ry-shell-strategy.ts."
     )
 
 
 
 def test_short_force_regex_catches_combined_flags() -> None:
-    """Both defense-in-depth plugins must detect `-f` even when combined
-    with other short flags in a cluster like `-fv`, `-fq`, `-fn`, `-vf`.
+    """The shell guard must detect `-f` even when combined with other
+    short flags in a cluster like `-fv`, `-fq`, `-fn`, `-vf`.
     The legacy narrow `(?:^|\\s)-f(?:\\s|$)` only matched standalone `-f`.
     Reviewer wave 2026-05-18 security F-2 closure.
     """
-    for name in ("ry-shell-strategy.ts", "ry-permission-policy.ts"):
-        src = (PLUGINS_DIR / name).read_text(encoding="utf-8")
-        # New broader pattern: `-` followed by any alpha cluster containing `f`.
-        assert "-[A-Za-z]*f[A-Za-z]*" in src, (
-            f"{name} must use the broadened shortForce regex "
-            f"`-[A-Za-z]*f[A-Za-z]*` to catch `-fv`, `-fq`, `-fn` clusters."
-        )
-        # Strip comments before scanning so the new commentary that quotes
-        # the legacy regex verbatim does not trip the regression guard.
-        no_line_comments = re.sub(r"^\s*//.*$", "", src, flags=re.MULTILINE)
-        code_only = re.sub(r"/\*.*?\*/", "", no_line_comments, flags=re.DOTALL)
-        assert "(?:^|\\s)-f(?:\\s|$)" not in code_only, (
-            f"{name} must not reintroduce the narrow `-f` regex in production "
-            f"code; that form silently allows combined-flag bypasses."
-        )
+    src = (PLUGINS_DIR / "ry-shell-strategy.ts").read_text(encoding="utf-8")
+    # New broader pattern: `-` followed by any alpha cluster containing `f`.
+    assert "-[A-Za-z]*f[A-Za-z]*" in src, (
+        "ry-shell-strategy.ts must use the broadened shortForce regex "
+        "`-[A-Za-z]*f[A-Za-z]*` to catch `-fv`, `-fq`, `-fn` clusters."
+    )
+    # Strip comments before scanning so commentary that quotes the legacy
+    # regex verbatim does not trip the regression guard.
+    no_line_comments = re.sub(r"^\s*//.*$", "", src, flags=re.MULTILINE)
+    code_only = re.sub(r"/\*.*?\*/", "", no_line_comments, flags=re.DOTALL)
+    assert "(?:^|\\s)-f(?:\\s|$)" not in code_only, (
+        "ry-shell-strategy.ts must not reintroduce the narrow `-f` regex in "
+        "production code; that form silently allows combined-flag bypasses."
+    )
 
 
 

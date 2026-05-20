@@ -155,7 +155,7 @@ Child sessions spawned via the `task` tool only inherit a subset of the parent's
 - `external_directory` rules are inherited.
 - `allow` rules and per-pattern allow lists are **NOT inherited** (issue [sst/opencode#5894](https://github.com/sst/opencode/issues/5894), PR #24293 still open as of May 2026).
 
-This means a subagent inheriting `bash: { "git diff": "allow", "*": "ask" }` will see only the default action for unmatched patterns, not the allowlist. When users ask "why does my subagent prompt for git when the parent allows it?", point them at this limitation. The project mitigates the related force-push and dangerous-rm patterns via `ry-shell-strategy.ts` (unconditional `tool.execute.before` throw) and `ry-permission-policy.ts` (`permission.ask` deny-only); both layers fire independently of the parent-child inheritance gap.
+This means a subagent inheriting `bash: { "git diff": "allow", "*": "ask" }` will see only the default action for unmatched patterns, not the allowlist. When users ask "why does my subagent prompt for git when the parent allows it?", point them at this limitation. The project mitigates the related force-push and dangerous-rm patterns via `ry-shell-strategy.ts` (unconditional `tool.execute.before` throw). `permission.ask` is not a security boundary in this repo; permission bus events are observed only by `ry-permission-events.ts`.
 
 ### Changing the default model
 

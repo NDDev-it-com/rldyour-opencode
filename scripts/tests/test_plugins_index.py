@@ -70,23 +70,17 @@ def test_every_plugin_subscribes_to_at_least_one_hook() -> None:
         )
 
 
-def test_defense_in_depth_pair_is_bidirectional() -> None:
-    """If plugin A names B in defense_in_depth_pair, B must name A back.
-    The Phase 1 hardening locked this invariant for ry-shell-strategy +
-    ry-permission-policy; the index reflects it.
+def test_no_permission_ask_defense_pair_metadata() -> None:
+    """`permission.ask` is typed but not triggered in pinned OpenCode.
+
+    The plugin index must not advertise a two-layer defense pair that
+    depends on that hook. Dynamic enforcement belongs to
+    ry-shell-strategy/tool.execute.before.
     """
     index = json.loads(INDEX_PATH.read_text(encoding="utf-8"))
-    by_name = {p["name"]: p for p in index["plugins"]}
     for plugin in index["plugins"]:
-        pair = plugin.get("defense_in_depth_pair")
-        if not pair:
-            continue
-        assert pair in by_name, f"plugin {plugin['name']!r} pairs with unknown {pair!r}"
-        reverse = by_name[pair].get("defense_in_depth_pair")
-        assert reverse == plugin["name"], (
-            f"defense_in_depth_pair asymmetry: {plugin['name']!r}→{pair!r} but "
-            f"{pair!r}→{reverse!r} (expected {plugin['name']!r})"
-        )
+        assert "defense_in_depth_pair" not in plugin
+        assert "permission.ask" not in plugin.get("hooks", [])
 
 
 def test_count_matches_disk() -> None:

@@ -70,9 +70,9 @@ return {
 | `tool.definition` | Sent to LLM | Modify `description` / `parameters` |
 | `shell.env` | Each shell spawn | Inject `env` vars |
 | `command.execute.before` | Slash command starts | Read `command`, `arguments`, `sessionID`; emit `parts` |
-| `permission.ask` | Permission prompt | Override `status` to `"allow"` / `"deny"` (see security note below) |
+| `permission.ask` | SDK type only in v1.15.4 | **Forbidden for enforcement** in this repo; source/runtime inspection found no trigger path in OpenCode v1.15.4 |
 
-> **Security note on `permission.ask`.** Setting `output.status = "allow"` unconditionally inside this hook bypasses the user's interactive consent — the central access control of OpenCode. Only use this hook with a precise, auditable allowlist condition (e.g., a narrow patterns array tied to a specific tool + sessionID). Never ship a plugin that auto-allows broadly. This repo's `ry-permission-policy.ts` subscribes to `permission.ask` in **deny-only mode**: it sets `output.status = "deny"` for categorically dangerous bash patterns (force-push without lease, catastrophic `rm -rf`, `--no-verify` on product branches) and never auto-allows. Legitimate "ask" prompts keep their user consent verbatim.
+> **Security note on `permission.ask`.** OpenCode v1.15.4's plugin SDK exposes this hook type, but the permission service publishes `permission.asked` / `permission.replied` bus events and does not trigger plugin-level `permission.ask`. Do not use it as a security boundary. Static permission config is the primary policy; dynamic denial must use runtime-proven hooks such as `tool.execute.before`. `scripts/check_plugin_hooks.py` rejects `permission.ask` in plugin code.
 
 ### Auth / provider extension
 
@@ -124,15 +124,9 @@ Each tool returns the script's combined stdout/stderr and stamps `ctx.metadata({
 
 HINTS keys use the OpenCode `<server>_<tool>` tool-ID format (single underscore; dashes preserved; introduced in v1.14.48, unchanged through v1.15.4). Example: `serena_find_symbol`, `chrome-devtools_list_console_messages`, `context7_resolve-library-id`. The Claude-Code-style `mcp__server__tool` prefix silently disables every hint and is banned by `scripts/tests/test_plugin_surface.py::test_ry_tool_hints_no_legacy_aliases`.
 
-### Permission policy (`.opencode/plugins/ry-permission-policy.ts`)
+### Permission event audit (`.opencode/plugins/ry-permission-events.ts`)
 
-`permission.ask` deny-only policy. Fires only when the static permission config (in `opencode.json` or per-agent frontmatter) sets a slot to `"ask"` — for `"allow"` / `"deny"` the runtime never calls the hook. Blocks three categorically dangerous patterns before the interactive permission dialog appears:
-
-- `git push --force` (long form) or `-f` anywhere inside a combined short-flag cluster (`-fv`, `-fq`, `-fn`) without `--force-with-lease` — data-loss risk on shared branches. The short-flag detector was broadened in the reviewer wave 2026-05-18 security F-2 closure.
-- `rm -rf <root|$HOME|~|~/|cwd|..|../>` — catastrophic; `node_modules` cleanup is allowlisted. The parent-directory traversal targets (`..`, `../`) were added by reviewer wave 2026-05-18 security F-1; `rm -rf ..` from any project subdirectory would otherwise erase the entire project tree.
-- `git push --no-verify` on any branch — pre-push hook bypass. Widened from the original product-branch-only restriction (`main` / `master` / `release` / `production`) in 0.12.0 commit `250632e`. Operators with a legitimate use case can opt out via `RY_ALLOW_NO_VERIFY=1` in their shell environment; a hardcoded bypass on the command line never wins over the env var.
-
-Never auto-allows; legitimate "ask" prompts keep user consent. Complements (not replaces) the unconditional `tool.execute.before` throws in `ry-shell-strategy.ts` — that one fires regardless of permission config; this one catches the same patterns when bash permission is statically `"ask"` (plan agent + reviewer subagents).
+`event` observer for `permission.asked` and `permission.replied`. It writes short, non-secret audit lines to `client.app.log` with session/request IDs and the permission/reply value. It never sets policy, never auto-allows, and never blocks. This separation is intentional: permission enforcement is static config plus `ry-shell-strategy.ts`; permission events are observability only.
 
 ### Dynamic system prompt context (`.opencode/plugins/ry-system-context.ts`)
 
@@ -172,7 +166,7 @@ Both helpers are best-effort — a transient client error never blocks the under
 
 ### Shell hardening (`.opencode/plugins/ry-shell-strategy.ts`)
 
-`shell.env` injects non-interactive git/CI env (`GIT_TERMINAL_PROMPT=0`, `CI=1`, `NODE_OPTIONS=--max-old-space-size=4096`). `tool.execute.before` is the unconditional enforcement layer for git push: throws on `git push --force` without `--force-with-lease` (surfaces a `toast("error", ...)` before throwing), warns on destructive `rm -rf .../` (`toast("warning", ...)` + `log("warn", ...)`), and surfaces a quality checklist on `git push` as a toast. Defense-in-depth with `ry-permission-policy.ts` — that plugin also denies the same patterns at the `permission.ask` layer when bash is statically `"ask"`; the `tool.execute.before` throw here fires regardless of permission config.
+`shell.env` injects non-interactive git/CI env (`GIT_TERMINAL_PROMPT=0`, `CI=1`, `NODE_OPTIONS=--max-old-space-size=4096`). `tool.execute.before` is the unconditional dynamic enforcement layer for shell hardening: throws on `git push --force` / `-f` without `--force-with-lease`, catastrophic `rm -rf` targets (`/`, `$HOME`, `~`, cwd, parent dir; `node_modules` allowlist), and `git push --no-verify` unless `RY_ALLOW_NO_VERIFY=1` is set in the shell environment. It also warns on non-catastrophic recursive `rm` and surfaces a quality checklist on ordinary `git push`. The hook fires regardless of static permission config.
 
 ### Session-idle reminder (`.opencode/plugins/ry-sync-reminder.ts`)
 

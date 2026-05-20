@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Plugin hook contract validator.** `scripts/check_plugin_hooks.py` now
+  classifies OpenCode plugin hooks and fails CI if a plugin relies on
+  typed-but-untriggered `permission.ask` or uses event-type strings as
+  top-level hook keys.
+- **Machine-readable rldyour adapter contract.**
+  `references/rldyour-contract.json`, `scripts/validate_contract.py`, and
+  `docs/contract-matrix.md` define canonical domains, skills, commands,
+  agents, adapter-only surfaces, and lifecycle hooks for the OpenCode adapter.
+
+### Changed
+
+- **Permission enforcement moved fully to runtime-proven hooks.**
+  `ry-permission-policy.ts` was replaced by observability-only
+  `ry-permission-events.ts`; dynamic denial remains in
+  `ry-shell-strategy.ts` via `tool.execute.before`.
+- **CodeQL now uploads to GitHub code scanning.** The public repo CodeQL
+  workflow uses `security-events: write`, no longer sets `upload: never`, and
+  uses an OS+language category for matrix uploads; SARIF artifacts remain
+  available for offline audit.
+- **Runtime validation fails closed when the CLI is required.**
+  `.github/workflows/opencode-runtime.yml` runs `validate_config.sh` with
+  `RY_REQUIRE_OPENCODE_CLI=1`.
+- **Default shell is portable Bash.** `opencode.json.shell` now uses
+  `/bin/bash`, and `_validate_helpers.py` validates absolute/relative shell
+  executables.
+
 ## [0.13.1] - 2026-05-18
 
 Patch release synchronizing the public documentation baseline after the release
