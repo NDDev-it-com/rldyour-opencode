@@ -65,7 +65,10 @@ Positive:
 Negative:
 
 - Workflow count grew from 2 to 10. Cognitive load on contributors is higher, mitigated by the consistent hardening pattern across all files and by `CONTRIBUTING.md` documenting the gate set.
-- macOS matrix doubles the runner-minute usage on touched surfaces. Mitigation: workflows are path-filtered where possible (`typecheck-plugins`, `lint`) so unrelated PRs don't pay the macOS cost.
+- macOS matrix doubles runtime on touched surfaces. Because the upstream
+  repository is public and uses only standard runners, these jobs do not consume
+  paid private-repository Actions minutes; still, OS-independent gates such as
+  dependency review and gitleaks stay Ubuntu-only.
 - Some non-GitHub release surfaces (gitleaks CLI tarball and npm SBOM behavior) require periodic re-verification. Mitigation: keep explicit version/checksum comments where external binaries are downloaded, use dependabot's `github-actions` ecosystem watcher for action pins, keep `scripts/check_action_pins.py --remote` green, and keep the `npm sbom` release step covered by tag-triggered Linux/macOS release runs.
 - `.gitleaks.toml` is intentionally narrow: it allowlists only sanitizer regression fixture files that contain fake token/private-key strings by design; do not add broad token regex allowlists.
 - CodeQL SARIF is uploaded to code scanning on public runs, so the Security tab and branch protection can observe real alerts instead of artifact-only analysis. The SARIF artifact remains a secondary audit output.
