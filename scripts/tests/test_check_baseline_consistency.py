@@ -104,6 +104,14 @@ def test_script_no_changelog_skips_soft_check() -> None:
     )
 
 
+def test_live_changelog_documents_current_baseline() -> None:
+    """The current baseline may be documented in Unreleased before it ships."""
+    proc = _run_live("--json")
+    assert proc.returncode == 0
+    payload = json.loads(proc.stdout)
+    assert payload["warnings"] == []
+
+
 # ---------------------------------------------------------------------------
 # Drift detection via fixture baseline
 # ---------------------------------------------------------------------------
@@ -129,6 +137,18 @@ def _seed_files(tmp_path: Path, files: dict[str, str]) -> None:
     for rel, contents in files.items():
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)
+        if rel == ".opencode/package.json":
+            data = json.loads(contents)
+            data.setdefault("license", "AGPL-3.0-only")
+            data.setdefault(
+                "author",
+                {
+                    "name": "Danil Silantyev (github:rldyourmnd), CEO & Engineer NDDev",
+                    "email": "rldyourmnd@users.noreply.github.com",
+                    "url": "https://github.com/rldyourmnd",
+                },
+            )
+            contents = json.dumps(data)
         path.write_text(contents, encoding="utf-8")
 
 

@@ -28,6 +28,8 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PATH = REPO_ROOT / "references" / "opencode-baseline.json"
+EXPECTED_PACKAGE_LICENSE = "AGPL-3.0-only"
+EXPECTED_PACKAGE_AUTHOR = "Danil Silantyev (github:rldyourmnd), CEO & Engineer NDDev"
 
 
 def _load_baseline() -> dict[str, Any]:
@@ -54,12 +56,22 @@ def _check_package_json(plugin_version: str) -> list[str]:
     except (OSError, json.JSONDecodeError) as exc:
         return [f"cannot read {path}: {exc}"]
     actual = data.get("dependencies", {}).get("@opencode-ai/plugin", "")
+    license_value = data.get("license")
+    author = data.get("author")
+    problems: list[str] = []
     if actual != plugin_version:
-        return [
+        problems.append(
             f".opencode/package.json @opencode-ai/plugin = {actual!r}, "
             f"baseline expects {plugin_version!r}"
-        ]
-    return []
+        )
+    if license_value != EXPECTED_PACKAGE_LICENSE:
+        problems.append(
+            f".opencode/package.json license = {license_value!r}, "
+            f"expected {EXPECTED_PACKAGE_LICENSE!r}"
+        )
+    if not isinstance(author, dict) or author.get("name") != EXPECTED_PACKAGE_AUTHOR:
+        problems.append(".opencode/package.json author must identify Danil Silantyev / rldyourmnd")
+    return problems
 
 
 def _check_bun_lock(plugin_version: str, sdk_version: str) -> list[str]:
@@ -206,12 +218,12 @@ def _check_schema_vendored(schema_version: str, vendored_path: str, external_ref
 
 
 def _check_changelog_release_anchor(plugin_version: str) -> list[str]:
-    """The latest CHANGELOG release entry should mention the baseline plugin version."""
+    """CHANGELOG should mention the baseline plugin version in Unreleased or latest release."""
     path = REPO_ROOT / "CHANGELOG.md"
     if not path.exists():
         return [f"CHANGELOG.md missing at {path}"]
     text = path.read_text(encoding="utf-8")
-    # Find the first concrete SemVer release block, skipping `[Unreleased]`.
+    unreleased = re.search(r"^## \[Unreleased\][^\n]*$", text, flags=re.MULTILINE)
     first_release = re.search(
         r"^## \[\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?\][^\n]*$",
         text,
@@ -219,13 +231,17 @@ def _check_changelog_release_anchor(plugin_version: str) -> list[str]:
     )
     if not first_release:
         return ["CHANGELOG.md has no [X.Y.Z] release header"]
+    if unreleased:
+        unreleased_block = text[unreleased.start():first_release.start()]
+        if plugin_version in unreleased_block:
+            return []
     start = first_release.start()
     next_release = re.search(r"^## \[[^\]]+\]", text[first_release.end():], flags=re.MULTILINE)
     end = first_release.end() + next_release.start() if next_release else len(text)
     block = text[start:end]
     if plugin_version not in block:
         return [
-            f"latest CHANGELOG release block does not mention plugin version {plugin_version!r}; "
+            f"CHANGELOG Unreleased/latest release blocks do not mention plugin version {plugin_version!r}; "
             f"this is non-fatal but suggests doc drift"
         ]
     return []
