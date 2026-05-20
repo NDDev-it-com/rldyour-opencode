@@ -72,10 +72,10 @@ EOF
 }
 
 git_identity_env() {
-  export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-rldyour-opencode}"
-  export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-rldyour-opencode@example.invalid}"
-  export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-rldyour-opencode}"
-  export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-rldyour-opencode@example.invalid}"
+  export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-Danil Silantyev}"
+  export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-rldyourmnd@users.noreply.github.com}"
+  export GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-Danil Silantyev}"
+  export GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-rldyourmnd@users.noreply.github.com}"
 }
 
 git_root() {
