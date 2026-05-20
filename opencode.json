@@ -6,7 +6,7 @@
   "autoupdate": "notify",
   "share": "manual",
   "snapshot": true,
-  "shell": "/bin/zsh",
+  "shell": "/bin/bash",
   "lsp": {
     "ruff": {
       "command": ["ruff", "server"],

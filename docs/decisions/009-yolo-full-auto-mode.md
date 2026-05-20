@@ -2,6 +2,7 @@
 
 - Status: accepted
 - Date: 2026-05-18
+- Updated: 2026-05-20
 - Deciders: @rldyourmnd
 - Consulted: external audit (2026-05-17 archive review), Phase 0+1+2 fixes
 
@@ -38,8 +39,9 @@ future audits don't propose the same change without re-reading the trade-off.
   - `ry-shell-strategy.ts` unconditionally blocks force-push-without-lease,
     catastrophic `rm -rf` targets, and `git push --no-verify` (Phase 1
     widened the block to any branch, with `RY_ALLOW_NO_VERIFY=1` opt-out).
-  - `ry-permission-policy.ts` denies the same patterns at `permission.ask`
-    when the static profile is `"ask"`.
+  - `permission.ask` is not part of the security boundary. OpenCode v1.15.4
+    exposes it in SDK types but does not trigger it from the permission
+    service; `scripts/check_plugin_hooks.py` rejects it in plugin code.
   - `ry-env-protection.ts` blocks reads of `.env*`, `.pem`, `.key`, `.ssh/`,
     `.gnupg/`, `.aws/`, and credential-shaped paths through both `read`
     and `bash` tools, with data-movement (cp/mv/tar/zip/base64) detection
@@ -59,8 +61,8 @@ future audits don't propose the same change without re-reading the trade-off.
    "trust the operator + guard catastrophic patterns" model.
 2. **No plugin guardrails, raw `allow` everywhere.** Reject. The catastrophic
    patterns (force-push, `rm -rf /`, `--no-verify` on product branches) need
-   defense-in-depth even in a YOLO profile.
-3. **YOLO `allow` + plugin guardrails (ADR-006 defense-in-depth pair).
+   deterministic dynamic blocking even in a YOLO profile.
+3. **YOLO `allow` + `tool.execute.before` guardrails (ADR-006).
    Document the trade-off explicitly.** **Selected.**
 
 ## Decision Outcome
@@ -117,8 +119,10 @@ Negative:
 
 ## Compliance
 
-- `scripts/tests/test_permission_policy_regexes.py` (44 cases) locks the
-  plugin guardrail behavior.
+- `scripts/tests/test_shell_strategy_regexes.py` locks the plugin guardrail
+  behavior.
+- `scripts/check_plugin_hooks.py` prevents typed-but-untriggered hook surfaces
+  from being reintroduced as security boundaries.
 - `scripts/tests/test_plugin_surface.py` enforces the no-`console.log`
   and audit-trail invariants.
 - This ADR is referenced from AGENTS.md § Engineering Rules so external

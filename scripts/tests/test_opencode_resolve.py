@@ -38,7 +38,7 @@ EXPECTED_PLUGINS = (
     "ry-tools.ts",
     "ry-command-audit.ts",
     "ry-tool-hints.ts",
-    "ry-permission-policy.ts",
+    "ry-permission-events.ts",
     "ry-system-context.ts",
 )
 

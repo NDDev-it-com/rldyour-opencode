@@ -13,7 +13,7 @@ as a test failure rather than silent drift.
 
 Source of truth: the plugin source files (the hook keys returned in the
 `Hooks` object) are authoritative for `hooks`. Curated fields
-(`description`, `category`, `defense_in_depth_pair`, etc.) live in this
+(`description`, `category`, adapter metadata, etc.) live in this
 script and must be updated when new plugins are added.
 """
 from __future__ import annotations
@@ -73,27 +73,26 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "writes_files": False,
         "network": False,
     },
-    "ry-permission-policy": {
+    "ry-permission-events": {
         "description": (
-            "Dynamic deny-only policy on permission.ask. Blocks force-push "
-            "without lease, catastrophic rm -rf, and --no-verify pushes. "
-            "Honours RY_ALLOW_NO_VERIFY=1 opt-out for symmetric coverage."
+            "Permission event observer. Logs permission.asked and "
+            "permission.replied bus events via the generic event hook. "
+            "Observability only; enforcement stays in ry-shell-strategy."
         ),
-        "category": "guardrail",
+        "category": "observability",
         "writes_files": False,
         "network": False,
-        "defense_in_depth_pair": "ry-shell-strategy",
     },
     "ry-shell-strategy": {
         "description": (
-            "Unconditional shell guardrail on tool.execute.before. Same three "
-            "patterns as ry-permission-policy plus shell.env hardening "
+            "Unconditional shell guardrail on tool.execute.before. Blocks "
+            "force-push without lease, catastrophic rm -rf, and --no-verify "
+            "pushes plus shell.env hardening "
             "(GIT_TERMINAL_PROMPT=0, NO_UPDATE_NOTIFIER=1, conditional CI=1)."
         ),
         "category": "guardrail",
         "writes_files": False,
         "network": False,
-        "defense_in_depth_pair": "ry-permission-policy",
     },
     "ry-sync-reminder": {
         "description": (
@@ -173,7 +172,6 @@ RECOGNISED_HOOKS = {
     "tool.execute.before",
     "tool.execute.after",
     "shell.env",
-    "permission.ask",
     "chat.message",
     "chat.params",
     "chat.headers",

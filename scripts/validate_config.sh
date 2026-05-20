@@ -93,6 +93,27 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+log_step "OpenCode plugin hook contract"
+# Permission enforcement must not rely on typed-but-untriggered hooks such
+# as `permission.ask`. This validator keeps security-critical plugins on
+# documented/runtime-proven surfaces (`tool.execute.before`, `shell.env`)
+# and catches accidental event.type values used as top-level hook keys.
+if python3 "${PROJECT_ROOT}/scripts/check_plugin_hooks.py"; then
+    log_ok "Plugin hook contract passed"
+else
+    ERRORS=$((ERRORS + 1))
+fi
+
+log_step "rldyour adapter contract"
+# Canonical cross-tool IDs (domains, skills, commands, agents, lifecycle
+# hooks) live in references/rldyour-contract.json. Validate the OpenCode
+# adapter mapping against real local files and plugin hook subscriptions.
+if python3 "${PROJECT_ROOT}/scripts/validate_contract.py"; then
+    log_ok "Adapter contract passed"
+else
+    ERRORS=$((ERRORS + 1))
+fi
+
 log_step "Skills"
 SKILLS_DIR="${PROJECT_ROOT}/.opencode/skills"
 if [ -d "$SKILLS_DIR" ]; then
@@ -175,7 +196,12 @@ if command -v opencode >/dev/null 2>&1; then
         ERRORS=$((ERRORS + 1))
     fi
 else
-    log_info "opencode CLI not on PATH — skipping runtime resolution smoke"
+    if [ "${RY_REQUIRE_OPENCODE_CLI:-0}" = "1" ]; then
+        log_err "opencode CLI not on PATH and RY_REQUIRE_OPENCODE_CLI=1"
+        ERRORS=$((ERRORS + 1))
+    else
+        log_info "opencode CLI not on PATH — skipping runtime resolution smoke"
+    fi
 fi
 
 log_step "Summary"

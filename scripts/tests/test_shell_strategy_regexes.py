@@ -1,8 +1,8 @@
-"""Regex coverage for `.opencode/plugins/ry-permission-policy.ts`.
+"""Regex coverage for `.opencode/plugins/ry-shell-strategy.ts`.
 
-The plugin denies three categorically dangerous bash patterns at the
-`permission.ask` hook. The TypeScript regexes are mirrored here so that
-a contributor changing either side gets a CI failure if the two
+The plugin blocks three categorically dangerous bash patterns at the
+`tool.execute.before` hook. The TypeScript regexes are mirrored here so
+that a contributor changing either side gets a CI failure if the two
 diverge.
 
 Lockstep rule: every regex in this file MUST stay byte-for-byte
@@ -19,12 +19,12 @@ from pathlib import Path
 import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-PLUGIN_PATH = PROJECT_ROOT / ".opencode" / "plugins" / "ry-permission-policy.ts"
+PLUGIN_PATH = PROJECT_ROOT / ".opencode" / "plugins" / "ry-shell-strategy.ts"
 
 
 @dataclass(frozen=True)
 class PolicyRegexes:
-    """Python mirror of the TypeScript regex set in ry-permission-policy.ts.
+    """Python mirror of the TypeScript regex set in ry-shell-strategy.ts.
 
     Each TS regex is rewritten with Python `re` syntax. Word boundaries
     behave identically between V8 and CPython for these patterns
@@ -39,11 +39,11 @@ class PolicyRegexes:
     rm_home_var: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\brm\s+(-rf?|-fr|--recursive)\s+\$HOME\b", re.IGNORECASE))
     rm_home_tilde: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\brm\s+(-rf?|-fr|--recursive)\s+~/?\s*$", re.IGNORECASE))
     rm_cwd_dot: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\brm\s+(-rf?|-fr|--recursive)\s+\.\s*$", re.IGNORECASE))
+    rm_parent: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\brm\s+(-rf?|-fr|--recursive)\s+\.\./?\s*$", re.IGNORECASE))
     rm_node_modules: re.Pattern[str] = field(default_factory=lambda: re.compile(
         r"\brm\s+(-rf?|-fr|--recursive)\s+\S*/?node_modules/?\s*$", re.IGNORECASE
     ))
     no_verify: re.Pattern[str] = field(default_factory=lambda: re.compile(r"(?<![A-Za-z0-9-])--no-verify(?![A-Za-z0-9-])", re.IGNORECASE))
-    product_branch: re.Pattern[str] = field(default_factory=lambda: re.compile(r"\b(main|master|release|production)\b", re.IGNORECASE))
 
 
 P = PolicyRegexes()
@@ -62,14 +62,15 @@ def rm_blocked(cmd: str) -> bool:
         or P.rm_home_var.search(cmd)
         or P.rm_home_tilde.search(cmd)
         or P.rm_cwd_dot.search(cmd)
+        or P.rm_parent.search(cmd)
     )
     if not dangerous:
         return False
     return not bool(P.rm_node_modules.search(cmd))
 
 
-def no_verify_product_branch_blocked(cmd: str) -> bool:
-    return bool(P.is_push.search(cmd)) and bool(P.no_verify.search(cmd)) and bool(P.product_branch.search(cmd))
+def no_verify_push_blocked(cmd: str) -> bool:
+    return bool(P.is_push.search(cmd)) and bool(P.no_verify.search(cmd))
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +122,8 @@ RM_POSITIVES = (
     "rm -rf ~",
     "rm -rf ~/",
     "rm -rf .",
+    "rm -rf ..",
+    "rm -rf ../",
 )
 
 RM_NEGATIVES_NODE = (
@@ -156,7 +159,7 @@ def test_rm_other_safe_paths_allowed(cmd: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# --no-verify product branch
+# --no-verify push
 # ---------------------------------------------------------------------------
 
 NV_POSITIVES = (
@@ -164,29 +167,28 @@ NV_POSITIVES = (
     "git push --no-verify origin master",
     "git push --no-verify origin release",
     "git push --no-verify origin production",
+    "git push --no-verify origin feature/x",
+    "git push --no-verify origin mainline",
 )
 
 NV_NEGATIVES = (
-    "git push --no-verify origin feature/x",
-    "git push --no-verify origin mainline",  # `\b(main)\b` must NOT match
-    "git push --no-verify origin mainframe",  # ditto
-    "git push --no-verify origin productionish",  # `\b(production)\b` must NOT match
     "git push origin main",  # no --no-verify
     "git push --verify origin main",  # no --no-verify
+    "git status --no-verify",  # no git push
 )
 
 
 @pytest.mark.parametrize("cmd", NV_POSITIVES)
-def test_no_verify_product_blocked_positives(cmd: str) -> None:
-    assert no_verify_product_branch_blocked(cmd), (
-        f"no_verify_product_branch_blocked({cmd!r}) should be True"
+def test_no_verify_push_blocked_positives(cmd: str) -> None:
+    assert no_verify_push_blocked(cmd), (
+        f"no_verify_push_blocked({cmd!r}) should be True"
     )
 
 
 @pytest.mark.parametrize("cmd", NV_NEGATIVES)
-def test_no_verify_product_blocked_negatives(cmd: str) -> None:
-    assert not no_verify_product_branch_blocked(cmd), (
-        f"no_verify_product_branch_blocked({cmd!r}) should be False"
+def test_no_verify_push_blocked_negatives(cmd: str) -> None:
+    assert not no_verify_push_blocked(cmd), (
+        f"no_verify_push_blocked({cmd!r}) should be False"
     )
 
 
@@ -203,7 +205,7 @@ def test_typescript_source_uses_same_regexes() -> None:
     src = PLUGIN_PATH.read_text(encoding="utf-8")
     expected_substrings = (
         r"\bgit\s+push\b",
-        r"FLAG_BOUNDARY_PRE",  # constants declared in ry-permission-policy.ts
+        r"FLAG_BOUNDARY_PRE",  # constants declared in ry-shell-strategy.ts
         r"FLAG_BOUNDARY_POST",
         r"(?<![A-Za-z0-9-])",
         r"(?![A-Za-z0-9-])",
@@ -222,10 +224,9 @@ def test_typescript_source_uses_same_regexes() -> None:
         r"\brm\s+(-rf?|-fr|--recursive)\s+\.\.\/?\s*$",
         r"\brm\s+(-rf?|-fr|--recursive)\s+\S*\/?node_modules\/?\s*$",
         r"--no-verify",
-        r"\b(main|master|release|production)\b",
     )
     for needle in expected_substrings:
         assert needle in src, (
             f"TS source missing regex literal {needle!r} — "
-            "Python mirror in test_permission_policy_regexes.py drifted from ry-permission-policy.ts"
+            "Python mirror in test_shell_strategy_regexes.py drifted from ry-shell-strategy.ts"
         )

@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Machine-readable rldyour workflow contract for the OpenCode adapter. Sister tool repos should map the same canonical IDs to their own native surfaces.",
+  "version": "1.0.0",
+  "updated": "2026-05-20",
+  "adapter": "opencode",
+  "domains": [
+    "browser",
+    "config",
+    "design",
+    "docs-sync",
+    "explore",
+    "flow",
+    "lsp",
+    "rules",
+    "security",
+    "serena"
+  ],
+  "skills": {
+    "browser.debug": "browser-debug",
+    "browser.routing": "browser-tool-routing",
+    "browser.validation": "browser-validation",
+    "design.design-system": "design-system-implementation",
+    "design.figma-to-code": "figma-to-code",
+    "design.fsd-frontend": "fsd-frontend-architecture",
+    "design.ry-design": "ry-design",
+    "browser.design-validation": "design-validation",
+    "docs-sync.instruction-sync": "instruction-docs-sync",
+    "explore.tech-research": "tech-research",
+    "explore.web-research": "web-research",
+    "flow.deploy": "ry-deploy",
+    "flow.init": "ry-init",
+    "flow.new-project": "ry-newp",
+    "flow.post-task-sync": "flow-post-task-sync",
+    "flow.review": "ry-review",
+    "flow.start": "ry-start",
+    "lsp.health-check": "lsp-health-check",
+    "lsp.routing": "lsp-routing",
+    "lsp.setup": "lsp-setup",
+    "rules.architecture-boundaries": "architecture-boundaries",
+    "rules.dependency-compatibility": "dependency-compatibility-policy",
+    "rules.implementation-discipline": "implementation-discipline",
+    "rules.project-instructions": "project-instructions-policy",
+    "rules.quality-first": "quality-first-engineering",
+    "rules.review": "ry-rules-review",
+    "rules.verification-gates": "verification-quality-gates",
+    "security.owasp-implementation": "owasp-top-10-implementation",
+    "security.review": "ry-sec-review",
+    "serena.code-workflow": "serena-code-workflow",
+    "serena.lsp-integration": "serena-lsp-integration",
+    "serena.memory-sync": "serena-memory-sync"
+  },
+  "commands": {
+    "design.ry-design": "ry-design",
+    "explore.ry-explore": "ry-explore",
+    "flow.deploy": "ry-deploy",
+    "flow.init": "ry-init",
+    "flow.new-project": "ry-newp",
+    "flow.review": "ry-review",
+    "flow.start": "ry-start",
+    "rules.review": "ry-rules-review",
+    "security.review": "ry-sec-review"
+  },
+  "adapter_only_commands": {
+    "flow.sync.manual": "ry-sync"
+  },
+  "agents": {
+    "agent.explore.research": "ry-explore",
+    "agent.review.architecture": "flow-architecture-review",
+    "agent.review.consistency": "flow-consistency-review",
+    "agent.review.integration": "flow-integration-review",
+    "agent.review.quality": "flow-quality-review",
+    "agent.review.security": "flow-security-review",
+    "agent.review.verification": "flow-verification-review",
+    "agent.sync.serena-memory": "flow-memory-sync"
+  },
+  "adapter_only_agents": {
+    "agent.adapter.opencode-customizer": "customize-opencode"
+  },
+  "hook_lifecycle": {
+    "session.start.context": {
+      "plugin": "ry-bootstrap",
+      "hook": "event",
+      "event_type": "session.created",
+      "class": "lifecycle"
+    },
+    "session.compaction.context": {
+      "plugin": "ry-bootstrap",
+      "hook": "experimental.session.compacting",
+      "class": "lifecycle"
+    },
+    "session.compaction.autocontinue": {
+      "plugin": "ry-bootstrap",
+      "hook": "experimental.compaction.autocontinue",
+      "class": "lifecycle"
+    },
+    "prompt.system.runtime-context": {
+      "plugin": "ry-system-context",
+      "hook": "experimental.chat.system.transform",
+      "class": "context"
+    },
+    "tool.pre.env-protection": {
+      "plugin": "ry-env-protection",
+      "hook": "tool.execute.before",
+      "class": "guardrail"
+    },
+    "tool.pre.git-policy": {
+      "plugin": "ry-shell-strategy",
+      "hook": "tool.execute.before",
+      "class": "guardrail"
+    },
+    "shell.env.noninteractive": {
+      "plugin": "ry-shell-strategy",
+      "hook": "shell.env",
+      "class": "guardrail"
+    },
+    "tool.post.commit-advice": {
+      "plugin": "ry-flow-hooks",
+      "hook": "tool.execute.after",
+      "class": "advisory"
+    },
+    "command.pre.audit": {
+      "plugin": "ry-command-audit",
+      "hook": "command.execute.before",
+      "class": "observability"
+    },
+    "permission.event.audit": {
+      "plugin": "ry-permission-events",
+      "hook": "event",
+      "event_type": "permission.asked|permission.replied",
+      "class": "observability"
+    },
+    "tool.definition.routing-hints": {
+      "plugin": "ry-tool-hints",
+      "hook": "tool.definition",
+      "class": "routing"
+    },
+    "tool.custom.diagnostics": {
+      "plugin": "ry-tools",
+      "hook": "tool",
+      "class": "tool-registration"
+    },
+    "session.idle.sync-reminder": {
+      "plugin": "ry-sync-reminder",
+      "hook": "event",
+      "event_type": "session.idle",
+      "class": "advisory"
+    }
+  }
+}
