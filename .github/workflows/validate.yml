@@ -95,6 +95,12 @@ jobs:
       - name: Verify plugins index is in sync with plugin .ts files
         run: python3 scripts/generate_plugins_index.py --check --strict
 
+      - name: Verify plugin hook contract
+        run: python3 scripts/check_plugin_hooks.py
+
+      - name: Validate rldyour adapter contract
+        run: python3 scripts/validate_contract.py
+
       - name: MCP smoke (static — parse only, no spawn, no network)
         # Audit P1-4: PR runs always validate the MCP roster statically;
         # local-launch + remote-head probes live in dependency-check.yml.

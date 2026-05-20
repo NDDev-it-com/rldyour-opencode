@@ -13,14 +13,13 @@ declare const process: { env: Record<string, string | undefined> }
 // Each notify call is wrapped in try/catch — best-effort UX: messaging
 // failures must never block tool execution.
 //
-// Defense-in-depth: this plugin's `tool.execute.before` throw is the
-// UNCONDITIONAL enforcement layer for git push hardening. It fires
-// regardless of whether the bash permission is "allow" or "ask".
-// `ry-permission-policy.ts` provides the secondary layer at
-// `permission.ask`, which catches the same patterns before the user
-// dialog appears — only relevant when bash is statically "ask"
-// (plan agent + reviewer subagents). Both layers intentionally co-own
-// the same invariant; removing either creates a coverage gap.
+// This plugin's `tool.execute.before` throw is the dynamic enforcement
+// layer for shell hardening. It fires regardless of whether the bash
+// permission is "allow" or "ask". Do not move security decisions to
+// `permission.ask`: OpenCode v1.15.4 exposes that hook in SDK types but
+// does not trigger it from the permission service. Static permissions in
+// opencode.json / agent frontmatter are the primary policy; this hook is
+// the deterministic dynamic deny layer.
 
 export const RyShellStrategy: Plugin = async ({ client }) => {
   async function log(level: "info" | "warn" | "error", message: string): Promise<void> {
@@ -63,7 +62,7 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
       // chars (space and `-`), so the naive `\b--FLAG\b` form silently
       // fails. Use a negated alphanum-or-hyphen lookbehind/lookahead so
       // `--force` matches but `--force-with-lease` does not. Same logic
-      // for `--no-verify`. Mirrors ry-permission-policy.ts.
+      // for `--no-verify`.
       const FLAG_BOUNDARY_PRE = "(?<![A-Za-z0-9-])"
       const FLAG_BOUNDARY_POST = "(?![A-Za-z0-9-])"
       const longForce = new RegExp(`${FLAG_BOUNDARY_PRE}--force${FLAG_BOUNDARY_POST}`, "i")
@@ -98,8 +97,8 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
       }
 
       // Layer 2 (catastrophic rm -rf). Unconditional throw mirrors the
-      // deny-only policy in ry-permission-policy.ts so the same pattern
-      // is blocked regardless of whether bash permission is statically
+      // deny policy so the same pattern is blocked regardless of whether
+      // bash permission is statically
       // "allow" (Build agent) or "ask" (plan + reviewer subagents).
       // node_modules cleanup is the documented allowlist exception.
       if (/\brm\s+(-rf?|-fr|--recursive)\b/i.test(command)) {

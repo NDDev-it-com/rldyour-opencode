@@ -22,11 +22,11 @@ permissions:
   # to let CodeQL inspect its own run; it does NOT widen privileges
   # beyond reading public workflow metadata.
   actions: read
-  # CodeQL also queries the CodeQL Action API during initialization/analyze
-  # post-processing. Keep this read-only so SARIF upload remains disabled
-  # (`upload: never`) while eliminating "Resource not accessible by
-  # integration" warning annotations on normal branch runs.
-  security-events: read
+  # Public repositories can publish CodeQL SARIF to GitHub code scanning.
+  # `security-events: write` is the least privilege required by CodeQL
+  # upload; results then appear as code scanning alerts instead of only as
+  # workflow artifacts.
+  security-events: write
 
 concurrency:
   group: codeql-${{ github.workflow }}-${{ github.ref }}
@@ -55,10 +55,12 @@ jobs:
       - name: Analyze
         uses: github/codeql-action/analyze@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35.5
         with:
-          category: "/language:${{ matrix.language }}"
-          # Keep CodeQL extraction/query execution as a CI gate, but store SARIF
-          # as a workflow artifact instead of uploading it to code scanning.
-          upload: never
+          # Matrix runs upload multiple analyses for the same commit; include
+          # both dimensions so code scanning stores each result set separately.
+          category: "/os:${{ matrix.os }}/language:${{ matrix.language }}"
+          # CodeQL action uploads SARIF to code scanning by default. Keep the
+          # local output directory too so the SARIF remains downloadable as a
+          # workflow artifact for offline audit/debugging.
           upload-database: false
           output: codeql-results
       - name: Upload CodeQL SARIF artifact

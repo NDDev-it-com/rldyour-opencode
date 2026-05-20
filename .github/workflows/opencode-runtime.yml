@@ -2,8 +2,8 @@ name: OpenCode Runtime
 
 # Installs a pinned opencode-ai CLI and exercises the runtime resolver:
 # `opencode --version`, `opencode debug config`, and the runtime smoke in
-# `scripts/validate_config.sh` (which is downgraded to [INFO] without the CLI
-# but is the canonical resolver gate when present).
+# `scripts/validate_config.sh` with RY_REQUIRE_OPENCODE_CLI=1 so the lane
+# fails closed if the binary is absent.
 #
 # Decoupled from the static `validate.yml` job because runtime resolution
 # requires the opencode binary on PATH, and we want a separate signal: a
@@ -19,6 +19,9 @@ on:
       - ".opencode/**"
       - "scripts/validate_config.sh"
       - "scripts/_validate_helpers.py"
+      - "scripts/check_plugin_hooks.py"
+      - "scripts/validate_contract.py"
+      - "references/rldyour-contract.json"
       - ".github/workflows/opencode-runtime.yml"
   pull_request:
     paths:
@@ -26,6 +29,9 @@ on:
       - ".opencode/**"
       - "scripts/validate_config.sh"
       - "scripts/_validate_helpers.py"
+      - "scripts/check_plugin_hooks.py"
+      - "scripts/validate_contract.py"
+      - "references/rldyour-contract.json"
       - ".github/workflows/opencode-runtime.yml"
   workflow_dispatch: {}
 
@@ -103,4 +109,6 @@ jobs:
         run: python3 -m pip install --upgrade pip "PyYAML==6.0.3"
 
       - name: Runtime validation gate
+        env:
+          RY_REQUIRE_OPENCODE_CLI: "1"
         run: bash scripts/validate_config.sh
