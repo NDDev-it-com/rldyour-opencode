@@ -85,7 +85,7 @@ jobs:
       - name: Install pinned OpenCode CLI
         run: |
           set -euo pipefail
-          bun install -g opencode-ai@1.15.5
+          bun install -g opencode-ai@1.15.6
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
 
       - name: opencode --version
@@ -106,7 +106,14 @@ jobs:
           python-version: "3.13"
 
       - name: Install validator runtime
-        run: python3 -m pip install --upgrade pip "PyYAML==6.0.3"
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install \
+            "pytest==9.0.3" \
+            "PyYAML==6.0.3" \
+            "jsonschema==4.26.0" \
+            "referencing==0.36.2" \
+            "ruff==0.15.13"
 
       - name: Runtime validation gate
         env:

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_by": "scripts/generate_commands_index.py",
-  "count": 10,
+  "count": 11,
   "commands": [
     {
       "name": "ry-deploy",
@@ -68,6 +68,20 @@
         "new project",
         "design from brief",
         "architecture docs"
+      ]
+    },
+    {
+      "name": "ry-repair",
+      "path": ".opencode/commands/ry-repair.md",
+      "description": "Нормализовать репозиторий: source-of-truth scan, semantic entropy audit, technical repairs, validators, docs/memory sync. Repair stale AI-tool context and contracts.",
+      "agent": "build",
+      "subtask": false,
+      "domain": "flow",
+      "triggers": [
+        "repair repository",
+        "semantic entropy",
+        "stale docs",
+        "contract normalization"
       ]
     },
     {

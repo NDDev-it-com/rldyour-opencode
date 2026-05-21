@@ -7,9 +7,10 @@
 # git-ignored (see .gitignore — added in commit b30a7b5 etc.).
 #
 # Usage:
-#   bash scripts/collect_diagnostics.sh                 # minimal bundle
-#   bash scripts/collect_diagnostics.sh --include-doctor  # add LSP doctor
-#   bash scripts/collect_diagnostics.sh --output PATH    # custom output dir
+#   bash scripts/collect_diagnostics.sh                   # minimal bundle
+#   bash scripts/collect_diagnostics.sh --include-doctor   # add LSP doctor
+#   bash scripts/collect_diagnostics.sh --include-live-mcp # add live MCP probe
+#   bash scripts/collect_diagnostics.sh --output PATH      # custom output dir
 
 set -euo pipefail
 
@@ -17,11 +18,13 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${PROJECT_ROOT}"
 
 INCLUDE_DOCTOR=0
+INCLUDE_LIVE_MCP=0
 OUT_BASE="${PROJECT_ROOT}/diagnostics"
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --include-doctor) INCLUDE_DOCTOR=1; shift ;;
+    --include-live-mcp) INCLUDE_LIVE_MCP=1; shift ;;
     --output) OUT_BASE="$2"; shift 2 ;;
     --help|-h)
       grep -E "^# " "$0" | sed -E 's/^# ?//' | head -10
@@ -95,7 +98,11 @@ run_cmd action-pins.txt       python3 scripts/check_action_pins.py .github/workf
 run_cmd flow-state.json       bash scripts/flow_post_task_state.sh
 run_cmd git-audit.txt         bash scripts/git_sync_audit.sh
 run_cmd fullrepo-status.json  bash scripts/fullrepo_sync.sh status-json
-run_cmd mcp-smoke.json        python3 scripts/smoke_mcp_capabilities.py --json
+run_cmd mcp-smoke.json        python3 scripts/smoke_mcp_capabilities.py --mode static --json
+
+if [ "${INCLUDE_LIVE_MCP}" -eq 1 ]; then
+  run_cmd mcp-smoke-live.json python3 scripts/smoke_mcp_capabilities.py --mode all --json
+fi
 
 # OpenCode CLI state (skipped silently if not on PATH).
 if command -v opencode >/dev/null 2>&1; then

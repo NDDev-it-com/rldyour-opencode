@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated integration review: cross-module contracts, schemas, configs, backward compatibility. Read-only. Invoked by ry-start or ry-review."
+description: "Orchestrated integration review: cross-module contracts, schemas, configs, backward compatibility. RU: интеграционное ревью API/schema/config синхронизации. Read-only. Invoked by ry-start or ry-review."
 mode: subagent
 temperature: 0.1
 steps: 36

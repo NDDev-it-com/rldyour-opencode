@@ -37,7 +37,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Session bootstrap. Logs a banner on session.created, pushes "
             "MCP/workflow context on experimental.session.compacting, and "
-            "disables the synthetic autocontinue turn on overflow."
+            "disables the synthetic autocontinue turn on overflow. RU: быстрый "
+            "старт с контекстом сессии и безопасной обработкой compaction."
         ),
         "category": "lifecycle",
         "writes_files": False,
@@ -47,7 +48,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Slash-command audit log. Appends one credential-sanitized line "
             "per command.execute.before to .serena/.command_audit.log "
-            "(256 KiB rolling cap)."
+            "(256 KiB rolling cap). RU: аудит slash-команд без секретов и "
+            "с ограниченным размером журнала."
         ),
         "category": "observability",
         "writes_files": True,
@@ -57,7 +59,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Best-effort sensitive-path guardrail. Blocks read/bash on .env*, "
             ".pem, .key, .ssh/, .gnupg/, .aws/ paths plus data-movement "
-            "utilities (cp/mv/tar/zip/base64/dd/socat/...). NOT a DLP boundary."
+            "utilities (cp/mv/tar/zip/base64/dd/socat/...). NOT a DLP boundary. "
+            "RU: защита чувствительных путей и data-movement команд, не DLP."
         ),
         "category": "guardrail",
         "writes_files": False,
@@ -67,7 +70,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Post-bash advice. Conventional Commits regex check on git commit "
             "output + /ry-sync nudge after every commit/merge/cherry-pick/"
-            "rebase that changes the repo."
+            "rebase that changes the repo. RU: подсказки после git-мутаций и "
+            "напоминание о /ry-sync."
         ),
         "category": "advisory",
         "writes_files": False,
@@ -77,7 +81,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Permission event observer. Logs permission.asked and "
             "permission.replied bus events via the generic event hook. "
-            "Observability only; enforcement stays in ry-shell-strategy."
+            "Observability only; enforcement stays in ry-shell-strategy. RU: "
+            "наблюдение permission events без enforcement."
         ),
         "category": "observability",
         "writes_files": False,
@@ -88,7 +93,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
             "Unconditional shell guardrail on tool.execute.before. Blocks "
             "force-push without lease, catastrophic rm -rf, and --no-verify "
             "pushes plus shell.env hardening "
-            "(GIT_TERMINAL_PROMPT=0, NO_UPDATE_NOTIFIER=1, conditional CI=1)."
+            "(GIT_TERMINAL_PROMPT=0, NO_UPDATE_NOTIFIER=1, conditional CI=1). "
+            "RU: shell/Git guardrail и non-interactive env hardening."
         ),
         "category": "guardrail",
         "writes_files": False,
@@ -97,7 +103,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     "ry-sync-reminder": {
         "description": (
             "Session-idle reminder. Toast-only nudge to run /ry-sync before "
-            "ending the session; no log spam between events."
+            "ending the session; no log spam between events. RU: ненавязчивое "
+            "напоминание о финальной синхронизации."
         ),
         "category": "advisory",
         "writes_files": False,
@@ -114,7 +121,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
             "Branch and HEAD values are sanitized via sanitizeRuntimeStamp "
             "before the system-prompt push to defeat indirect prompt "
             "injection through crafted branch names (reviewer wave security "
-            "F-4 closure)."
+            "F-4 closure). RU: runtime-контекст в system prompt с sanitization "
+            "ветки/HEAD."
         ),
         "category": "context-injection",
         "writes_files": False,
@@ -124,7 +132,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Appends routing hints to known MCP tool descriptions via "
             "tool.definition. Encodes AGENTS.md § Tool Priority matrix in the "
-            "tool itself so the LLM sees the hint inline."
+            "tool itself so the LLM sees the hint inline. RU: подсказки "
+            "маршрутизации прямо в описаниях MCP tools."
         ),
         "category": "routing",
         "writes_files": False,
@@ -144,7 +153,8 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Registers five LLM-callable custom tools (rldyour_validate_config, "
             "_check_deps, _lsp_health, _git_audit, _fullrepo_status) wrapping "
-            "diagnostic scripts. Each tool has timeout + maxOutputBytes budget."
+            "diagnostic scripts. Each tool has timeout + maxOutputBytes budget. "
+            "RU: диагностические custom tools с timeout и output budget."
         ),
         "category": "tool-registration",
         "writes_files": False,
@@ -163,7 +173,7 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
 # The plugin SDK returns a Hooks object where keys are hook names. We match
 # both string-key form (`"tool.execute.before": ...`) and bare-identifier
 # form (`event: ...`). Recognised hook names are listed in the
-# @opencode-ai/plugin@1.15.4 SDK; unknown keys are surfaced as warnings.
+# @opencode-ai/plugin@1.15.6 SDK; unknown keys are surfaced as warnings.
 RECOGNISED_HOOKS = {
     "event",
     "config",

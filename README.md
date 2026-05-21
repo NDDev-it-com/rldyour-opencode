@@ -2,16 +2,16 @@
 
 Personal OpenCode configuration marketplace authored by Danil Silantyev (github:rldyourmnd), CEO & Engineer NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules -- all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
 
-Validated against `@opencode-ai/plugin` 1.15.5 (May 2026); the OpenCode v1.14.48 → v1.15.5 plugin pin bumps preserve the runtime hook surface and tool-ID naming, so existing agents/skills/commands stay behavior-compatible.
+Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.15.6 (May 2026); the OpenCode v1.14.48 → v1.15.6 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading and config-robustness fixes.
 
 ## What This Is
 
 A self-contained OpenCode project configuration that provides:
 
-- **32 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
+- **33 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
 - **9 subagents** for specialized tasks (6 reviewer tracks, memory sync, deep research, config helper).
 - **10 slash commands** for lifecycle orchestration:
-  - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
+  - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-repair`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
   - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
 - **13 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, Semgrep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
 - **10 TypeScript plugins** for session lifecycle, LLM augmentation, guardrails, and observability:
@@ -69,8 +69,8 @@ A self-contained OpenCode project configuration that provides:
 | Cross-tool instructions | `AGENTS.md` | 1 |
 | Claude Code project memory (agent-only) | `.claude/CLAUDE.md` | 1 |
 | Subagents | `.opencode/agents/*.md` | 9 |
-| Skills | `.opencode/skills/<name>/SKILL.md` | 32 |
-| Slash commands | `.opencode/commands/*.md` | 10 |
+| Skills | `.opencode/skills/<name>/SKILL.md` | 33 |
+| Slash commands | `.opencode/commands/*.md` | 11 |
 | Plugins | `.opencode/plugins/*.ts` | 10 |
 | Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
 | MCP servers | `opencode.json` → `mcp` | 13 |
@@ -94,7 +94,7 @@ rldyour-opencode/
 ├── .claude/CLAUDE.md           # Claude-Code-specific project memory (agent-only)
 ├── .opencode/
 │   ├── agents/   *.md          # 9 subagents (6 reviewer, memory-sync, ry-explore, customize-opencode)
-│   ├── skills/   <name>/SKILL.md  # 32 skills across 10 domains
+│   ├── skills/   <name>/SKILL.md  # 33 skills across 10 domains
 │   ├── commands/ *.md          # 10 slash commands
 │   ├── plugins/  *.ts          # 10 Bun-runtime plugins
 │   └── package.json            # @opencode-ai/plugin pin
@@ -117,6 +117,7 @@ rldyour-opencode/
 | `/ry-init` | `build` | Scoped read-only project context with Serena-first discovery |
 | `/ry-start` | `build` | Full task lifecycle: init → research → plan → implement → verify → review → sync |
 | `/ry-review` | `plan` | Report-only deep review with parallel reviewer subagents |
+| `/ry-repair` | `build` | Repair stale docs, memories, contracts, hooks, MCP/LSP config, CI, and AI-tool context |
 | `/ry-newp` | `build` | Plan a new project (skeptical questions, research, ADRs, architecture docs) |
 | `/ry-deploy` | `build` | Deploy with sync, log checks, fix-forward |
 | `/ry-sync` | `build` | Synchronize memories, docs, git, and fullrepo |

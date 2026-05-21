@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_by": "scripts/generate_skills_index.py",
-  "count": 32,
+  "count": 33,
   "skills": [
     {
       "name": "architecture-boundaries",
@@ -391,6 +391,23 @@
         "deepwiki",
         "grep",
         "sequential-thinking"
+      ],
+      "network": true
+    },
+    {
+      "name": "ry-repair",
+      "path": ".opencode/skills/ry-repair/SKILL.md",
+      "domain": "flow",
+      "triggers": [
+        "repository repair",
+        "semantic entropy cleanup",
+        "stale AI-tool context",
+        "contract normalization"
+      ],
+      "requires_mcp": [
+        "serena",
+        "github",
+        "context7"
       ],
       "network": true
     },

@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated quality review: correctness, completeness, edge cases, error handling, resource lifecycle. Read-only. Invoked by ry-start or ry-review."
+description: "Orchestrated quality review: correctness, completeness, edge cases, error handling, resource lifecycle. RU: ревью качества реализации, edge cases и техдолга. Read-only. Invoked by ry-start or ry-review."
 mode: subagent
 temperature: 0.1
 steps: 36

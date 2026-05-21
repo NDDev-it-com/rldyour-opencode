@@ -25,6 +25,7 @@ python3 scripts/validate_contract.py
 | Canonical ID | OpenCode surface | Cross-tool parity |
 |---|---|---|
 | `flow.sync.manual` | `/ry-sync` command | Canonical manual sync flow. Claude maps it to `/ry-sync`; Codex maps it to the `ry-sync` skill/prompt surface. |
+| `flow.repair` | `/ry-repair` command + `ry-repair` skill | Canonical repository-repair flow. Claude maps it to `/rldyour-flow:ry-repair`; Codex maps it to `$rldyour-flow:ry-repair`. |
 
 ## OpenCode-Only Surfaces
 
