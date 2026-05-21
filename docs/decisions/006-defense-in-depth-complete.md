@@ -8,10 +8,10 @@
 
 ## Context and Problem Statement
 
-The marketplace uses static OpenCode permission config as the primary policy
-and one runtime-proven dynamic layer for dangerous bash patterns:
+The marketplace uses owner-standard full-auto OpenCode permissions for primary
+contexts and one runtime-proven dynamic layer for dangerous bash patterns:
 
-- `.opencode/plugins/ry-shell-strategy.ts` subscribes to `tool.execute.before` and throws unconditionally when a dangerous pattern is detected. The throw fires regardless of whether the bash permission is statically `"ask"` (the repository default) or locally overridden to `"allow"` by the owner.
+- `.opencode/plugins/ry-shell-strategy.ts` subscribes to `tool.execute.before` and throws unconditionally when a dangerous pattern is detected. The throw fires while the repository default has `bash: "allow"`, so the guardrail is independent of OpenCode permission prompts.
 - `.opencode/plugins/ry-permission-events.ts` subscribes to the generic `event` hook and logs `permission.asked` / `permission.replied`. It is observability-only and never enforces policy.
 
 Before the 2026-05-20 hardening worktree, the marketplace also shipped `.opencode/plugins/ry-permission-policy.ts` on the typed `permission.ask` hook. A 2026-05-20 source inspection of OpenCode v1.15.4 found that the permission service publishes `permission.asked` / `permission.replied` bus events, but no runtime path triggers the plugin-level `permission.ask` hook. Treating that typed-but-untriggered hook as a security boundary was incorrect, so enforcement was consolidated into the runtime-proven `tool.execute.before` layer.
@@ -20,7 +20,7 @@ Additionally, the force-push throw in `ry-shell-strategy.ts` toasted-then-threw 
 
 ## Decision Drivers
 
-- The public `build` agent now runs with `bash: ask`; an owner-local config may still override it to `allow`, so the unconditional `tool.execute.before` layer remains the dynamic safety net for dangerous patterns.
+- The primary `build` and `plan` agents now run with `bash: allow`; the unconditional `tool.execute.before` layer remains the deterministic dynamic safety net for dangerous patterns.
 - OpenCode v1.15.x subagent permission inheritance is still partial (PR `sst/opencode#24293` open); we cannot assume `deny` rules propagate to child sessions reliably.
 - The SDK type surface alone is not sufficient proof that a hook is triggered. Security boundaries must use documented or source-proven runtime hooks.
 - Audit trail completeness: every block must record a `service: <plugin>, level: error` line in `client.app.log` before the throw, so log analysis is sufficient to reconstruct what happened.
@@ -29,7 +29,7 @@ Additionally, the force-push throw in `ry-shell-strategy.ts` toasted-then-threw 
 
 1. Rely on `permission.ask` only. Reject: it does not cover `bash: allow`, and in pinned OpenCode v1.15.4 it is not triggered by the permission service.
 2. Keep `permission.ask` as a secondary deny layer. Reject: retaining dead enforcement creates false confidence and makes audits believe a non-firing hook is protecting the system.
-3. Use static permission config as the primary policy, use `tool.execute.before` as the deterministic dynamic deny layer, and keep permission bus events as observability only. **Selected.**
+3. Use owner-standard full-auto static permission config, use `tool.execute.before` as the deterministic dynamic deny layer for high-impact dangerous patterns, and keep permission bus events as observability only. **Selected.**
 
 ## Decision Outcome
 
