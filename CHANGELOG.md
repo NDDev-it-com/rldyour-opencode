@@ -49,13 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `/bin/bash`, and `_validate_helpers.py` validates absolute/relative shell
   executables.
 - **Local plugin package metadata is explicit.** `.opencode/package.json` now
-  declares AGPL-3.0-only licensing and canonical authorship for Danil Silantyev
-  (`github:rldyourmnd`), CEO & Engineer NDDev. The baseline validator fails if
+  declares AGPL-3.0-or-later licensing and canonical authorship for Danil Silantyev
+  (`github:rldyourmnd`), CEO NDDev. The baseline validator fails if
   this package metadata drifts.
-- **OpenCode runtime baseline updated to 1.15.5.** Local runtime resolution
-  reported `opencode --version` as `1.15.5`; `.opencode/package.json`,
-  `.opencode/bun.lock`, `references/opencode-baseline.json`, and the runtime
-  workflow now align on `opencode-ai` / `@opencode-ai/plugin` / SDK `1.15.5`.
 - **Generated fullrepo commits use owner identity by default.**
   `scripts/fullrepo_sync.sh` now falls back to Danil Silantyev
   (`rldyourmnd@users.noreply.github.com`) for author and committer identity
@@ -261,20 +257,20 @@ release/documentation artifacts are synchronized with the current repository sta
 - **Release-track hygiene for public publication.**
   `VERSION` and `CHANGELOG.md` are now updated for a consistent final public
   cut that explicitly carries maintainer identity:
-  `Danil Silantyev (rldyourmnd), CEO & Engineer NDDev`.
+  `Danil Silantyev (github:rldyourmnd), CEO NDDev`.
 
 ## [0.12.5] - 2026-05-18
 
 Open-source hardening and release-readiness release. This wave moves the
-repository to AGPL-3.0-only licensing, marks explicit authorship, and
+repository to AGPL-3.0-or-later licensing, marks explicit authorship, and
 normalizes CI/CD behavior for public Linux/macOS operation before preparing the
 public upstream publication and release.
 
 ### Added
 
-- **Project license changed to AGPL-3.0-only.** `LICENSE` now contains the full
+- **Project license changed to AGPL-3.0-or-later.** `LICENSE` now contains the full
   GNU Affero General Public License, version 3.0, and includes project
-  attribution for `Danil Silantyev (rldyourmnd), CEO & Engineer NDDev`.
+  attribution for `Danil Silantyev (github:rldyourmnd), CEO NDDev`.
 - **Runtime and baseline versions aligned.** `@opencode-ai/plugin` is pinned to
   `1.15.4` in `.opencode/package.json` and `.opencode/bun.lock`, matching
   `references/opencode-baseline.json` and `opencode-runtime.yml` checks.
