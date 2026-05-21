@@ -188,7 +188,7 @@ This affects:
 
 ### Serena MCP Tool Names
 
-Serena 1.3.0 with `--context=agent` exposes these tools (scoped to 28 tools):
+Serena 1.5.1 with `--context=agent` exposes these tools:
 - `list_memories`, `read_memory`, `write_memory`, `edit_memory`, `delete_memory`, `rename_memory`
 - `get_symbols_overview`, `find_symbol`, `find_referencing_symbols`, `search_for_pattern`
 - And others
