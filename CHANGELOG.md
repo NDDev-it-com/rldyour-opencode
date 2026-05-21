@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `references/rldyour-contract.json`, `scripts/validate_contract.py`, and
   `docs/contract-matrix.md` define canonical domains, skills, commands,
   agents, adapter-only surfaces, and lifecycle hooks for the OpenCode adapter.
+- **ADR-010 owner full-auto standard.** The repository now records the owner's
+  policy that YOLO/full-auto/dangerously-skip-permissions mode is the standard
+  primary OpenCode posture.
 
 ### Changed
 
@@ -24,10 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `ry-permission-policy.ts` was replaced by observability-only
   `ry-permission-events.ts`; dynamic denial remains in
   `ry-shell-strategy.ts` via `tool.execute.before`.
-- **Published OpenCode permissions now use safe primary defaults.**
-  `opencode.json` asks before `edit` and `bash` for the top-level and `build`
-  primary agent; owner full-auto belongs in a personal local override instead
-  of the public default.
+- **Published OpenCode permissions now use owner-standard full-auto primary
+  defaults.** `opencode.json` allows `edit` and `bash` for the top-level,
+  `build`, and `plan` primary contexts while keeping dynamic dangerous-shell
+  guardrails in `tool.execute.before`.
 - **Manual sync is a canonical flow.** `flow.sync.manual` now maps to
   `/ry-sync` in the main command contract rather than being marked
   OpenCode-only.

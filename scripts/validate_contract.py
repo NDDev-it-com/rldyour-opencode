@@ -64,22 +64,33 @@ def validate() -> dict[str, Any]:
     if not isinstance(security, dict):
         problems.append("contract.security must be an object")
     else:
-        if security.get("owner_full_auto") != "local-override-only":
-            problems.append("contract.security.owner_full_auto must be local-override-only")
+        if security.get("full_auto_standard") is not True:
+            problems.append("contract.security.full_auto_standard must be true")
+        aliases = set(security.get("dangerously_skip_permissions_aliases") or [])
+        for alias in ("yolo", "full-auto", "dangerously-skip-permissions"):
+            if alias not in aliases:
+                problems.append(f"contract.security.dangerously_skip_permissions_aliases missing {alias!r}")
+        if security.get("safe_override") != "local-operator-config-only":
+            problems.append("contract.security.safe_override must be local-operator-config-only")
         if security.get("forbidden_enforcement_hook") != "permission.ask":
             problems.append("contract.security.forbidden_enforcement_hook must be permission.ask")
 
-        expected_permissions = security.get("safe_default_permissions")
+        expected_permissions = security.get("standard_permissions")
         if not isinstance(expected_permissions, dict):
-            problems.append("contract.security.safe_default_permissions must be an object")
+            problems.append("contract.security.standard_permissions must be an object")
         else:
             actual_top = opencode_config.get("permission") or {}
             actual_build = ((opencode_config.get("agent") or {}).get("build") or {}).get("permission") or {}
-            for scope_name, actual_permissions in (("top_level", actual_top), ("build", actual_build)):
+            actual_plan = ((opencode_config.get("agent") or {}).get("plan") or {}).get("permission") or {}
+            for scope_name, actual_permissions in (
+                ("top_level", actual_top),
+                ("build", actual_build),
+                ("plan", actual_plan),
+            ):
                 expected_scope = expected_permissions.get(scope_name)
                 if not isinstance(expected_scope, dict):
                     problems.append(
-                        f"contract.security.safe_default_permissions.{scope_name} must be an object"
+                        f"contract.security.standard_permissions.{scope_name} must be an object"
                     )
                     continue
                 for permission, expected_value in expected_scope.items():

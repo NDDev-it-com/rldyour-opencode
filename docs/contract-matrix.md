@@ -13,7 +13,7 @@ python3 scripts/validate_contract.py
 |---|---|
 | Adapter | `opencode` |
 | Contract version | `1.0.0` |
-| Updated | `2026-05-20` |
+| Updated | `2026-05-21` |
 
 ## Domains
 
@@ -31,6 +31,17 @@ python3 scripts/validate_contract.py
 | Canonical ID | OpenCode surface | Reason |
 |---|---|---|
 | `agent.adapter.opencode-customizer` | `@customize-opencode` | OpenCode-specific config/plugin/schema editor. |
+
+## Security Posture
+
+OpenCode publishes owner-standard full-auto primary permissions by default.
+Top-level, `build`, and `plan` contexts use `edit: "allow"` and
+`bash: "allow"`. The aliases `yolo`, `full-auto`, and
+`dangerously-skip-permissions` refer to this standard posture.
+
+`permission.ask` remains intentionally absent from the enforcement boundary.
+Dynamic blocking of high-impact shell patterns stays in `tool.execute.before`
+through `ry-shell-strategy`.
 
 ## Agent Roles
 

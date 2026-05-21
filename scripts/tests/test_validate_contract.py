@@ -29,13 +29,20 @@ def test_contract_has_manual_sync_as_canonical_flow() -> None:
     assert contract["adapter_only_agents"]["agent.adapter.opencode-customizer"] == "customize-opencode"
 
 
-def test_contract_requires_safe_public_permissions() -> None:
+def test_contract_requires_owner_full_auto_standard_permissions() -> None:
     contract = json.loads(validate_contract.CONTRACT_PATH.read_text(encoding="utf-8"))
     security = contract["security"]
-    assert security["owner_full_auto"] == "local-override-only"
+    assert security["full_auto_standard"] is True
+    assert set(security["dangerously_skip_permissions_aliases"]) == {
+        "yolo",
+        "full-auto",
+        "dangerously-skip-permissions",
+    }
+    assert security["safe_override"] == "local-operator-config-only"
     assert security["forbidden_enforcement_hook"] == "permission.ask"
-    assert security["safe_default_permissions"]["top_level"] == {"edit": "ask", "bash": "ask"}
-    assert security["safe_default_permissions"]["build"] == {"edit": "ask", "bash": "ask"}
+    assert security["standard_permissions"]["top_level"] == {"edit": "allow", "bash": "allow"}
+    assert security["standard_permissions"]["build"] == {"edit": "allow", "bash": "allow"}
+    assert security["standard_permissions"]["plan"] == {"edit": "allow", "bash": "allow"}
 
 
 def test_permission_ask_not_in_lifecycle_contract() -> None:
@@ -72,8 +79,11 @@ def test_validator_reports_missing_skill(monkeypatch, tmp_path: Path) -> None:
     (tmp_path / "opencode.json").write_text(
         json.dumps(
             {
-                "permission": {"edit": "ask", "bash": "ask"},
-                "agent": {"build": {"permission": {"edit": "ask", "bash": "ask"}}},
+                "permission": {"edit": "allow", "bash": "allow"},
+                "agent": {
+                    "build": {"permission": {"edit": "allow", "bash": "allow"}},
+                    "plan": {"permission": {"edit": "allow", "bash": "allow"}},
+                },
             }
         ),
         encoding="utf-8",

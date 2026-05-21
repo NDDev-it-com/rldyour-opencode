@@ -100,7 +100,8 @@ Additional prompt content...
 
 ### Built-in agents (can override):
 - `build` — default primary, all tools enabled
-- `plan` — restricted primary, edit/bash ask by default
+- `plan` — primary planning context; this repository keeps edit/bash allowed
+  by owner-standard full-auto policy
 
 ### Subagent invocation:
 - Primary agents switch via Tab key
@@ -218,8 +219,8 @@ Global:
 ```json
 {
   "permission": {
-    "edit": "ask",
-    "bash": "ask",
+    "edit": "allow",
+    "bash": "allow",
     "webfetch": "allow",
     "websearch": "allow",
     "lsp": "allow"
