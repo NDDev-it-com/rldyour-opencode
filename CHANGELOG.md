@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **OpenCode runtime baseline updated to 1.15.6.** `.opencode/package.json`,
+  `.opencode/bun.lock`, `references/opencode-baseline.json`, and the runtime
+  workflow now align on `opencode-ai` / `@opencode-ai/plugin` /
+  `@opencode-ai/sdk` `1.15.6`, the 2026-05-20 patch baseline.
 - **Permission enforcement moved fully to runtime-proven hooks.**
   `ry-permission-policy.ts` was replaced by observability-only
   `ry-permission-events.ts`; dynamic denial remains in

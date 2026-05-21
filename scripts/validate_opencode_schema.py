@@ -10,7 +10,7 @@ permission keys, action pins). This script is the complementary structural
 gate against the upstream contract.
 
 Usage:
-    python3 scripts/validate_opencode_schema.py [--schema PATH] [--config PATH]
+    python3 scripts/validate_opencode_schema.py [--schema PATH] [--config PATH] [--offline|--live]
 
 Exits 0 when the config validates cleanly, 1 when it does not, 2 on
 operational errors (missing schema file, missing jsonschema library, etc.).
@@ -61,7 +61,7 @@ def _format_error_path(error: object) -> str:
     return "".join(parts)
 
 
-def validate(config_path: Path, schema_path: Path) -> int:
+def validate(config_path: Path, schema_path: Path, *, live: bool = False) -> int:
     if not schema_path.exists():
         print(f"[ERR] schema not found: {schema_path}", file=sys.stderr)
         return 2
@@ -84,6 +84,14 @@ def validate(config_path: Path, schema_path: Path) -> int:
 
     schema = _load_json(schema_path)
     config = _load_json(config_path)
+
+    if live:
+        print(
+            "[ERR] --live is intentionally not implemented in CI. Refresh the "
+            "vendored schema explicitly, commit it, then run --offline.",
+            file=sys.stderr,
+        )
+        return 2
 
     # Build an offline Registry from the EXTERNAL_REF_VENDORED_AT map so
     # any `$ref: https://...` inside the vendored schema resolves to the
@@ -163,8 +171,20 @@ def main(argv: list[str] | None = None) -> int:
         default=DEFAULT_CONFIG,
         help=f"Path to the OpenCode config file (default: {DEFAULT_CONFIG.relative_to(REPO_ROOT)})",
     )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--offline",
+        action="store_true",
+        help="Use only vendored schema snapshots. This is the default.",
+    )
+    mode.add_argument(
+        "--live",
+        action="store_true",
+        help="Reserved for future explicit live schema refresh; currently fails closed.",
+    )
     args = parser.parse_args(argv)
-    return validate(args.config, args.schema)
+    _ = args.offline
+    return validate(args.config, args.schema, live=args.live)
 
 
 if __name__ == "__main__":

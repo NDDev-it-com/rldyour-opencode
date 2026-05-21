@@ -41,11 +41,12 @@ OPENCODE_JSON = REPO_ROOT / "opencode.json"
 # server names the skill consumes; `network` is true when the skill uses
 # remote MCP or web fetch as part of its happy path.
 DOMAIN_BY_SKILL: dict[str, str] = {
-    # Flow (6)
+    # Flow (7)
     "flow-post-task-sync": "flow",
     "ry-init": "flow",
     "ry-start": "flow",
     "ry-review": "flow",
+    "ry-repair": "flow",
     "ry-newp": "flow",
     "ry-deploy": "flow",
     # Serena (3)
@@ -108,6 +109,7 @@ REQUIRES_MCP: dict[str, list[str]] = {
     "ry-init": ["serena"],
     "ry-start": ["serena", "sequential-thinking"],
     "ry-review": ["serena"],
+    "ry-repair": ["serena", "github", "context7"],
     "ry-newp": ["context7", "deepwiki", "grep", "sequential-thinking"],
     "ry-deploy": [],
 }
@@ -125,6 +127,7 @@ NETWORK_SKILLS = {
     "owasp-top-10-implementation",
     "ry-sec-review",
     "ry-newp",
+    "ry-repair",
 }
 
 _TRIGGERS_RE = re.compile(r"EN triggers?:\s*(.+?)(?:\.|\Z)", re.IGNORECASE | re.DOTALL)

@@ -1,6 +1,6 @@
 # OpenCode Plugin Patterns
 
-Reference for the advanced `@opencode-ai/plugin` hook surface used by this marketplace. Sourced from `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts` v1.15.4 (pin bumped from v1.15.3, originally introduced from v1.14.48 — the runtime hook surface and tool-ID format are unchanged across these versions); cross-checked against https://opencode.ai/docs/plugins/.
+Reference for the advanced `@opencode-ai/plugin` hook surface used by this marketplace. Sourced from `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts` v1.15.6 (pin bumped from v1.15.3, originally introduced from v1.14.48 — the runtime hook surface and tool-ID format are unchanged across these versions); cross-checked against https://opencode.ai/docs/plugins/.
 
 ## Plugin context
 

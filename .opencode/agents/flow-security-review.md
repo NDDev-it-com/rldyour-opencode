@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated security review: OWASP Top 10, auth/authz, injection, secrets. Defensive-only. Read-only. Invoked by ry-start or ry-review."
+description: "Orchestrated security review: OWASP Top 10, auth/authz, injection, secrets. RU: defensive security review для auth, injection, секретов и trust boundaries. Defensive-only. Read-only. Invoked by ry-start or ry-review."
 mode: subagent
 temperature: 0.1
 steps: 42
