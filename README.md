@@ -78,7 +78,7 @@ A self-contained OpenCode project configuration that provides:
 | Reference docs (skill/agent contracts + machine contracts) | `references/*` | 22 |
 | Operator guides | `docs/*.md` | 5 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`, `contract-matrix`) |
 | Architecture decision archive | `docs/decisions/*.md` | 10 |
-| Diagnostic scripts (bash + python) | `scripts/` | 30 (17 python files + 13 bash entry points; new in Unreleased: `check_plugin_hooks.py`, `validate_contract.py`) |
+| Diagnostic scripts (bash + python) | `scripts/` | 30 (17 python files + 13 bash entry points; new in 0.13.2: `check_plugin_hooks.py`, `validate_contract.py`) |
 | Pytest suites | `scripts/tests/*.py` | 26 (includes plugin hook and adapter contract validators, public-repo CI/CD automation policy, and the release-baseline changelog regression) |
 | CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
 
