@@ -15,8 +15,8 @@ def test_live_contract_is_valid() -> None:
 def test_contract_counts_cover_runtime_surfaces() -> None:
     result = validate_contract.validate()
     counts = result["counts"]
-    assert counts["skills"] == 32
-    assert counts["commands"] == 10
+    assert counts["skills"] == 33
+    assert counts["commands"] == 11
     assert counts["agents"] == 9
     assert counts["plugins"] == 10
     assert counts["hook_lifecycle"] >= 10
@@ -25,6 +25,7 @@ def test_contract_counts_cover_runtime_surfaces() -> None:
 def test_contract_has_manual_sync_as_canonical_flow() -> None:
     contract = json.loads(validate_contract.CONTRACT_PATH.read_text(encoding="utf-8"))
     assert contract["commands"]["flow.sync.manual"] == "ry-sync"
+    assert contract["commands"]["flow.repair"] == "ry-repair"
     assert "flow.sync.manual" not in contract["adapter_only_commands"]
     assert contract["adapter_only_agents"]["agent.adapter.opencode-customizer"] == "customize-opencode"
 

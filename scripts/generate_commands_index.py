@@ -49,6 +49,10 @@ COMMAND_METADATA: dict[str, dict[str, Any]] = {
         "domain": "flow",
         "triggers": ["review diff", "review PR", "report-only review", "audit changes"],
     },
+    "ry-repair": {
+        "domain": "flow",
+        "triggers": ["repair repository", "semantic entropy", "stale docs", "contract normalization"],
+    },
     "ry-newp": {
         "domain": "flow",
         "triggers": ["new project", "design from brief", "architecture docs"],

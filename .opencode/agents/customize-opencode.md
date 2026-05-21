@@ -1,5 +1,5 @@
 ---
-description: Helper agent for safely editing opencode.json config with schema validation, backup, and rollback. Invoked when the user wants to modify OpenCode configuration.
+description: "Helper agent for safely editing opencode.json config with schema validation, backup, and rollback. RU: агент безопасной настройки OpenCode config с schema validation и rollback."
 mode: subagent
 temperature: 0.1
 steps: 36
