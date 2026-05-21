@@ -56,7 +56,7 @@ When `opencode` CLI is on PATH, `validate_config.sh` also exercises the live `op
 ## Commit, branch, and PR conventions
 
 - **Conventional Commits 1.0.0** for every commit. Format: `<type>(<scope>): <description>` with type from `feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert`.
-- **Atomic commits**: one logical change per commit. Never `--amend` an already-pushed commit; ship a follow-up commit instead.
+- **Atomic commits**: one logical change per commit. Split unrelated implementation, tests/validators, docs/instructions, license/metadata, generated artifacts, and Serena/fullrepo sync when they are independently reviewable. Never `--amend` an already-pushed commit; ship a follow-up commit instead.
 - **Commit subject ≤72 characters**; longer detail in the body.
 - **Branch naming**: `feat/<topic>`, `fix/<topic>`, `chore/<topic>`. Solo-maintainer commits on `main` are acceptable for small atomic changes; multi-step features should use a feature branch and a single PR.
 - **PR description** must include: scope, validation evidence (which gates ran green), risk assessment, ADR link if architectural.
