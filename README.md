@@ -19,7 +19,7 @@ A self-contained OpenCode project configuration that provides:
   - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
   - Runtime context + permission events: `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt), `ry-permission-events` (observability-only `permission.asked` / `permission.replied` event audit)
 - **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
-- **Granular permissions** per agent (reviewer subagents are read-only with git-only bash allowlist; `task` and `external_directory` explicitly denied).
+- **Safe public permissions** by default: primary agents ask before `edit` and `bash`; reviewer subagents are read-only with git-only bash allowlists, and owner-local full-auto belongs in a personal config override.
 
 ## Quick Start
 
@@ -124,6 +124,11 @@ rldyour-opencode/
 | `/ry-explore` | `ry-explore` (subtask) | Deep multi-source research via Context7 / DeepWiki / Grep / web |
 | `/ry-sec-review` | `plan` | Defensive Mythos-style security review |
 | `/ry-rules-review` | `plan` | Audit implementation against rldyour rules (report-only) |
+
+`build` remains the implementation agent, but its public configuration uses
+`edit: "ask"` and `bash: "ask"`. The owner can layer a local OpenCode config
+override for full-auto trusted-machine work; this repository does not publish
+that posture as the default.
 
 ## Reviewer Subagents
 

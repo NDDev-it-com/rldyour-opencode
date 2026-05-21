@@ -1,8 +1,8 @@
 """Plugin surface integrity tests.
 
-Verify that the 10 plugins listed in AGENTS.md actually exist on disk, that
+Verify that the 10 plugins listed in the generated plugin index exist on disk, that
 ry-tool-hints' HINTS keys reference real MCP servers from opencode.json,
-and that ry-tools' registered tool IDs match what AGENTS.md and CHANGELOG
+and that ry-tools' registered tool IDs match what the plugin index and CHANGELOG
 claim. Catches future drift between plugin code, the manifest, and
 human-facing docs.
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 PLUGINS_DIR = PROJECT_ROOT / ".opencode" / "plugins"
 OPENCODE_JSON = PROJECT_ROOT / "opencode.json"
-AGENTS_MD = PROJECT_ROOT / "AGENTS.md"
+PLUGINS_INDEX = PROJECT_ROOT / ".opencode" / "plugins" / "index.json"
 
 EXPECTED_PLUGINS = {
     "ry-bootstrap.ts",
@@ -46,13 +46,16 @@ def test_all_expected_plugins_exist() -> None:
     )
 
 
-def test_plugin_count_matches_agents_md() -> None:
-    text = AGENTS_MD.read_text(encoding="utf-8-sig")
-    match = re.search(r"rldyour plugins \((\d+)\)", text)
-    assert match, "AGENTS.md must list 'rldyour plugins (N)'"
-    declared = int(match.group(1))
+def test_plugin_count_matches_generated_index() -> None:
+    data = json.loads(PLUGINS_INDEX.read_text(encoding="utf-8-sig"))
+    declared = int(data["count"])
+    indexed = {Path(entry["path"]).name for entry in data["plugins"]}
     actual = len(list(PLUGINS_DIR.glob("*.ts")))
-    assert declared == actual, f"AGENTS.md says {declared} plugins but {actual} exist on disk"
+    assert declared == actual, f"plugins index says {declared} plugins but {actual} exist on disk"
+    assert indexed == EXPECTED_PLUGINS, (
+        f"plugins index drifted — extra={indexed - EXPECTED_PLUGINS}, "
+        f"missing={EXPECTED_PLUGINS - indexed}"
+    )
 
 
 def test_ry_tools_registers_expected_ids() -> None:
