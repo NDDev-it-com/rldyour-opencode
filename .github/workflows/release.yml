@@ -3,11 +3,11 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "*.*.*"
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to release (vMAJOR.MINOR.PATCH). Must match VERSION."
+        description: "Tag to release (MAJOR.MINOR.PATCH). Must match VERSION."
         required: true
 
 permissions:
@@ -106,7 +106,7 @@ jobs:
           else
             tag_input="${GITHUB_REF##*/}"
           fi
-          expected="v${ver}"
+          expected="${ver}"
           if [ "$tag_input" != "$expected" ]; then
             echo "[ERR] tag $tag_input does not match VERSION ($expected)"
             exit 1

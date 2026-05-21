@@ -25,7 +25,7 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 9. Update `VERSION` to the new SemVer.
 10. Update `README.md` if catalog counts changed (skills / commands / MCP / plugins / scripts / tests).
 11. `git commit` with subject `chore(release): X.Y.Z` and the CHANGELOG block in the body.
-12. `git tag vX.Y.Z` (annotated, signed if configured).
+12. `git tag X.Y.Z` (annotated, signed if configured).
 13. Push `main` and tags; public repositories use automatic CI/CD by default. Verify the GitHub Actions runs for the pushed HEAD/tag, including `.github/workflows/validate.yml` (which runs both `validate_config.sh` and `pytest scripts/tests/`). If a required release/readiness workflow did not run because it is dispatch-only, scheduled, or release-only, trigger that existing workflow with `gh workflow run` and wait for it.
 
 ## Publishing fullrepo context
@@ -40,7 +40,7 @@ This force-with-lease pushes the complete portable snapshot to `origin/fullrepo`
 
 ## Hotfix branch (when `main` is locked)
 
-1. Branch from the previous release tag: `git checkout -b hotfix/X.Y.Z+1 vX.Y.Z`.
+1. Branch from the previous release tag: `git checkout -b hotfix/X.Y.Z+1 X.Y.Z`.
 2. Apply the fix atomically.
 3. Bump PATCH, update CHANGELOG, validate as above.
 4. Open a PR back into `main`; tag after merge.
