@@ -111,7 +111,8 @@ install_exclude_patterns() {
 
   echo "[fullrepo] Installing git exclude patterns..."
 
-  local exclude_file="$root/.git/info/exclude"
+  local exclude_file
+  exclude_file=$(git rev-parse --git-path info/exclude)
   mkdir -p "$(dirname "$exclude_file")"
 
   local block
