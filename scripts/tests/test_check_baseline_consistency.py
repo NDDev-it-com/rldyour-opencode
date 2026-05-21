@@ -130,6 +130,14 @@ def _copy_script_with_fixture_baseline(
     (tmp_path / "references" / "opencode-baseline.json").write_text(
         json.dumps({"baseline": baseline_override}, indent=2), encoding="utf-8"
     )
+    (tmp_path / "LICENSE").write_text(
+        "Copyright (C) 2026 Danil Silantyev (github:rldyourmnd), CEO NDDev\n"
+        "This project is licensed under the GNU Affero General Public License, "
+        "version 3 or later, as published by the Free Software Foundation.\n"
+        "\n"
+        "GNU AFFERO GENERAL PUBLIC LICENSE\n",
+        encoding="utf-8",
+    )
     return tmp_path / "scripts" / "check_baseline_consistency.py"
 
 
@@ -139,11 +147,11 @@ def _seed_files(tmp_path: Path, files: dict[str, str]) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         if rel == ".opencode/package.json":
             data = json.loads(contents)
-            data.setdefault("license", "AGPL-3.0-only")
+            data.setdefault("license", "AGPL-3.0-or-later")
             data.setdefault(
                 "author",
                 {
-                    "name": "Danil Silantyev (github:rldyourmnd), CEO & Engineer NDDev",
+                    "name": "Danil Silantyev (github:rldyourmnd), CEO NDDev",
                     "email": "rldyourmnd@users.noreply.github.com",
                     "url": "https://github.com/rldyourmnd",
                 },
@@ -210,6 +218,39 @@ def test_drift_detected_when_package_json_pins_older(tmp_path: Path) -> None:
     assert any(
         ".opencode/package.json" in p and "1.15.3" in p for p in payload["problems"]
     ), payload["problems"]
+
+
+def test_drift_detected_when_license_grant_is_not_or_later(tmp_path: Path) -> None:
+    _copy_script_with_fixture_baseline(tmp_path, _BASELINE_OK)
+    (tmp_path / "LICENSE").write_text(
+        "Copyright (C) 2026 Danil Silantyev (github:rldyourmnd), CEO NDDev\n"
+        "This project is licensed under the GNU Affero General Public License, "
+        "version 3, as published by the Free Software Foundation.\n"
+        "\n"
+        "GNU AFFERO GENERAL PUBLIC LICENSE\n",
+        encoding="utf-8",
+    )
+    _seed_files(
+        tmp_path,
+        {
+            ".opencode/package.json": json.dumps(
+                {"dependencies": {"@opencode-ai/plugin": "1.15.4"}}
+            ),
+            ".opencode/bun.lock": (
+                '"@opencode-ai/plugin": ["@opencode-ai/plugin@1.15.4"\n'
+                '"@opencode-ai/sdk": ["@opencode-ai/sdk@1.15.4"\n'
+            ),
+            "references/opencode-config.schema.v1.15.4.json": "{}",
+            "CHANGELOG.md": "## [0.12.2]\n@opencode-ai/plugin@1.15.4\n",
+            ".github/workflows/opencode-runtime.yml": (
+                'install -g opencode-ai@1.15.4\nbun-version: "1.3.14"\n'
+            ),
+        },
+    )
+    proc = _run_fixture(tmp_path, "--json")
+    assert proc.returncode == 1, proc.stdout
+    payload = json.loads(proc.stdout)
+    assert any("LICENSE grant must be AGPL-3.0-or-later" in p for p in payload["problems"])
 
 
 def test_drift_detected_when_bun_lock_pins_older(tmp_path: Path) -> None:

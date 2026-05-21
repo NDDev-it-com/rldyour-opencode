@@ -28,8 +28,9 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PATH = REPO_ROOT / "references" / "opencode-baseline.json"
-EXPECTED_PACKAGE_LICENSE = "AGPL-3.0-only"
-EXPECTED_PACKAGE_AUTHOR = "Danil Silantyev (github:rldyourmnd), CEO & Engineer NDDev"
+EXPECTED_PACKAGE_LICENSE = "AGPL-3.0-or-later"
+EXPECTED_PACKAGE_AUTHOR = "Danil Silantyev (github:rldyourmnd), CEO NDDev"
+EXPECTED_LICENSE_GRANT = "version 3 or later"
 
 
 def _load_baseline() -> dict[str, Any]:
@@ -71,6 +72,25 @@ def _check_package_json(plugin_version: str) -> list[str]:
         )
     if not isinstance(author, dict) or author.get("name") != EXPECTED_PACKAGE_AUTHOR:
         problems.append(".opencode/package.json author must identify Danil Silantyev / rldyourmnd")
+    return problems
+
+
+def _check_license_file() -> list[str]:
+    """The public license file must match the package SPDX policy."""
+    path = REPO_ROOT / "LICENSE"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"cannot read {path}: {exc}"]
+
+    header = "\n".join(text.splitlines()[:3])
+    problems: list[str] = []
+    if "GNU AFFERO GENERAL PUBLIC LICENSE" not in text:
+        problems.append("LICENSE must contain the GNU Affero General Public License text")
+    if EXPECTED_LICENSE_GRANT not in header:
+        problems.append(f"LICENSE grant must be {EXPECTED_PACKAGE_LICENSE}")
+    if EXPECTED_PACKAGE_AUTHOR not in header:
+        problems.append("LICENSE copyright line must use canonical author metadata")
     return problems
 
 
@@ -270,6 +290,7 @@ def main(argv: list[str] | None = None) -> int:
 
     hard_problems: list[str] = []
     hard_problems.extend(_check_package_json(plugin_version))
+    hard_problems.extend(_check_license_file())
     hard_problems.extend(_check_bun_lock(plugin_version, sdk_version))
     hard_problems.extend(_check_opencode_runtime_workflow(cli_version, bun_version))
     hard_problems.extend(_check_workflow_bun_pins(bun_version))

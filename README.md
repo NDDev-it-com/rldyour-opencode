@@ -1,6 +1,6 @@
 # rldyour-opencode
 
-Personal OpenCode configuration marketplace authored by Danil Silantyev (github:rldyourmnd), CEO & Engineer NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules -- all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
+Personal OpenCode configuration marketplace authored by Danil Silantyev (github:rldyourmnd), CEO NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules -- all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
 
 Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.15.6 (May 2026); the OpenCode v1.14.48 → v1.15.6 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading and config-robustness fixes.
 
@@ -232,4 +232,4 @@ See `docs/observability.md` for full triage flow.
 
 ## License
 
-AGPL-3.0-only
+AGPL-3.0-or-later
