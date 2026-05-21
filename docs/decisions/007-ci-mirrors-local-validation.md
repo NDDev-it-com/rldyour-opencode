@@ -47,7 +47,7 @@ Workflow set:
 | `codeql.yml` | push + PR + weekly + manual dispatch | Linux + macOS | javascript-typescript + python analysis using `.github/codeql/codeql-config.yml` so hidden `.opencode/plugins` TypeScript is included; SARIF is uploaded to code scanning with an OS+language category and also kept as a workflow artifact |
 | `secret-scan.yml` | push + PR + manual dispatch | Linux | gitleaks CLI release tarball with SHA256 verification, `.gitleaks.toml` fixture allowlist, and checkout fetch-depth: 0 |
 | `dependency-review.yml` | PR | Linux | actions/dependency-review-action, fail-on-severity: moderate |
-| `release.yml` | `v*.*.*` tag + dispatch | Linux + macOS | full validation + typecheck + tag-vs-VERSION check + npm SBOM generation + GitHub Release on Linux |
+| `release.yml` | numeric `X.Y.Z` tag + dispatch | Linux + macOS | full validation + typecheck + tag-vs-VERSION check + npm SBOM generation + GitHub Release on Linux |
 | `sbom.yml` | release published + dispatch | Linux | standalone CycloneDX SBOM artifact |
 | `opencode-runtime.yml` | push + PR + dispatch | Linux + macOS | installs the pinned OpenCode CLI and verifies `opencode debug config` / runtime resolver behavior |
 

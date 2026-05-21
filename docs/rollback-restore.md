@@ -31,7 +31,7 @@ bash scripts/fullrepo_sync.sh bootstrap-init
 
 To roll a release back when consumers report regressions:
 
-1. `git tag -d vX.Y.Z` locally if the tag was unpushed; `git push --delete origin vX.Y.Z` only with explicit owner approval.
+1. `git tag -d X.Y.Z` locally if the tag was unpushed; `git push --delete origin X.Y.Z` only with explicit owner approval.
 2. Open a hotfix branch from the previous good tag (`docs/release-process.md` §Hotfix branch).
 3. Land the fix, bump PATCH, run release checklist.
 4. Communicate the rollback in the new CHANGELOG section (`### Fixed` entry that names the regression).
