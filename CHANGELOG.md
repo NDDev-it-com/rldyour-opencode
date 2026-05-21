@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.4] - 2026-05-21
+
+### Changed
+
+- MCP runtime pins are refreshed to the current stable set used by the
+  cross-adapter control plane: `serena-agent==1.5.1`,
+  `chrome-devtools-mcp@1.0.1`, and `shadcn@4.8.0`.
+- The remote GitHub MCP definition now sends `X-MCP-Toolsets:
+  context,repos,issues,pull_requests,users`, matching the Claude/Codex GitHub
+  MCP allowlist while preserving the OpenCode-native remote transport.
+- OpenCode runtime baseline remains `opencode-ai` / `@opencode-ai/plugin` /
+  `@opencode-ai/sdk` `1.15.6`.
+
 ## [0.13.3] - 2026-05-21
 
 ### Fixed

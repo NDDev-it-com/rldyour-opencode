@@ -147,10 +147,10 @@ Focus on the failing tests and suggest fixes.
   "mcp": {
     "serena": {
       "type": "local",
-      "command": ["npx", "-y", "@anthropic/serena-mcp@1.3.0", "--context", "agent"],
+      "command": ["uvx", "--from", "serena-agent==1.5.1", "serena", "start-mcp-server", "--context=agent"],
       "enabled": true,
       "environment": {
-        "SERENA_AGENT_VERSION": "1.3.0"
+        "SERENA_AGENT_VERSION": "1.5.1"
       }
     }
   }
