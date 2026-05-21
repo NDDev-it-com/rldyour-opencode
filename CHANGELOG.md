@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.3] - 2026-05-21
+
+### Fixed
+
+- `scripts/fullrepo_sync.sh` now resolves `.git/info/exclude` with
+  `git rev-parse --git-path info/exclude`, so `install-exclude`,
+  `bootstrap-init`, and `publish` work from Git submodule checkouts where
+  `.git` is a gitfile. `test_install_exclude_uses_git_path_for_gitfile_checkout`
+  covers the control-plane monorepo case. Runtime baseline remains
+  `opencode-ai` / `@opencode-ai/plugin` / `@opencode-ai/sdk` `1.15.6`.
+
 ## [0.13.2] - 2026-05-21
 
 ### Added
