@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.6] - 2026-05-22
+
+### Changed
+
+- Primary release tags are now numeric-only (`X.Y.Z`) and must match root
+  `VERSION`; legacy `vX.Y.Z` tag names are historical only.
+- Runtime baseline remains `opencode-ai`, `@opencode-ai/plugin`, and
+  `@opencode-ai/sdk` `1.15.7`.
+- `ry-start` now routes explicit deploy/server rollout intent into `/ry-deploy`
+  after implementation validation and sync.
+- `ry-review` now defines time-window, PR, issue, branch, and last-deploy
+  target parsing before reviewer dispatch.
+- `ry-newp` now explicitly seeds `CONTEXT-01-CORE.md` and
+  `FUTURE-01-VISION.md` after approved scaffold commits.
+
 ## [0.13.5] - 2026-05-22
 
 ### Changed

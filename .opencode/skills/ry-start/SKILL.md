@@ -34,6 +34,16 @@ Implement a task to a high-quality, scalable, synchronized state. Speed is secon
     Consolidate findings via Severity × Disposition (see `references/reviewer-protocol.md`); fix `must-fix` + `should-fix` items; rerun only the reviewer tracks that reported issues.
 15. Run `flow-post-task-sync` before final response.
 
+## Deploy Intent Routing
+
+If the owner request includes deploy, production, server rollout,
+sync-and-deploy, or a named deployment target, do not finish after
+implementation. After code validation, reviewer fixes, and Serena/docs sync,
+route into `/ry-deploy` with the same scope and target. If the deploy contract
+is incomplete, ask for the missing server, branch, environment, health-check,
+rollback, or credential decision before deploying. Never invent server access
+or deployment targets.
+
 ## Automatic Helper Routing
 
 The owner normally writes prompts in Russian. `ry-start` must route helper skills automatically instead of waiting for explicit helper skill names:
