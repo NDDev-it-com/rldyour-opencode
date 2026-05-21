@@ -11,7 +11,7 @@
 The marketplace uses static OpenCode permission config as the primary policy
 and one runtime-proven dynamic layer for dangerous bash patterns:
 
-- `.opencode/plugins/ry-shell-strategy.ts` subscribes to `tool.execute.before` and throws unconditionally when a dangerous pattern is detected. The throw fires regardless of whether the bash permission is statically `"allow"` (Build agent) or `"ask"` (plan + reviewer subagents).
+- `.opencode/plugins/ry-shell-strategy.ts` subscribes to `tool.execute.before` and throws unconditionally when a dangerous pattern is detected. The throw fires regardless of whether the bash permission is statically `"ask"` (the repository default) or locally overridden to `"allow"` by the owner.
 - `.opencode/plugins/ry-permission-events.ts` subscribes to the generic `event` hook and logs `permission.asked` / `permission.replied`. It is observability-only and never enforces policy.
 
 Before the 2026-05-20 hardening worktree, the marketplace also shipped `.opencode/plugins/ry-permission-policy.ts` on the typed `permission.ask` hook. A 2026-05-20 source inspection of OpenCode v1.15.4 found that the permission service publishes `permission.asked` / `permission.replied` bus events, but no runtime path triggers the plugin-level `permission.ask` hook. Treating that typed-but-untriggered hook as a security boundary was incorrect, so enforcement was consolidated into the runtime-proven `tool.execute.before` layer.
@@ -20,7 +20,7 @@ Additionally, the force-push throw in `ry-shell-strategy.ts` toasted-then-threw 
 
 ## Decision Drivers
 
-- The Build agent runs with `bash: allow` globally, so the unconditional `tool.execute.before` layer is the only dynamic safety net for that profile.
+- The public `build` agent now runs with `bash: ask`; an owner-local config may still override it to `allow`, so the unconditional `tool.execute.before` layer remains the dynamic safety net for dangerous patterns.
 - OpenCode v1.15.x subagent permission inheritance is still partial (PR `sst/opencode#24293` open); we cannot assume `deny` rules propagate to child sessions reliably.
 - The SDK type surface alone is not sufficient proof that a hook is triggered. Security boundaries must use documented or source-proven runtime hooks.
 - Audit trail completeness: every block must record a `service: <plugin>, level: error` line in `client.app.log` before the throw, so log analysis is sufficient to reconstruct what happened.

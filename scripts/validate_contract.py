@@ -16,6 +16,7 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = REPO_ROOT / "references" / "rldyour-contract.json"
+OPENCODE_CONFIG = REPO_ROOT / "opencode.json"
 SKILLS_INDEX = REPO_ROOT / ".opencode" / "skills" / "index.json"
 COMMANDS_INDEX = REPO_ROOT / ".opencode" / "commands" / "index.json"
 PLUGINS_INDEX = REPO_ROOT / ".opencode" / "plugins" / "index.json"
@@ -42,6 +43,7 @@ def _values(mapping: object) -> set[str]:
 
 def validate() -> dict[str, Any]:
     contract = _load_json(CONTRACT_PATH)
+    opencode_config = _load_json(OPENCODE_CONFIG)
     skills_index = _load_json(SKILLS_INDEX)
     commands_index = _load_json(COMMANDS_INDEX)
     plugins_index = _load_json(PLUGINS_INDEX)
@@ -57,6 +59,36 @@ def validate() -> dict[str, Any]:
     command_names = {entry["name"] for entry in commands_index.get("commands", [])}
     agent_names = {path.stem for path in AGENTS_DIR.glob("*.md")}
     plugin_by_name = {entry["name"]: entry for entry in plugins_index.get("plugins", [])}
+
+    security = contract.get("security")
+    if not isinstance(security, dict):
+        problems.append("contract.security must be an object")
+    else:
+        if security.get("owner_full_auto") != "local-override-only":
+            problems.append("contract.security.owner_full_auto must be local-override-only")
+        if security.get("forbidden_enforcement_hook") != "permission.ask":
+            problems.append("contract.security.forbidden_enforcement_hook must be permission.ask")
+
+        expected_permissions = security.get("safe_default_permissions")
+        if not isinstance(expected_permissions, dict):
+            problems.append("contract.security.safe_default_permissions must be an object")
+        else:
+            actual_top = opencode_config.get("permission") or {}
+            actual_build = ((opencode_config.get("agent") or {}).get("build") or {}).get("permission") or {}
+            for scope_name, actual_permissions in (("top_level", actual_top), ("build", actual_build)):
+                expected_scope = expected_permissions.get(scope_name)
+                if not isinstance(expected_scope, dict):
+                    problems.append(
+                        f"contract.security.safe_default_permissions.{scope_name} must be an object"
+                    )
+                    continue
+                for permission, expected_value in expected_scope.items():
+                    actual_value = actual_permissions.get(permission)
+                    if actual_value != expected_value:
+                        problems.append(
+                            f"opencode.json {scope_name} permission {permission!r} is {actual_value!r}; "
+                            f"expected {expected_value!r}"
+                        )
 
     contract_skills = _values(contract.get("skills"))
     missing_skills = sorted(contract_skills - skill_names)

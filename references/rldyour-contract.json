@@ -4,6 +4,20 @@
   "version": "1.0.0",
   "updated": "2026-05-20",
   "adapter": "opencode",
+  "security": {
+    "safe_default_permissions": {
+      "top_level": {
+        "edit": "ask",
+        "bash": "ask"
+      },
+      "build": {
+        "edit": "ask",
+        "bash": "ask"
+      }
+    },
+    "owner_full_auto": "local-override-only",
+    "forbidden_enforcement_hook": "permission.ask"
+  },
   "domains": [
     "browser",
     "config",
@@ -57,13 +71,12 @@
     "flow.init": "ry-init",
     "flow.new-project": "ry-newp",
     "flow.review": "ry-review",
+    "flow.sync.manual": "ry-sync",
     "flow.start": "ry-start",
     "rules.review": "ry-rules-review",
     "security.review": "ry-sec-review"
   },
-  "adapter_only_commands": {
-    "flow.sync.manual": "ry-sync"
-  },
+  "adapter_only_commands": {},
   "agents": {
     "agent.explore.research": "ry-explore",
     "agent.review.architecture": "flow-architecture-review",
