@@ -154,18 +154,18 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 
 | Server | Type | Version | Purpose |
 |---|---|---|---|
-| serena | local (uvx) | 1.3.0 | Semantic code navigation, analysis, editing |
+| serena | local (uvx) | 1.5.1 | Semantic code navigation, analysis, editing |
 | sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
 | playwright | local (bunx) | 0.0.75 | Browser automation, UI validation |
-| chrome-devtools | local (bunx) | 0.26.0 | Chrome DevTools diagnostics |
+| chrome-devtools | local (bunx) | 1.0.1 | Chrome DevTools diagnostics |
 | semgrep | local (uvx) | 1.163.0 | Static analysis and security |
-| shadcn | local (bunx) | 4.7.0 | shadcn/ui registry access |
+| shadcn | local (bunx) | 4.8.0 | shadcn/ui registry access |
 | dart-flutter | local (dart) | — | Dart/Flutter project support |
 | context7 | remote | — | Current library documentation |
 | deepwiki | remote | — | Repository documentation |
 | grep | remote | — | Search across public GitHub repos |
 | figma | remote | — | Figma design context |
-| github | remote | — | GitHub Copilot MCP (requires PAT) |
+| github | remote | toolsets: context,repos,issues,pull_requests,users | GitHub Copilot MCP (requires PAT) |
 | openai-docs | remote | — | Official OpenAI/Codex documentation |
 
 ## Models

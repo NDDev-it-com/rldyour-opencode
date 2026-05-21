@@ -88,11 +88,11 @@ Since OpenCode has NO hooks system, the lifecycle automation pattern must change
 | context7 | remote HTTP | `{ "type": "remote", "url": "https://mcp.context7.com/mcp" }` |
 | deepwiki | remote HTTP | `{ "type": "remote", "url": "https://mcp.deepwiki.com/mcp" }` |
 | grep | remote HTTP | `{ "type": "remote", "url": "https://mcp.grep.app" }` |
-| github | remote HTTP with auth | `{ "type": "remote", "url": "https://api.githubcopilot.com/mcp/", "headers": { "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}" } }` |
+| github | remote HTTP with auth/toolsets | `{ "type": "remote", "url": "https://api.githubcopilot.com/mcp/", "headers": { "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}", "X-MCP-Toolsets": "context,repos,issues,pull_requests,users" } }` |
 | figma | remote HTTP | `{ "type": "remote", "url": "https://mcp.figma.com/" }` |
 | openai-docs | remote HTTP | `{ "type": "remote", "url": "https://openai-mcp-serverless.vercel.app/mcp" } or remove` |
 | semgrep | stdio | `{ "type": "local", "command": ["semgrep", "mcp", "--config", "auto"] } or remove` |
-| shadcn | stdio | `{ "type": "local", "command": ["npx", "-y", "shadcn@4.7.0", "mcp"] }` |
+| shadcn | stdio | `{ "type": "local", "command": ["bunx", "shadcn@4.8.0", "mcp"] }` |
 | chrome-devtools | stdio | Remove — not available as npm package |
 | dart | stdio | `{ "type": "local", "command": ["dart", "mcp-server"] } or use OpenCode built-in LSP` |
 
