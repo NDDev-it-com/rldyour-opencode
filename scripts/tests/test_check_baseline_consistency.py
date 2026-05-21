@@ -131,11 +131,14 @@ def _copy_script_with_fixture_baseline(
         json.dumps({"baseline": baseline_override}, indent=2), encoding="utf-8"
     )
     (tmp_path / "LICENSE").write_text(
-        "Copyright (C) 2026 Danil Silantyev (github:rldyourmnd), CEO NDDev\n"
-        "This project is licensed under the GNU Affero General Public License, "
-        "version 3 or later, as published by the Free Software Foundation.\n"
-        "\n"
-        "GNU AFFERO GENERAL PUBLIC LICENSE\n",
+        "GNU AFFERO GENERAL PUBLIC LICENSE\n"
+        "Version 3, 19 November 2007\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "NOTICE").write_text(
+        "Copyright (C) 2026 Danil Silantyev (github:rldyourmnd), CEO NDDev.\n"
+        "License: AGPL-3.0-or-later.\n"
+        "Danil Silantyev may issue additional licensing grants separately.\n",
         encoding="utf-8",
     )
     return tmp_path / "scripts" / "check_baseline_consistency.py"
@@ -220,14 +223,12 @@ def test_drift_detected_when_package_json_pins_older(tmp_path: Path) -> None:
     ), payload["problems"]
 
 
-def test_drift_detected_when_license_grant_is_not_or_later(tmp_path: Path) -> None:
+def test_drift_detected_when_license_notice_is_not_or_later(tmp_path: Path) -> None:
     _copy_script_with_fixture_baseline(tmp_path, _BASELINE_OK)
-    (tmp_path / "LICENSE").write_text(
-        "Copyright (C) 2026 Danil Silantyev (github:rldyourmnd), CEO NDDev\n"
-        "This project is licensed under the GNU Affero General Public License, "
-        "version 3, as published by the Free Software Foundation.\n"
-        "\n"
-        "GNU AFFERO GENERAL PUBLIC LICENSE\n",
+    (tmp_path / "NOTICE").write_text(
+        "Copyright (C) 2026 Danil Silantyev (github:rldyourmnd), CEO NDDev.\n"
+        "License: AGPL-3.0-only.\n"
+        "Danil Silantyev may issue additional licensing grants separately.\n",
         encoding="utf-8",
     )
     _seed_files(
@@ -250,7 +251,7 @@ def test_drift_detected_when_license_grant_is_not_or_later(tmp_path: Path) -> No
     proc = _run_fixture(tmp_path, "--json")
     assert proc.returncode == 1, proc.stdout
     payload = json.loads(proc.stdout)
-    assert any("LICENSE grant must be AGPL-3.0-or-later" in p for p in payload["problems"])
+    assert any("NOTICE grant must be AGPL-3.0-or-later" in p for p in payload["problems"])
 
 
 def test_drift_detected_when_bun_lock_pins_older(tmp_path: Path) -> None:
