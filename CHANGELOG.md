@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.2] - 2026-05-21
+
 ### Added
 
 - **Plugin hook contract validator.** `scripts/check_plugin_hooks.py` now
@@ -23,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Repository release advanced to `0.13.2`. Local release evidence on
+  2026-05-21: `bash scripts/validate_config.sh`, contract/schema/profile/index
+  checks, static MCP capability smoke, `python3 -m pytest -q scripts/tests`
+  (`525 passed + 1 skipped`), and `.opencode` TypeScript `noEmit` all passed.
 - **OpenCode runtime baseline updated to 1.15.6.** `.opencode/package.json`,
   `.opencode/bun.lock`, `references/opencode-baseline.json`, and the runtime
   workflow now align on `opencode-ai` / `@opencode-ai/plugin` /
