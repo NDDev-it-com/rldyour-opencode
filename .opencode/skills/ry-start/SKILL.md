@@ -13,7 +13,7 @@ Implement a task to a high-quality, scalable, synchronized state. Speed is secon
 
 1. If context is missing, run a scoped `ry-init` automatically.
 2. Understand the prompt. For ambiguity, ask concise Russian questions with options.
-3. Research code through Serena memories and semantic tools (`serena_find_symbol`, `serena_get_symbols_overview`, `serena_find_referencing_symbols`).
+3. Research current code through Serena memories and semantic tools (`serena_find_symbol`, `serena_get_symbols_overview`, `serena_find_referencing_symbols`).
 4. Research current docs, patterns, and alternatives through `ry-explore`. Prefer Context7 MCP for official versioned docs, DeepWiki MCP for public repo architecture, and Grep MCP for real production usage patterns.
 5. Read `references/context-sufficiency-gate.md` and pass the gate before editing code.
 6. Write a detailed plan. Verify each plan item against code using Serena before editing.

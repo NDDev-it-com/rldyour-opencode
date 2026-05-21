@@ -13,7 +13,7 @@ Synchronize local repository, GitHub, and server, then deploy safely with eviden
 
 1. Read deploy contract from `AGENTS.md`, then `.serena/deploy/*.md` if present. The deploy contract defines server addresses, sync methods, migration commands, health checks, and rollback procedures.
 2. Run readiness checks before any push:
-   - `bash scripts/deploy_readiness.sh <target>` — single-shot composite (working tree clean of real changes, on `main`, in sync with upstream, Serena memories present, project-native test/lint commands detected).
+   - `bash scripts/deploy_readiness.sh <target>` — single-shot deploy preflight composite (working tree clean of real changes, on `main`, in sync with upstream, Serena memories present, project-native test/lint commands detected).
    - `bash scripts/git_sync_audit.sh` — exact dirty file list (whitelist-aware), worktree count, merged-branch cleanup candidates.
    - `bash scripts/validate_config.sh` + `python3 -m pytest scripts/tests/` — same gates CI runs.
    Stop on any FAIL and surface the exact blocker before continuing.
@@ -21,7 +21,7 @@ Synchronize local repository, GitHub, and server, then deploy safely with eviden
 4. Sync code to server.
 5. Run migrations only when readiness is clear and the deploy contract defines a migration command.
 6. Restart/build services.
-7. Verify logs, tests, health checks, and critical behavior.
+7. Run postflight verification: logs, tests, health checks, and critical behavior.
 8. If anything fails, perform root cause analysis using server logs, code, and internet research. Fix-forward and redeploy. Ask the user with options for risky or ambiguous decisions.
 9. DB rollback only when explicit rollback command and backup/restore point are verified.
 10. Finish with `flow-post-task-sync`.
