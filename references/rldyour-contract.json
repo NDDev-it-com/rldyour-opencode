@@ -2,20 +2,30 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Machine-readable rldyour workflow contract for the OpenCode adapter. Sister tool repos should map the same canonical IDs to their own native surfaces.",
   "version": "1.0.0",
-  "updated": "2026-05-20",
+  "updated": "2026-05-21",
   "adapter": "opencode",
   "security": {
-    "safe_default_permissions": {
+    "full_auto_standard": true,
+    "dangerously_skip_permissions_aliases": [
+      "yolo",
+      "full-auto",
+      "dangerously-skip-permissions"
+    ],
+    "standard_permissions": {
       "top_level": {
-        "edit": "ask",
-        "bash": "ask"
+        "edit": "allow",
+        "bash": "allow"
       },
       "build": {
-        "edit": "ask",
-        "bash": "ask"
+        "edit": "allow",
+        "bash": "allow"
+      },
+      "plan": {
+        "edit": "allow",
+        "bash": "allow"
       }
     },
-    "owner_full_auto": "local-override-only",
+    "safe_override": "local-operator-config-only",
     "forbidden_enforcement_hook": "permission.ask"
   },
   "domains": [
