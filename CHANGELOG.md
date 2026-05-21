@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.5] - 2026-05-22
+
+### Changed
+
+- OpenCode runtime baseline updated to the current npm `latest` line:
+  `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` `1.15.7`.
+  The adapter keeps the same owner-full-auto permission posture and
+  runtime-proven `tool.execute.before` enforcement boundary.
+
 ## [0.13.4] - 2026-05-21
 
 ### Changed
