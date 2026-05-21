@@ -20,11 +20,16 @@ python3 scripts/validate_contract.py
 `browser`, `config`, `design`, `docs-sync`, `explore`, `flow`, `lsp`,
 `rules`, `security`, `serena`.
 
+## Manual Sync Flow
+
+| Canonical ID | OpenCode surface | Cross-tool parity |
+|---|---|---|
+| `flow.sync.manual` | `/ry-sync` command | Canonical manual sync flow. Claude maps it to `/ry-sync`; Codex maps it to the `ry-sync` skill/prompt surface. |
+
 ## OpenCode-Only Surfaces
 
 | Canonical ID | OpenCode surface | Reason |
 |---|---|---|
-| `flow.sync.manual` | `/ry-sync` command | OpenCode has slash commands; Codex sync is prompt/skill-driven and Claude sync is hook/command-dependent. |
 | `agent.adapter.opencode-customizer` | `@customize-opencode` | OpenCode-specific config/plugin/schema editor. |
 
 ## Agent Roles

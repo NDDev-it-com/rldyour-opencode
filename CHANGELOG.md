@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `ry-permission-policy.ts` was replaced by observability-only
   `ry-permission-events.ts`; dynamic denial remains in
   `ry-shell-strategy.ts` via `tool.execute.before`.
+- **Published OpenCode permissions now use safe primary defaults.**
+  `opencode.json` asks before `edit` and `bash` for the top-level and `build`
+  primary agent; owner full-auto belongs in a personal local override instead
+  of the public default.
+- **Manual sync is a canonical flow.** `flow.sync.manual` now maps to
+  `/ry-sync` in the main command contract rather than being marked
+  OpenCode-only.
 - **CodeQL now uploads to GitHub code scanning.** The public repo CodeQL
   workflow uses `security-events: write`, no longer sets `upload: never`, and
   uses an OS+language category for matrix uploads; SARIF artifacts remain

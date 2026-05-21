@@ -218,8 +218,8 @@ Global:
 ```json
 {
   "permission": {
-    "edit": "allow",
-    "bash": "allow",
+    "edit": "ask",
+    "bash": "ask",
     "webfetch": "allow",
     "websearch": "allow",
     "lsp": "allow"

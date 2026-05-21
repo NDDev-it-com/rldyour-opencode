@@ -22,10 +22,20 @@ def test_contract_counts_cover_runtime_surfaces() -> None:
     assert counts["hook_lifecycle"] >= 10
 
 
-def test_contract_has_explicit_opencode_only_surfaces() -> None:
+def test_contract_has_manual_sync_as_canonical_flow() -> None:
     contract = json.loads(validate_contract.CONTRACT_PATH.read_text(encoding="utf-8"))
-    assert contract["adapter_only_commands"]["flow.sync.manual"] == "ry-sync"
+    assert contract["commands"]["flow.sync.manual"] == "ry-sync"
+    assert "flow.sync.manual" not in contract["adapter_only_commands"]
     assert contract["adapter_only_agents"]["agent.adapter.opencode-customizer"] == "customize-opencode"
+
+
+def test_contract_requires_safe_public_permissions() -> None:
+    contract = json.loads(validate_contract.CONTRACT_PATH.read_text(encoding="utf-8"))
+    security = contract["security"]
+    assert security["owner_full_auto"] == "local-override-only"
+    assert security["forbidden_enforcement_hook"] == "permission.ask"
+    assert security["safe_default_permissions"]["top_level"] == {"edit": "ask", "bash": "ask"}
+    assert security["safe_default_permissions"]["build"] == {"edit": "ask", "bash": "ask"}
 
 
 def test_permission_ask_not_in_lifecycle_contract() -> None:
@@ -54,10 +64,20 @@ def test_validator_reports_missing_skill(monkeypatch, tmp_path: Path) -> None:
     )
     monkeypatch.setattr(validate_contract, "REPO_ROOT", tmp_path)
     monkeypatch.setattr(validate_contract, "CONTRACT_PATH", tmp_path / "references" / "rldyour-contract.json")
+    monkeypatch.setattr(validate_contract, "OPENCODE_CONFIG", tmp_path / "opencode.json")
     monkeypatch.setattr(validate_contract, "SKILLS_INDEX", tmp_path / ".opencode" / "skills" / "index.json")
     monkeypatch.setattr(validate_contract, "COMMANDS_INDEX", tmp_path / ".opencode" / "commands" / "index.json")
     monkeypatch.setattr(validate_contract, "PLUGINS_INDEX", tmp_path / ".opencode" / "plugins" / "index.json")
     monkeypatch.setattr(validate_contract, "AGENTS_DIR", tmp_path / ".opencode" / "agents")
+    (tmp_path / "opencode.json").write_text(
+        json.dumps(
+            {
+                "permission": {"edit": "ask", "bash": "ask"},
+                "agent": {"build": {"permission": {"edit": "ask", "bash": "ask"}}},
+            }
+        ),
+        encoding="utf-8",
+    )
 
     result = validate_contract.validate()
     assert not result["ok"]
