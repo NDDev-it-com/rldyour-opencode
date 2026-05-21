@@ -16,7 +16,10 @@ Leave the project in a synchronized, documented, committed state. This skill run
 3. Inspect uncommitted changes deeply. Separate source changes, docs, Serena knowledge, generated junk, runtime markers, and secrets.
 4. Run `instruction-docs-sync` when durable project instructions may have changed. Keep `AGENTS.md` optimized for the current agent environment.
 5. Run applicable quality checks from project scripts and detected stack checks.
-6. Commit atomically with Conventional Commits. Use separate commits for implementation, tests, docs/instructions, and Serena knowledge when that improves history clarity.
+6. Commit atomically with Conventional Commits. Use separate commits for
+   implementation, tests/validators, docs/instructions, license/metadata,
+   generated artifacts, and Serena/fullrepo sync when that improves history
+   clarity or reviewability.
 7. Push to upstream when configured. If no upstream exists, ask before creating one.
 8. Keep normal branch history clean from agent-only files. Ensure `.git/info/exclude` contains the rldyour fullrepo block and move tracked agent-only files out of the current branch only when the project is ready for that migration.
 9. Publish the complete project snapshot to `fullrepo` through sync scripts. This uses safe `--force-with-lease`, not a blind force push.
