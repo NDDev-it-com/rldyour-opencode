@@ -211,6 +211,32 @@ def test_install_exclude_writes_canonical_marker(tmp_path: Path) -> None:
     assert "\nscripts/\n" not in exclude_text
 
 
+def test_install_exclude_uses_git_path_for_gitfile_checkout(tmp_path: Path) -> None:
+    """Submodules have a `.git` file, not a `.git/` directory.
+
+    `fullrepo_sync.sh` must write to Git's resolved `info/exclude` path so the
+    control-plane monorepo can bootstrap/publish adapter `fullrepo` snapshots
+    directly from submodule worktrees.
+    """
+    tmp_script = _copy_script_to_tmp_repo(tmp_path)
+    git_dir = tmp_path / ".git"
+    real_git_dir = tmp_path / ".git-real"
+    git_dir.rename(real_git_dir)
+    git_dir.write_text(f"gitdir: {real_git_dir}\n", encoding="utf-8")
+
+    subprocess.run(
+        ["bash", str(tmp_script), "install-exclude"],
+        check=True,
+        capture_output=True,
+        cwd=tmp_path,
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+    exclude_text = (real_git_dir / "info" / "exclude").read_text(encoding="utf-8")
+    assert "# >>> rldyour fullrepo agent-only files >>>" in exclude_text
+    assert "# <<< rldyour fullrepo agent-only files <<<" in exclude_text
+
+
 def test_publish_creates_complete_head_plus_agent_snapshot(tmp_path: Path) -> None:
     """`fullrepo` must be a complete portable snapshot, not an agent-only
     tree that omits root manifests such as opencode.json / VERSION."""
