@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- OpenCode runtime baseline now tracks `opencode-ai`, `@opencode-ai/plugin`,
+  and `@opencode-ai/sdk` `1.15.10`, matching the current upstream stable
+  release and CI runtime install target.
+
 ## [0.13.6] - 2026-05-22
 
 ### Changed
