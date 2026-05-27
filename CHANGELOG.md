@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-05-27
+
 ### Changed
 
 - OpenCode runtime baseline now tracks `opencode-ai`, `@opencode-ai/plugin`,
@@ -14,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   release and CI runtime install target.
 - Shared MCP runtime pins now match current upstream stable packages:
   `serena-agent==1.5.3`, `chrome-devtools-mcp@1.1.1`, and `shadcn@4.8.1`.
+- Vendored OpenCode config schema now matches the `1.15.11` runtime baseline.
+- `scripts/validate_config.sh` now exposes explicit `auto`, `static`,
+  `installed`, and `live` lanes for deterministic source-only, installed CLI,
+  and network freshness checks.
+- MCP profile validation now requires skill-specific justifications for
+  high-context servers such as GitHub.
 
 ## [0.13.6] - 2026-05-22
 
