@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - OpenCode runtime baseline now tracks `opencode-ai`, `@opencode-ai/plugin`,
-  and `@opencode-ai/sdk` `1.15.10`, matching the current upstream stable
+  and `@opencode-ai/sdk` `1.15.11`, matching the current upstream stable
   release and CI runtime install target.
 - Shared MCP runtime pins now match current upstream stable packages:
   `serena-agent==1.5.3`, `chrome-devtools-mcp@1.1.0`, and `shadcn@4.8.1`.
