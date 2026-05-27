@@ -32,6 +32,47 @@ log_info() { echo -e "${YELLOW}[INFO]${NC} $1"; }
 #                            # from Python validator stderr.
 log_fail() { echo -e "${RED}[FAIL]${NC} $1"; }
 
+MODE="${RY_OPENCODE_VALIDATE_MODE:-auto}"
+
+usage() {
+    cat <<'EOF'
+Usage: bash scripts/validate_config.sh [--mode auto|static|installed|live]
+
+Modes:
+  auto       Static validation plus best-effort runtime probes when opencode is on PATH (default).
+  static     No opencode binary and no network; validate repository files only.
+  installed  Require a local opencode binary and run debug config/skill/agent probes.
+  live       Installed mode plus network-backed dependency freshness check.
+EOF
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --mode)
+            shift
+            MODE="${1:?--mode requires auto, static, installed, or live}"
+            case "$MODE" in
+                auto|static|installed|live) ;;
+                *)
+                    log_err "Invalid --mode: ${MODE}"
+                    usage >&2
+                    exit 2
+                    ;;
+            esac
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            log_err "Unknown argument: $1"
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
 if [ ! -f "$HELPER" ]; then
     log_err "Missing Python helper: ${HELPER}"
     exit 1
@@ -166,14 +207,12 @@ else
 fi
 
 log_step "Runtime resolution (opencode CLI)"
-# Non-blocking runtime smoke. When `opencode` is on PATH, exercise the
-# debug surface that ships with the v1.15.x CLI: the same code paths a
-# real session uses to load config, list skills, and resolve agents. We
-# do not assert on the resolved structure here — _validate_helpers.py
-# already validates the static shape. The smoke is "did the runtime
-# accept our config at all?" — strict-fail mode would block release
-# whenever a developer machine lacks the binary, so this stays warn-only.
-if command -v opencode >/dev/null 2>&1; then
+# `auto` keeps the historical local behavior: run runtime probes when the
+# CLI is available and skip otherwise. `static`, `installed`, and `live`
+# make CI/release lane intent explicit.
+if [ "$MODE" = "static" ]; then
+    log_info "static mode — skipping opencode CLI runtime probes"
+elif command -v opencode >/dev/null 2>&1; then
     if opencode debug config >/dev/null 2>&1; then
         log_ok "opencode debug config resolved"
     else
@@ -195,9 +234,17 @@ if command -v opencode >/dev/null 2>&1; then
         log_warn "opencode debug agent build FAILED"
         ERRORS=$((ERRORS + 1))
     fi
+    if [ "$MODE" = "live" ]; then
+        if bash "${PROJECT_ROOT}/scripts/check_deps_freshness.sh" --check-freshness --json >/dev/null; then
+            log_ok "dependency freshness check passed"
+        else
+            log_err "dependency freshness check failed"
+            ERRORS=$((ERRORS + 1))
+        fi
+    fi
 else
-    if [ "${RY_REQUIRE_OPENCODE_CLI:-0}" = "1" ]; then
-        log_err "opencode CLI not on PATH and RY_REQUIRE_OPENCODE_CLI=1"
+    if [ "${RY_REQUIRE_OPENCODE_CLI:-0}" = "1" ] || [ "$MODE" = "installed" ] || [ "$MODE" = "live" ]; then
+        log_err "opencode CLI not on PATH and installed runtime validation is required"
         ERRORS=$((ERRORS + 1))
     else
         log_info "opencode CLI not on PATH — skipping runtime resolution smoke"
