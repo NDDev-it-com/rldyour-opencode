@@ -20,8 +20,8 @@
       "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.15.11"
     },
     "config_schema": {
-      "version": "v1.15.4",
-      "vendored_at": "references/opencode-config.schema.v1.15.4.json",
+      "version": "v1.15.11",
+      "vendored_at": "references/opencode-config.schema.v1.15.11.json",
       "external_refs_vendored_at": [
         "references/models.dev-model-schema.json"
       ],

@@ -71,7 +71,7 @@ jobs:
       - name: Run repo validator (opencode.json + skill/agent/command frontmatter + VERSION)
         run: bash scripts/validate_config.sh
 
-      - name: Validate opencode.json against vendored JSON Schema (v1.15.4, offline)
+      - name: Validate opencode.json against vendored JSON Schema (v1.15.11, offline)
         # Audit P0-2: schema validator resolves external $refs through a
         # vendored Registry (references/models.dev-model-schema.json), so
         # this gate never requires network reachability.

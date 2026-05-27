@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Validate OpenCode plugin hook usage against the pinned runtime contract.
 
-OpenCode v1.15.4 has three materially different hook classes:
+The current OpenCode v1.15.11 baseline has three materially different hook classes:
 
 - documented hooks/events from https://opencode.ai/docs/plugins/
 - SDK/runtime hooks present in @opencode-ai/plugin and triggered by the
-  v1.15.4 source tree, but omitted from the public docs event list
+  v1.15.4 source tree and still allowed through the current baseline, but omitted
+  from the public docs event list
 - typed-but-untriggered surfaces, most notably `permission.ask`
 
 This validator keeps the marketplace honest: security enforcement must use
@@ -54,9 +55,10 @@ SDK_RUNTIME_HOOKS = frozenset(
 
 FORBIDDEN_HOOKS = {
     "permission.ask": (
-        "OpenCode v1.15.4 SDK types expose this hook, but source/runtime "
+        "OpenCode SDK types expose this hook, but v1.15.4 source/runtime "
         "inspection shows the permission service publishes permission.asked/"
-        "permission.replied events and does not trigger plugin permission.ask."
+        "permission.replied events and does not trigger plugin permission.ask; "
+        "the current v1.15.11 baseline keeps it forbidden for enforcement."
     )
 }
 
