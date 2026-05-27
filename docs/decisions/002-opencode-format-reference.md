@@ -91,7 +91,7 @@ Additional prompt content...
 | `bash` | `bash` |
 | `task` | `task` |
 | `external_directory` | Any tool that reads/writes outside project worktree |
-| `todowrite` | `todowrite`, `todoread` |
+| `todowrite` | `todowrite` |
 | `webfetch` | `webfetch` |
 | `websearch` | `websearch` |
 | `lsp` | `lsp` |
