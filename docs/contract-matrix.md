@@ -75,6 +75,7 @@ through `ry-shell-strategy`.
 | `tool.custom.diagnostics` | `ry-tools` | `tool` | tool-registration |
 | `session.idle.sync-reminder` | `ry-sync-reminder` | `event` (`session.idle`) | advisory |
 
-`permission.ask` is intentionally absent. In OpenCode v1.15.4 it is present in
-SDK types but is not triggered by the permission service; enforcement uses
-static permission config plus `tool.execute.before`.
+`permission.ask` is intentionally absent. Source/runtime inspection originally
+proved this on OpenCode v1.15.4 and the current v1.15.11 baseline keeps the
+same repository policy: enforcement uses static permission config plus
+runtime-proven `tool.execute.before` guards, not `permission.ask`.
