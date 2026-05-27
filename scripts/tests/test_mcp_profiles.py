@@ -96,6 +96,28 @@ def test_high_context_members_exist_in_mcp() -> None:
         )
 
 
+def test_high_context_skill_dependencies_are_justified() -> None:
+    profiles = _load_json(PROFILES_PATH)
+    skills_index = _load_json(SKILLS_INDEX)
+    high_context_block = profiles.get("high_context") or {}
+    high = set(high_context_block.get("members") or [])
+    justifications = high_context_block.get("justifications") or {}
+    assert isinstance(justifications, dict)
+
+    missing: list[str] = []
+    for skill in skills_index.get("skills", []) or []:
+        skill_name = str(skill.get("name") or "")
+        skill_justifications = justifications.get(skill_name) or {}
+        for server in skill.get("requires_mcp") or []:
+            if server in high and not str(skill_justifications.get(server) or "").strip():
+                missing.append(f"{skill_name}.{server}")
+
+    assert not missing, (
+        "high-context MCP skill dependencies require explicit justifications: "
+        f"{sorted(missing)}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Validator behaviour
 # ---------------------------------------------------------------------------
@@ -237,8 +259,8 @@ def test_validator_skill_requires_unknown_mcp(tmp_path: Path) -> None:
     assert any("ghost" in p for p in payload["problems"])
 
 
-def test_validator_high_context_soft_warning(tmp_path: Path) -> None:
-    """A skill that depends on a high_context server emits a soft warning."""
+def test_validator_high_context_requires_justification(tmp_path: Path) -> None:
+    """A skill that depends on a high_context server must be justified."""
     cfg = {"mcp": {"github": {"type": "remote", "url": "https://x"}}}
     profiles = {
         "version": "1.0.0",
@@ -272,10 +294,62 @@ def test_validator_high_context_soft_warning(tmp_path: Path) -> None:
         check=False,
         timeout=DEFAULT_TIMEOUT,
     )
+    assert proc.returncode == 1, proc.stdout
+    payload = json.loads(proc.stdout)
+    assert any(
+        "without high_context.justifications.uses-github.github" in p
+        for p in payload["problems"]
+    ), payload["problems"]
+    assert payload["warnings"] == []
+
+
+def test_validator_high_context_justification_passes(tmp_path: Path) -> None:
+    """A high-context skill dependency with justification is accepted."""
+    cfg = {"mcp": {"github": {"type": "remote", "url": "https://x"}}}
+    profiles = {
+        "version": "1.0.0",
+        "profiles": {"repo": {"description": "x", "members": ["github"]}},
+        "high_context": {
+            "description": "heavy",
+            "members": ["github"],
+            "justifications": {
+                "uses-github": {
+                    "github": "Required for remote PR and issue repair context."
+                }
+            },
+        },
+    }
+    skills_index = {
+        "version": "1.0.0",
+        "skills": [
+            {"name": "uses-github", "domain": "flow", "requires_mcp": ["github"], "network": True}
+        ],
+    }
+    (tmp_path / "opencode.json").write_text(json.dumps(cfg), encoding="utf-8")
+    (tmp_path / "profiles.json").write_text(json.dumps(profiles), encoding="utf-8")
+    (tmp_path / "skills-index.json").write_text(json.dumps(skills_index), encoding="utf-8")
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VALIDATOR),
+            "--profiles",
+            str(tmp_path / "profiles.json"),
+            "--opencode",
+            str(tmp_path / "opencode.json"),
+            "--skills-index",
+            str(tmp_path / "skills-index.json"),
+            "--json",
+        ],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=DEFAULT_TIMEOUT,
+    )
     assert proc.returncode == 0, proc.stdout
     payload = json.loads(proc.stdout)
-    assert payload["warnings"], payload
-    assert any("high-context" in w for w in payload["warnings"])
+    assert payload["problems"] == []
+    assert payload["warnings"] == []
 
 
 def test_validator_missing_profiles_file_returns_two(tmp_path: Path) -> None:
@@ -296,5 +370,4 @@ def test_validator_missing_profiles_file_returns_two(tmp_path: Path) -> None:
     )
     assert proc.returncode == 2
     assert "required file missing" in proc.stderr
-
 

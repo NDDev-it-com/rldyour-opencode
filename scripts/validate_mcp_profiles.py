@@ -11,8 +11,8 @@ contract:
 - Every skill in `.opencode/skills/index.json` requires MCP servers that
   exist in opencode.json (mirrors `test_skills_index.py`, kept here so
   this validator is the single CI gate for the MCP graph).
-- High-context servers (per `high_context.members`) used by any skill
-  generate a soft warning so the operator notices the cost.
+- High-context servers (per `high_context.members`) used by any skill must
+  have an explicit skill-specific justification in `high_context.justifications`.
 
 Exits 0 when the graph is clean. Exits 1 when any hard invariant fails.
 Exits 2 on operational error (missing inputs).
@@ -97,6 +97,10 @@ def _collect_problems(
 
     high_context_block = profiles.get("high_context") or {}
     high_context = set(high_context_block.get("members") or [])
+    high_context_justifications = high_context_block.get("justifications") or {}
+    if high_context_justifications and not isinstance(high_context_justifications, dict):
+        hard.append("high_context.justifications must be an object when present")
+        high_context_justifications = {}
     for server in high_context:
         if server not in declared_servers:
             hard.append(
@@ -117,10 +121,16 @@ def _collect_problems(
                         f"that is not declared in opencode.json.mcp"
                     )
                 if server in high_context:
-                    soft.append(
-                        f"skill {skill.get('name')!r} pulls in high-context MCP "
-                        f"{server!r}; confirm the dependency is justified"
-                    )
+                    skill_name = str(skill.get("name") or "")
+                    skill_justifications = high_context_justifications.get(skill_name) or {}
+                    if (
+                        not isinstance(skill_justifications, dict)
+                        or not str(skill_justifications.get(server) or "").strip()
+                    ):
+                        hard.append(
+                            f"skill {skill_name!r} requires high-context MCP {server!r} "
+                            f"without high_context.justifications.{skill_name}.{server}"
+                        )
 
     return hard, soft
 

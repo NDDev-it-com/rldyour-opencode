@@ -49,9 +49,14 @@
     }
   },
   "high_context": {
-    "description": "Servers known to bring large context payloads — usually because they expose paginated GitHub / Drive / corp-tool data. Including these in a skill's `requires_mcp` is allowed but should be intentional. Audited as a soft warning by scripts/validate_mcp_profiles.py.",
+    "description": "Servers known to bring large context payloads — usually because they expose paginated GitHub / Drive / corp-tool data. Including these in a skill's `requires_mcp` is allowed only with a skill-specific justification.",
     "members": [
       "github"
-    ]
+    ],
+    "justifications": {
+      "ry-repair": {
+        "github": "Required for GitHub-aware repair flows that inspect remote issues, PRs, review context, and repository metadata. Local-only repair still uses local git/files first."
+      }
+    }
   }
 }
