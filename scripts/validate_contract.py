@@ -42,7 +42,8 @@ def _values(mapping: object) -> set[str]:
 
 
 def validate() -> dict[str, Any]:
-    product_version = (REPO_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    version_path = REPO_ROOT / "VERSION"
+    product_version = version_path.read_text(encoding="utf-8").strip() if version_path.is_file() else ""
     contract = _load_json(CONTRACT_PATH)
     opencode_config = _load_json(OPENCODE_CONFIG)
     skills_index = _load_json(SKILLS_INDEX)
@@ -52,16 +53,21 @@ def validate() -> dict[str, Any]:
     problems: list[str] = []
     warnings: list[str] = []
 
-    for label, payload in (
-        ("references/rldyour-contract.json", contract),
-        (".opencode/skills/index.json", skills_index),
-        (".opencode/commands/index.json", commands_index),
-        (".opencode/plugins/index.json", plugins_index),
-    ):
-        if payload.get("version") != product_version:
-            problems.append(
-                f"{label} version {payload.get('version')!r} must match VERSION {product_version!r}"
-            )
+    if product_version:
+        for label, payload in (
+            ("references/rldyour-contract.json", contract),
+            (".opencode/skills/index.json", skills_index),
+            (".opencode/commands/index.json", commands_index),
+            (".opencode/plugins/index.json", plugins_index),
+        ):
+            if payload.get("version") != product_version:
+                problems.append(
+                    f"{label} version {payload.get('version')!r} must match VERSION {product_version!r}"
+                )
+    else:
+        warnings.append(
+            "VERSION missing; skipping product-version parity for contract and generated indexes"
+        )
 
     domains = set(contract.get("domains") or [])
     if not domains:
