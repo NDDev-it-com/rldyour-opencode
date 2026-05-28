@@ -3,7 +3,10 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OPENCODE_JSON="${PROJECT_ROOT}/opencode.json"
-EXCLUDE_FILE="${PROJECT_ROOT}/.git/info/exclude"
+EXCLUDE_FILE="$(cd "$PROJECT_ROOT" && git rev-parse --git-path info/exclude 2>/dev/null || true)"
+if [ -n "$EXCLUDE_FILE" ] && [ "${EXCLUDE_FILE#/}" = "$EXCLUDE_FILE" ]; then
+    EXCLUDE_FILE="${PROJECT_ROOT}/${EXCLUDE_FILE}"
+fi
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -39,24 +42,28 @@ EXCLUDE_PATTERNS=(
     "# end rldyour-opencode agent-only files"
 )
 
-if [ ! -f "$EXCLUDE_FILE" ]; then
-    mkdir -p "$(dirname "$EXCLUDE_FILE")"
-    touch "$EXCLUDE_FILE"
-fi
-
-RLDYOUR_BLOCK_FOUND=false
-if grep -q "rldyour-opencode agent-only files" "$EXCLUDE_FILE" 2>/dev/null; then
-    RLDYOUR_BLOCK_FOUND=true
-fi
-
-if [ "$RLDYOUR_BLOCK_FOUND" = true ]; then
-    log_ok "Exclude patterns already installed"
+if [ -z "$EXCLUDE_FILE" ]; then
+    log_warn "Not inside a git worktree; skipping .git/info/exclude installation"
 else
-    echo "" >> "$EXCLUDE_FILE"
-    for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-        echo "$pattern" >> "$EXCLUDE_FILE"
-    done
-    log_ok "Exclude patterns installed in .git/info/exclude"
+    if [ ! -f "$EXCLUDE_FILE" ]; then
+        mkdir -p "$(dirname "$EXCLUDE_FILE")"
+        touch "$EXCLUDE_FILE"
+    fi
+
+    RLDYOUR_BLOCK_FOUND=false
+    if grep -q "rldyour-opencode agent-only files" "$EXCLUDE_FILE" 2>/dev/null; then
+        RLDYOUR_BLOCK_FOUND=true
+    fi
+
+    if [ "$RLDYOUR_BLOCK_FOUND" = true ]; then
+        log_ok "Exclude patterns already installed"
+    else
+        echo "" >> "$EXCLUDE_FILE"
+        for pattern in "${EXCLUDE_PATTERNS[@]}"; do
+            echo "$pattern" >> "$EXCLUDE_FILE"
+        done
+        log_ok "Exclude patterns installed in $EXCLUDE_FILE"
+    fi
 fi
 
 log_step "Verifying agent-only directory structure"

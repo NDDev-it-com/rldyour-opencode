@@ -13,6 +13,7 @@
     ],
     "standard_permissions": {
       "top_level": {
+        "read": "allow",
         "edit": "allow",
         "bash": "allow"
       },
@@ -26,7 +27,12 @@
       }
     },
     "safe_override": "local-operator-config-only",
-    "forbidden_enforcement_hook": "permission.ask"
+    "forbidden_enforcement_hook": "permission.ask",
+    "read_policy": {
+      "owner_full_auto_read": "allow",
+      "source": "docs/decisions/010-owner-full-auto-standard-mode.md",
+      "guardrail": "ry-env-protection tool.execute.before remains a runtime secret-exfiltration guardrail, not a safe-mode replacement"
+    }
   },
   "domains": [
     "browser",

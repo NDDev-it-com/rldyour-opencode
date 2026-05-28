@@ -100,6 +100,32 @@ def validate() -> dict[str, Any]:
                             f"opencode.json {scope_name} permission {permission!r} is {actual_value!r}; "
                             f"expected {expected_value!r}"
                         )
+            if actual_top.get("read") == "allow":
+                read_policy = security.get("read_policy")
+                if not isinstance(read_policy, dict):
+                    problems.append(
+                        "contract.security.read_policy must document intentional owner read access"
+                    )
+                else:
+                    if read_policy.get("owner_full_auto_read") != "allow":
+                        problems.append(
+                            "contract.security.read_policy.owner_full_auto_read must be allow"
+                        )
+                    if read_policy.get("source") != "docs/decisions/010-owner-full-auto-standard-mode.md":
+                        problems.append(
+                            "contract.security.read_policy.source must point to ADR-010"
+                        )
+                    guardrail = str(read_policy.get("guardrail") or "")
+                    if "ry-env-protection" not in guardrail or "tool.execute.before" not in guardrail:
+                        problems.append(
+                            "contract.security.read_policy.guardrail must mention ry-env-protection tool.execute.before"
+                        )
+                env_guard = (contract.get("hook_lifecycle") or {}).get("tool.pre.env-protection") or {}
+                if env_guard.get("plugin") != "ry-env-protection" or env_guard.get("hook") != "tool.execute.before":
+                    problems.append(
+                        "owner read access requires hook_lifecycle.tool.pre.env-protection mapped to "
+                        "ry-env-protection tool.execute.before"
+                    )
 
     contract_skills = _values(contract.get("skills"))
     missing_skills = sorted(contract_skills - skill_names)
