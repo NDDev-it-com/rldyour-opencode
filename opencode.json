@@ -139,13 +139,13 @@
     },
     "semgrep": {
       "type": "local",
-      "command": ["uvx", "--from", "semgrep==1.163.0", "semgrep", "mcp"],
+      "command": ["uvx", "--from", "semgrep==1.164.0", "semgrep", "mcp"],
       "enabled": true,
       "timeout": 30000
     },
     "shadcn": {
       "type": "local",
-      "command": ["bunx", "shadcn@4.8.1", "mcp"],
+      "command": ["bunx", "shadcn@4.8.2", "mcp"],
       "enabled": true,
       "timeout": 30000
     },

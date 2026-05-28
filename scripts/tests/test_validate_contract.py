@@ -41,9 +41,16 @@ def test_contract_requires_owner_full_auto_standard_permissions() -> None:
     }
     assert security["safe_override"] == "local-operator-config-only"
     assert security["forbidden_enforcement_hook"] == "permission.ask"
-    assert security["standard_permissions"]["top_level"] == {"edit": "allow", "bash": "allow"}
+    assert security["standard_permissions"]["top_level"] == {
+        "read": "allow",
+        "edit": "allow",
+        "bash": "allow",
+    }
     assert security["standard_permissions"]["build"] == {"edit": "allow", "bash": "allow"}
     assert security["standard_permissions"]["plan"] == {"edit": "allow", "bash": "allow"}
+    assert security["read_policy"]["owner_full_auto_read"] == "allow"
+    assert security["read_policy"]["source"] == "docs/decisions/010-owner-full-auto-standard-mode.md"
+    assert "ry-env-protection" in security["read_policy"]["guardrail"]
 
 
 def test_permission_ask_not_in_lifecycle_contract() -> None:

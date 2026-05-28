@@ -158,8 +158,8 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 | sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
 | playwright | local (bunx) | 0.0.75 | Browser automation, UI validation |
 | chrome-devtools | local (bunx) | 1.1.1 | Chrome DevTools diagnostics |
-| semgrep | local (uvx) | 1.163.0 | Static analysis and security |
-| shadcn | local (bunx) | 4.8.1 | shadcn/ui registry access |
+| semgrep | local (uvx) | 1.164.0 | Static analysis and security |
+| shadcn | local (bunx) | 4.8.2 | shadcn/ui registry access |
 | dart-flutter | local (dart) | — | Dart/Flutter project support |
 | context7 | remote | — | Current library documentation |
 | deepwiki | remote | — | Repository documentation |
