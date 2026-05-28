@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Synchronize internal plugin and index versions with the adapter release.
+- OpenCode runtime baseline remains `opencode-ai`, `@opencode-ai/plugin`,
+  and `@opencode-ai/sdk` `1.15.11`; this release only aligns adapter
+  product/index coordinates.
 
 ## [1.0.0] - 2026-05-28
 
