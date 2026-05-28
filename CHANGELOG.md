@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.1] - 2026-05-29
+
+### Fixed
+
+- Remove stale Opus 4.7 model wording from OpenCode surface matrix.
+
 ## [1.1.0] - 2026-05-29
 
 ### Changed
