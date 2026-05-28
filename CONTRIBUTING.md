@@ -1,6 +1,6 @@
 # Contributing to rldyour-opencode
 
-Thanks for taking the time to contribute. This document captures the workflow, validation contract, and reviewer expectations for code, configuration, documentation, and Serena memory changes in this OpenCode marketplace.
+Thanks for taking the time to contribute to the rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review. This document captures the workflow, validation contract, and reviewer expectations for code, configuration, documentation, and Serena memory changes in this OpenCode marketplace.
 
 ## Quick links
 

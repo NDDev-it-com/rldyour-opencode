@@ -2,7 +2,7 @@
   "name": "rldyour-opencode-plugins",
   "version": "0.1.0",
   "private": true,
-  "description": "OpenCode configuration pack for rldyour AI CLI workflows: local plugins, MCP/LSP, permissions, commands, agents, browser/design, and security.",
+  "description": "rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review.",
   "type": "module",
   "dependencies": {
     "@opencode-ai/plugin": "1.15.11",
