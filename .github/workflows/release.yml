@@ -6,8 +6,8 @@ on:
       - "*.*.*"
   workflow_dispatch:
     inputs:
-      tag:
-        description: "Tag to release (MAJOR.MINOR.PATCH). Must match VERSION."
+      version:
+        description: "Version to release from VERSION (numeric SemVer X.Y.Z). Creates the tag when dispatching manually."
         required: true
 
 permissions:
@@ -98,11 +98,11 @@ jobs:
         # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         # Reviewer wave 2026-05-18 security F-3 closure.
         env:
-          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
           ver="$(cat VERSION)"
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            tag_input="$INPUT_TAG"
+            tag_input="$INPUT_VERSION"
           else
             tag_input="${GITHUB_REF##*/}"
           fi
@@ -117,13 +117,14 @@ jobs:
         # Same env-mapped pattern as the VERSION check above; reviewer
         # wave 2026-05-18 security F-3 closure.
         env:
-          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            printf 'tag=%s\n' "$INPUT_TAG" >> "$GITHUB_OUTPUT"
+            printf 'tag=%s\n' "$INPUT_VERSION" >> "$GITHUB_OUTPUT"
           else
             printf 'tag=%s\n' "${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"
           fi
+          printf 'version=%s\n' "$(cat VERSION)" >> "$GITHUB_OUTPUT"
       - name: Generate CycloneDX SBOM
         working-directory: .opencode
         run: npm sbom --sbom-format cyclonedx > ../sbom.json
@@ -133,13 +134,32 @@ jobs:
           name: sbom-${{ matrix.os }}-${{ github.sha }}
           path: sbom.json
           if-no-files-found: error
-      - name: Create GitHub Release
+      - name: Create release tag (workflow_dispatch only)
+        if: github.event_name == 'workflow_dispatch' && matrix.os == 'ubuntu-latest'
+        env:
+          RELEASE_VERSION: ${{ steps.release_tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if git rev-parse -q --verify "refs/tags/${RELEASE_VERSION}" >/dev/null; then
+            echo "Tag ${RELEASE_VERSION} already exists locally"
+          else
+            git tag "${RELEASE_VERSION}"
+            git push origin "refs/tags/${RELEASE_VERSION}"
+          fi
+      - name: Publish GitHub Release
         if: matrix.os == 'ubuntu-latest'
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda  # v3.0.0
-        with:
-          tag_name: ${{ steps.release_tag.outputs.tag }}
-          files: |
-            sbom.json
-            CHANGELOG.md
-          generate_release_notes: true
-          draft: false
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ steps.release_tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_VERSION" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_VERSION" sbom.json CHANGELOG.md --clobber
+          else
+            gh release create "$RELEASE_VERSION" \
+              --verify-tag \
+              --title "$RELEASE_VERSION" \
+              --generate-notes \
+              sbom.json \
+              CHANGELOG.md
+          fi
