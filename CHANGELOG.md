@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.0.3] - 2026-05-29
+
+### Changed
+
+- Standardize release automation and repository descriptions while preserving @opencode-ai/plugin 1.15.11 baseline.
+
 ## [1.0.2] - 2026-05-29
 
 ### Changed
