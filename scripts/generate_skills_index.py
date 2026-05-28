@@ -191,7 +191,7 @@ def build_index() -> dict[str, Any]:
             },
         )
     return {
-        "version": "1.0.0",
+        "version": (REPO_ROOT / "VERSION").read_text(encoding="utf-8").strip(),
         "generated_by": "scripts/generate_skills_index.py",
         "count": len(skills),
         "skills": skills,

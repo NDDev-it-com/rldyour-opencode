@@ -123,6 +123,15 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+log_step "Generated indexes"
+if python3 "${PROJECT_ROOT}/scripts/generate_skills_index.py" --check --strict \
+    && python3 "${PROJECT_ROOT}/scripts/generate_commands_index.py" --check --strict \
+    && python3 "${PROJECT_ROOT}/scripts/generate_plugins_index.py" --check --strict; then
+    log_ok "Generated indexes passed"
+else
+    ERRORS=$((ERRORS + 1))
+fi
+
 log_step "GitHub Actions script injection scan"
 # Reviewer wave 2026-05-18 security F-3: `${{ inputs.* }}` and
 # `${{ github.event.* }}` in `run:` blocks must be mapped through `env:`
