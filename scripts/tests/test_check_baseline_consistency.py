@@ -180,7 +180,7 @@ _BASELINE_OK = {
         "jsonschema": "4.26.0",
         "ruff": "0.15.13",
     },
-    "security_tooling": {"gitleaks": "8.30.1", "codeql_action": "v4.35.5"},
+    "security_tooling": {"gitleaks": "8.30.1", "codeql_action": "v4.36.0"},
 }
 
 
