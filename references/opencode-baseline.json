@@ -1,27 +1,27 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Single source of truth for every pinned dependency the marketplace targets. Validators read this file and compare against opencode.json, .opencode/package.json, .opencode/bun.lock, workflow installations, and README/CHANGELOG text. Any drift fails CI. Bump these values in one place and let `scripts/check_baseline_consistency.py` find every reference that needs updating.",
-  "version": "1.0.3",
-  "updated": "2026-05-27",
+  "version": "1.1.0",
+  "updated": "2026-05-29",
   "baseline": {
     "opencode_cli": {
-      "version": "1.15.11",
+      "version": "1.15.12",
       "npm_package": "opencode-ai",
-      "ref": "https://github.com/sst/opencode/releases/tag/v1.15.11"
+      "ref": "https://github.com/sst/opencode/releases/tag/v1.15.12"
     },
     "plugin_sdk": {
-      "version": "1.15.11",
+      "version": "1.15.12",
       "npm_package": "@opencode-ai/plugin",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.15.11"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.15.12"
     },
     "sdk": {
-      "version": "1.15.11",
+      "version": "1.15.12",
       "npm_package": "@opencode-ai/sdk",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.15.11"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.15.12"
     },
     "config_schema": {
-      "version": "v1.15.11",
-      "vendored_at": "references/opencode-config.schema.v1.15.11.json",
+      "version": "v1.15.12",
+      "vendored_at": "references/opencode-config.schema.v1.15.12.json",
       "external_refs_vendored_at": [
         "references/models.dev-model-schema.json"
       ],
