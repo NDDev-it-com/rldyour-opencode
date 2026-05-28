@@ -43,7 +43,7 @@
     },
     "security_tooling": {
       "gitleaks": "8.30.1",
-      "codeql_action": "v4.35.5"
+      "codeql_action": "v4.36.0"
     }
   }
 }
