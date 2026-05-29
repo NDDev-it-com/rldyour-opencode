@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.7] - 2026-05-30
+
+### Fixed
+
+- Document OpenCode 1.15.12 baseline for release CI.
+- Document the current `opencode-ai`, `@opencode-ai/plugin`, and
+  `@opencode-ai/sdk` `1.15.12` runtime/package baseline in the next release
+  block so release CI has no doc-drift warning.
+
 ## [1.1.6] - 2026-05-29
 
 ### Changed
