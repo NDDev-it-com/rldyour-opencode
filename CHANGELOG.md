@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.5] - 2026-05-29
+
+### Fixed
+
+- Synchronize OpenCode reference metadata and remove stale active Unreleased wording.
+- Preserve the current `opencode-ai`, `@opencode-ai/plugin`, and
+  `@opencode-ai/sdk` `1.15.12` runtime/package baseline while advancing
+  adapter product metadata.
+
 ## [1.1.4] - 2026-05-29
 
 ### Fixed
