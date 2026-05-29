@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.4] - 2026-05-29
+
+### Fixed
+
+- Document the current `opencode-ai`, `@opencode-ai/plugin`, and
+  `@opencode-ai/sdk` `1.15.12` runtime/package baseline in the latest release
+  block so baseline-consistency CI has no doc-drift warning.
+
 ## [1.1.3] - 2026-05-29
 
 ### Fixed
