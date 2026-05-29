@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.6] - 2026-05-29
+
+### Changed
+
+- Add a release-safe OpenCode permission profile alongside the owner-YOLO default.
+
 ## [1.1.5] - 2026-05-29
 
 ### Fixed
