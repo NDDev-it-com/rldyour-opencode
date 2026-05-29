@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.3] - 2026-05-29
+
+### Fixed
+
+- Localize Codex OpenAI skill metadata and remove stale OpenCode inventory wording.
+
 ## [1.1.2] - 2026-05-29
 
 ### Fixed
