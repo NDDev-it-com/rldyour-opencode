@@ -20,6 +20,7 @@ A self-contained OpenCode project configuration that provides:
   - Runtime context + permission events: `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt), `ry-permission-events` (observability-only `permission.asked` / `permission.replied` event audit)
 - **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
 - **Owner-standard full-auto permissions** by default: primary agents allow `edit` and `bash`; reviewer subagents are read-only with git-only bash allowlists, and deterministic `tool.execute.before` guardrails still block the repository's high-impact dangerous shell patterns.
+- **Release-safe overlay**: `opencode.release-safe.json` keeps native static read-deny patterns for `.env`, private keys, tokens, credentials, and shell/edit ask posture for public OSS examples and conservative installs. The owner `opencode.json` remains the local YOLO profile.
 
 ## Quick Start
 

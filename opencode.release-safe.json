@@ -1,0 +1,47 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "$comment": "Release-safe public profile overlay. Keep opencode.json as the owner-YOLO default; use this profile for public OSS examples and conservative installs.",
+  "permission": {
+    "read": {
+      "*": "allow",
+      ".env": "deny",
+      ".env.*": "deny",
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/*.p12": "deny",
+      "**/*.pfx": "deny",
+      "**/*id_rsa*": "deny",
+      "**/*private*key*": "deny",
+      "**/*token*": "deny",
+      "**/*secret*": "deny",
+      "**/*credential*": "deny",
+      "**/.ssh/**": "deny",
+      "**/.gnupg/**": "deny",
+      "**/.aws/credentials": "deny"
+    },
+    "edit": "ask",
+    "bash": "ask",
+    "webfetch": "ask",
+    "websearch": "ask",
+    "lsp": "allow",
+    "skill": "allow",
+    "glob": "allow",
+    "grep": "allow"
+  },
+  "agent": {
+    "build": {
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      }
+    },
+    "plan": {
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      }
+    }
+  }
+}
