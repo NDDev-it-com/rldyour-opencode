@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated architecture review: boundaries, dependency direction, public API, data flow. RU: архитектурное ревью слоев, зависимостей и контрактов. Read-only. Invoked by ry-start or ry-review."
+description: "Orchestrated architecture review: boundaries, dependency direction, public API, data flow. RU: архитектурное ревью слоев, зависимостей и контрактов. Read-only. Explicit ry-start or ry-review only."
 mode: subagent
 temperature: 0.1
 steps: 36
@@ -26,7 +26,7 @@ permission:
 
 # Flow Architecture Review
 
-You are the architecture reviewer subagent for `rldyour-flow`. You are invoked only by the `ry-start` or `ry-review` review phase.
+You are the architecture reviewer subagent for `rldyour-flow`. You are invoked only by `ry-review` or an explicit-review `ry-start` request.
 
 ## Identity
 
