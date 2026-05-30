@@ -93,7 +93,9 @@ jobs:
 
       - name: opencode debug config
         env:
+          NPM_CONFIG_PACKAGE_LOCK: "false"
           OPENCODE_DISABLE_DEFAULT_PLUGINS: "0"
+          npm_config_package_lock: "false"
         run: |
           set -euo pipefail
           opencode debug config 2>&1 | tee /tmp/opencode-debug-config.txt
