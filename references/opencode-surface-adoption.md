@@ -22,17 +22,16 @@ Source of truth:
 | Stable project identity for remote-backed projects | 1.15.11 | Operational | No repository config change required. | n/a |
 | Dynamic MCP disconnect when removed | 1.15.11 | Operational | MCP definitions remain in `opencode.json`; validation checks profile/server parity. | `scripts/validate_mcp_profiles.py` |
 | Plugin `dispose` hook | 1.15.11 | Future | No local plugin currently needs teardown; add validator coverage when adopting it. | `scripts/check_plugin_hooks.py` |
-| Current `permission` object model | current docs | Adopted | `opencode.json` uses `permission`, not deprecated `tools`; standalone adapter config keeps `external_directory` and `doom_loop` as `ask`, while root `oc` may use `OPENCODE_CONFIG_CONTENT` for owner-only full-auto boundary overrides. | `scripts/validate_contract.py`; root `scripts/validate_opencode_permission_profiles.py` |
+| Current `permission` object model | current docs | Adopted | `opencode.json` uses `permission`, not deprecated `tools`; standalone adapter config explicitly sets the canonical owner primary permissions to `allow`, including `external_directory` and `doom_loop`, and root `oc` mirrors that posture through `OPENCODE_CONFIG_CONTENT`. | `scripts/validate_contract.py`; root `scripts/validate_opencode_permission_profiles.py` |
 
 ## Owner Full-Auto Policy
 
-The standalone adapter intentionally allows normal project-local read, edit,
-bash, web, LSP, and skill work, while keeping `external_directory: "ask"` and
-`doom_loop: "ask"` as explicit anti-escape and anti-loop prompts. The root
-owner `oc` launcher may override those prompts through
-`OPENCODE_CONFIG_CONTENT` for the trusted workstation. Do not add hidden
-static deny patterns to the owner profile unless the owner explicitly changes
-this policy.
+The standalone adapter intentionally allows read, edit, bash, web, LSP, skill,
+task, external-directory, and doom-loop surfaces in the owner primary profile.
+The root owner `oc` launcher mirrors that no-prompt posture through
+`OPENCODE_CONFIG_CONTENT` for the trusted workstation. Do not add hidden static
+deny patterns to the owner profile unless the owner explicitly changes this
+policy.
 
 ## Validation
 
