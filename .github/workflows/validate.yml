@@ -79,7 +79,7 @@ jobs:
 
       - name: Verify baseline consistency (docs/package/lock/workflows on one pin)
         # Audit P0-1: hard-fail on plugin SDK / CLI / Bun / pytest pin drift.
-        run: python3 scripts/check_baseline_consistency.py
+        run: python3 scripts/validate_opencode_baseline.py
 
       - name: Validate MCP profile graph (mcp-profiles.json + skill.requires_mcp)
         # Audit P1-3: every MCP server belongs to exactly one profile and
