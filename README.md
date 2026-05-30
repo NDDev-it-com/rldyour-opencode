@@ -19,7 +19,7 @@ A self-contained OpenCode project configuration that provides:
   - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
   - Runtime context + permission events: `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt), `ry-permission-events` (observability-only `permission.asked` / `permission.replied` event audit)
 - **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
-- **Owner-standard full-auto permissions** by default: primary agents allow `edit` and `bash`; reviewer subagents are read-only with git-only bash allowlists, and deterministic `tool.execute.before` guardrails still block the repository's high-impact dangerous shell patterns.
+- **Owner-standard full-auto permissions** by default: primary agents allow project-local `edit` and `bash`; standalone `external_directory` and `doom_loop` prompts stay `ask`, reviewer subagents are read-only with git-only bash allowlists, and deterministic `tool.execute.before` guardrails still block the repository's high-impact dangerous shell patterns.
 - **Release-safe overlay**: `opencode.release-safe.json` keeps native static read-deny patterns for `.env`, private keys, tokens, credentials, and shell/edit ask posture for public OSS examples and conservative installs. The owner `opencode.json` remains the local YOLO profile.
 
 ## Quick Start
@@ -129,9 +129,13 @@ rldyour-opencode/
 
 `build` remains the implementation agent, and its repository configuration uses
 owner-standard full-auto permissions: `edit: "allow"` and `bash: "allow"`.
-The `plan` primary agent uses the same full-auto baseline. Reviewer subagents
-remain stricter (`edit: "deny"`, git-only read bash allowlists) because their
-role contract is report-only review, not implementation.
+The `plan` primary agent uses the same full-auto baseline. The standalone
+adapter keeps `external_directory: "ask"` and `doom_loop: "ask"` as explicit
+anti-escape and anti-loop prompts; the root owner `oc` launcher may override
+those prompts for the trusted workstation through `OPENCODE_CONFIG_CONTENT`.
+Reviewer subagents remain stricter (`edit: "deny"`, git-only read bash
+allowlists) because their role contract is report-only review, not
+implementation.
 
 ## Reviewer Subagents
 

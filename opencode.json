@@ -50,7 +50,9 @@
     "skill": "allow",
     "glob": "allow",
     "grep": "allow",
-    "read": "allow"
+    "read": "allow",
+    "external_directory": "ask",
+    "doom_loop": "ask"
   },
   "agent": {
     "build": {

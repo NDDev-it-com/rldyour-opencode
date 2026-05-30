@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Single source of truth for every pinned dependency the marketplace targets. Validators read this file and compare against opencode.json, .opencode/package.json, .opencode/bun.lock, workflow installations, and README/CHANGELOG text. Any drift fails CI. Bump these values in one place and let `scripts/check_baseline_consistency.py` find every reference that needs updating.",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "updated": "2026-05-30",
   "baseline": {
     "opencode_cli": {
       "version": "1.15.12",
       "npm_package": "opencode-ai",
-      "ref": "https://github.com/sst/opencode/releases/tag/v1.15.12"
+      "ref": "https://github.com/anomalyco/opencode/releases/tag/v1.15.12"
     },
     "plugin_sdk": {
       "version": "1.15.12",
