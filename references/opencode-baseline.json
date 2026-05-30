@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Single source of truth for every pinned dependency the marketplace targets. Validators read this file and compare against opencode.json, .opencode/package.json, .opencode/bun.lock, workflow installations, and README/CHANGELOG text. Any drift fails CI. Bump these values in one place and let `scripts/check_baseline_consistency.py` find every reference that needs updating.",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "updated": "2026-05-30",
   "baseline": {
     "opencode_cli": {

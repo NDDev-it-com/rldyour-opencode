@@ -66,7 +66,8 @@ def test_real_project_workflows_are_clean() -> None:
         f"stderr={result.stderr!r}"
     )
     assert "[OK]" in result.stdout
-    assert "11 workflow" in result.stdout or "11 workflow file" in result.stdout
+    workflow_count = len(list((PROJECT_ROOT / ".github" / "workflows").glob("*.yml")))
+    assert f"{workflow_count} workflow" in result.stdout
 
 
 def test_inputs_dot_token_in_run_is_flagged(tmp_path: Path) -> None:
