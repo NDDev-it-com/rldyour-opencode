@@ -1,5 +1,5 @@
 ---
-description: "Полный lifecycle задачи: init → research → plan → implement → quality gates → reviewer subagents → post-task sync. Full task lifecycle from prompt to reviewed and synced state."
+description: "Полный lifecycle задачи: init → research → plan → implement → quality gates → post-task sync; review only when explicitly requested. Full task lifecycle from prompt to synced state."
 agent: build
 ---
 
@@ -15,7 +15,7 @@ Implement a task through the full quality workflow:
 8. Create or select branch/worktree and implement through atomic commits.
 9. Run progress checkpoints after meaningful milestones or every 2-3 plan groups: compare implementation against the plan, context pack, existing patterns, and touched integration path. Report progress in Russian.
 10. Run quality gates and fix all issues in touched scope plus integration path.
-11. Run reviewer workflow. Use parallel subagents (flow-architecture-review, flow-quality-review, flow-consistency-review, flow-integration-review, flow-verification-review) for the review phase. Use flow-security-review when the scope is security-sensitive.
+11. Run explicit review workflow only when the user asks for review, audit, security review, rules review, or ry-review. Normal ry-start implementation must skip reviewer fan-out to save tokens.
 12. Run browser/security/design/LSP workflows when triggered by the change type.
 13. Synchronize Serena memories, AGENTS.md, instruction docs, git, and fullrepo through /ry-sync.
 

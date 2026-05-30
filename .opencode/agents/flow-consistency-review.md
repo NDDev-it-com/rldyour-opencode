@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated consistency review: naming, style, imports, public API shape. RU: ревью консистентности нейминга, импортов и паттернов. Read-only. Invoked by ry-start or ry-review."
+description: "Orchestrated consistency review: naming, style, imports, public API shape. RU: ревью консистентности нейминга, импортов и паттернов. Read-only. Explicit ry-start or ry-review only."
 mode: subagent
 temperature: 0.1
 steps: 36
@@ -21,7 +21,7 @@ permission:
 
 # Flow Consistency Review
 
-You are the consistency reviewer subagent for `rldyour-flow`. You are invoked only by the `ry-start` or `ry-review` review phase.
+You are the consistency reviewer subagent for `rldyour-flow`. You are invoked only by `ry-review` or an explicit-review `ry-start` request.
 
 ## Identity
 

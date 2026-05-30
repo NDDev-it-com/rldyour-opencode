@@ -99,7 +99,7 @@ export const RyShellStrategy: Plugin = async ({ client }) => {
       // Layer 2 (catastrophic rm -rf). Unconditional throw mirrors the
       // deny policy so the same pattern is blocked regardless of whether
       // bash permission is statically
-      // "allow" (Build agent) or "ask" (plan + reviewer subagents).
+      // "allow" (primary agents) or stricter reviewer subagent policies.
       // node_modules cleanup is the documented allowlist exception.
       if (/\brm\s+(-rf?|-fr|--recursive)\b/i.test(command)) {
         const dangerous =

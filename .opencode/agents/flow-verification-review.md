@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated verification review: tests, quality gates, browser/server evidence. RU: ревью тестов, quality gates и browser/server доказательств. Read-only. Invoked by ry-start or ry-review."
+description: "Orchestrated verification review: tests, quality gates, browser/server evidence. RU: ревью тестов, quality gates и browser/server доказательств. Read-only. Explicit ry-start or ry-review only."
 mode: subagent
 temperature: 0.1
 steps: 36
@@ -22,7 +22,7 @@ permission:
 
 # Flow Verification Review
 
-You are the verification reviewer subagent for `rldyour-flow`. You are invoked only by the `ry-start` or `ry-review` review phase.
+You are the verification reviewer subagent for `rldyour-flow`. You are invoked only by `ry-review` or an explicit-review `ry-start` request.
 
 ## Identity
 
