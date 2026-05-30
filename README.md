@@ -19,7 +19,7 @@ A self-contained OpenCode project configuration that provides:
   - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
   - Runtime context + permission events: `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt), `ry-permission-events` (observability-only `permission.asked` / `permission.replied` event audit)
 - **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
-- **Owner-standard full-auto permissions** by default: primary agents allow project-local `edit` and `bash`; standalone `external_directory` and `doom_loop` prompts stay `ask`, reviewer subagents are read-only with git-only bash allowlists, and deterministic `tool.execute.before` guardrails still block the repository's high-impact dangerous shell patterns.
+- **Owner-standard full-auto permissions** by default: primary agents allow read/edit/bash/web/LSP/skill/task/external-directory/doom-loop actions without prompts; reviewer subagents are read-only with git-only bash allowlists, and deterministic `tool.execute.before` guardrails still block the repository's high-impact dangerous shell patterns.
 - **Release-safe overlay**: `opencode.release-safe.json` keeps native static read-deny patterns for `.env`, private keys, tokens, credentials, and shell/edit ask posture for public OSS examples and conservative installs. The owner `opencode.json` remains the local YOLO profile.
 
 ## Quick Start
@@ -116,7 +116,7 @@ rldyour-opencode/
 | Command | Agent | Purpose |
 |---|---|---|
 | `/ry-init` | `build` | Scoped read-only project context with Serena-first discovery |
-| `/ry-start` | `build` | Full task lifecycle: init → research → plan → implement → verify → review → sync |
+| `/ry-start` | `build` | Full task lifecycle: init → research → plan → implement → verify → sync; review only by explicit request |
 | `/ry-review` | `plan` | Report-only deep review with parallel reviewer subagents |
 | `/ry-repair` | `build` | Repair stale docs, memories, contracts, hooks, MCP/LSP config, CI, and AI-tool context |
 | `/ry-newp` | `build` | Plan a new project (skeptical questions, research, ADRs, architecture docs) |
@@ -128,18 +128,18 @@ rldyour-opencode/
 | `/ry-rules-review` | `plan` | Audit implementation against rldyour rules (report-only) |
 
 `build` remains the implementation agent, and its repository configuration uses
-owner-standard full-auto permissions: `edit: "allow"` and `bash: "allow"`.
-The `plan` primary agent uses the same full-auto baseline. The standalone
-adapter keeps `external_directory: "ask"` and `doom_loop: "ask"` as explicit
-anti-escape and anti-loop prompts; the root owner `oc` launcher may override
-those prompts for the trusted workstation through `OPENCODE_CONFIG_CONTENT`.
+owner-standard full-auto permissions for OpenCode's canonical v1.15.x keys,
+including `read`, `edit`, `bash`, `task`, `external_directory`, and
+`doom_loop`. The `plan` primary agent uses the same full-auto baseline. The
+root owner `oc` launcher mirrors that no-prompt posture through
+`OPENCODE_CONFIG_CONTENT` for the trusted workstation.
 Reviewer subagents remain stricter (`edit: "deny"`, git-only read bash
 allowlists) because their role contract is report-only review, not
 implementation.
 
 ## Reviewer Subagents
 
-All reviewer tracks are `mode: subagent`, `hidden: true`, `edit: deny`, with `bash` allowlist limited to read-only git verbs. Invoke directly via `@<name>` or transitively via `/ry-start`/`/ry-review`.
+All reviewer tracks are `mode: subagent`, `hidden: true`, `edit: deny`, with `bash` allowlist limited to read-only git verbs. Invoke directly via `@<name>` or transitively via `/ry-review`; `/ry-start` only routes them when the user explicitly asks for review, audit, security review, or rules review.
 
 | Agent | Color | Focus |
 |---|---|---|

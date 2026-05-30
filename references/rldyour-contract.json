@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Machine-readable rldyour workflow contract for the OpenCode adapter. Sister tool repos should map the same canonical IDs to their own native surfaces.",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "updated": "2026-05-30",
   "adapter": "opencode",
   "security": {
@@ -15,17 +15,59 @@
       "top_level": {
         "read": "allow",
         "edit": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
         "bash": "allow",
-        "external_directory": "ask",
-        "doom_loop": "ask"
+        "task": "allow",
+        "external_directory": "allow",
+        "todowrite": "allow",
+        "question": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "repo_clone": "allow",
+        "repo_overview": "allow",
+        "lsp": "allow",
+        "doom_loop": "allow",
+        "skill": "allow"
       },
       "build": {
+        "read": "allow",
         "edit": "allow",
-        "bash": "allow"
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "allow",
+        "task": "allow",
+        "external_directory": "allow",
+        "todowrite": "allow",
+        "question": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "repo_clone": "allow",
+        "repo_overview": "allow",
+        "lsp": "allow",
+        "doom_loop": "allow",
+        "skill": "allow"
       },
       "plan": {
+        "read": "allow",
         "edit": "allow",
-        "bash": "allow"
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "allow",
+        "task": "allow",
+        "external_directory": "allow",
+        "todowrite": "allow",
+        "question": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "repo_clone": "allow",
+        "repo_overview": "allow",
+        "lsp": "allow",
+        "doom_loop": "allow",
+        "skill": "allow"
       }
     },
     "safe_override": "local-operator-config-only",
@@ -35,11 +77,11 @@
       "source": "docs/decisions/010-owner-full-auto-standard-mode.md",
       "guardrail": "ry-env-protection tool.execute.before remains a runtime secret-exfiltration guardrail, not a safe-mode replacement"
     },
-    "boundary_prompt_policy": {
+    "no_prompt_policy": {
       "source": "docs/decisions/010-owner-full-auto-standard-mode.md",
-      "external_directory": "ask",
-      "doom_loop": "ask",
-      "owner_launcher_override": "root oc may explicitly override these prompts through OPENCODE_CONFIG_CONTENT for the trusted owner workstation"
+      "external_directory": "allow",
+      "doom_loop": "allow",
+      "owner_launcher_parity": "root oc mirrors these permissions through OPENCODE_CONFIG_CONTENT for the trusted owner workstation"
     }
   },
   "domains": [

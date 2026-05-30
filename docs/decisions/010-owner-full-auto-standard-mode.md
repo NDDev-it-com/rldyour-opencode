@@ -34,32 +34,32 @@ override.
 ## Decision Outcome
 
 `opencode.json` publishes owner-standard full-auto primary permissions for
-normal project-local implementation work while keeping explicit prompts for
-directory-escape and loop-protection surfaces:
+normal implementation work, including external-directory access and doom-loop
+retry protection:
 
 ```json
 "permission": {
   "read": "allow",
   "edit": "allow",
   "bash": "allow",
-  "external_directory": "ask",
-  "doom_loop": "ask"
+  "external_directory": "allow",
+  "doom_loop": "allow"
 }
 ```
 
 The `build` and `plan` primary agents also use `edit: "allow"` and
-`bash: "allow"`.
+`bash: "allow"` plus the same explicit full-auto permission posture for
+OpenCode's canonical v1.15.x permission keys.
 
 OpenCode's upstream default can deny sensitive env-file reads. This adapter
 intentionally publishes `read: "allow"` for the owner-standard primary
-runtime, while `external_directory` and `doom_loop` remain `ask` in the
-standalone adapter by design. The root `oc` launcher may further inject broad
-read/full-auto permissions, including explicit boundary-prompt overrides,
-through `OPENCODE_CONFIG_CONTENT`. That launcher posture is owner-only and
-assumes a trusted workstation. `ry-env-protection` remains a runtime
-secret-exfiltration guardrail for obvious secret paths and shell reads; it is
-not a replacement safe mode and must not be treated as a prompt approval
-boundary.
+runtime, and now also publishes `external_directory: "allow"` and
+`doom_loop: "allow"` so the standalone adapter matches the owner's no-prompt
+standard. The root `oc` launcher mirrors the same full-auto permissions through
+`OPENCODE_CONFIG_CONTENT` for the trusted workstation. `ry-env-protection`
+remains a runtime secret-exfiltration guardrail for obvious secret paths and
+shell reads; it is not a replacement safe mode and must not be treated as a
+prompt approval boundary.
 
 Reviewer subagents keep their report-only restrictions (`edit: "deny"` plus
 read-only git bash allowlists) because their role contract is review, not
@@ -85,18 +85,17 @@ Negative:
 - Static OpenCode default env-file denial is not the owner-standard boundary
   in this adapter. The boundary is trusted-owner execution plus explicit
   runtime guardrails and auditability.
-- Standalone adapter sessions still prompt on external-directory access and
-  doom-loop detection unless the owner intentionally uses the root `oc`
-  launcher override.
+- Standalone adapter sessions no longer preserve OpenCode's default
+  external-directory and doom-loop prompts; the release-safe profile remains
+  the conservative published example.
 
 ## Compliance
 
 - `references/rldyour-contract.json` records `full_auto_standard: true`.
 - `scripts/validate_contract.py` fails if top-level, `build`, or `plan`
   primary permissions drift away from the owner-standard permission contract.
-- `scripts/validate_contract.py` fails if standalone top-level
-  `external_directory` or `doom_loop` posture drifts from the documented
-  `ask` boundary-prompt policy.
+- `scripts/validate_contract.py` fails if top-level, `build`, or `plan`
+  permissions drift away from the documented no-prompt full-auto policy.
 - `scripts/validate_contract.py` fails if top-level `read: "allow"` is present
   without the matching owner-read policy metadata and `ry-env-protection`
   `tool.execute.before` guardrail mapping.
