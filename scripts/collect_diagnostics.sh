@@ -106,8 +106,8 @@ fi
 
 # OpenCode CLI state (skipped silently if not on PATH).
 if command -v opencode >/dev/null 2>&1; then
-  run_cmd opencode-info.txt   opencode debug info
-  run_cmd opencode-config.txt opencode debug config
+  run_cmd opencode-info.txt   env NPM_CONFIG_PACKAGE_LOCK=false npm_config_package_lock=false opencode debug info
+  run_cmd opencode-config.txt env NPM_CONFIG_PACKAGE_LOCK=false npm_config_package_lock=false opencode debug config
 else
   echo "opencode CLI not on PATH; skipped" >"${BUNDLE}/opencode-cli.txt"
 fi

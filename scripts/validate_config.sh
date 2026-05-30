@@ -34,6 +34,14 @@ log_fail() { echo -e "${RED}[FAIL]${NC} $1"; }
 
 MODE="${RY_OPENCODE_VALIDATE_MODE:-auto}"
 
+# OpenCode runtime probes may traverse npm-backed plugin resolution even though
+# this adapter uses bun.lock as its canonical lockfile. Prevent npm from
+# materializing an ignored .opencode/package-lock.json that later fails source
+# archive hygiene.
+run_opencode_debug() {
+    NPM_CONFIG_PACKAGE_LOCK=false npm_config_package_lock=false opencode "$@"
+}
+
 usage() {
     cat <<'EOF'
 Usage: bash scripts/validate_config.sh [--mode auto|static|installed|live]
@@ -222,13 +230,13 @@ log_step "Runtime resolution (opencode CLI)"
 if [ "$MODE" = "static" ]; then
     log_info "static mode — skipping opencode CLI runtime probes"
 elif command -v opencode >/dev/null 2>&1; then
-    if opencode debug config >/dev/null 2>&1; then
+    if run_opencode_debug debug config >/dev/null 2>&1; then
         log_ok "opencode debug config resolved"
     else
         log_warn "opencode debug config FAILED (run opencode debug config for details)"
         ERRORS=$((ERRORS + 1))
     fi
-    if opencode debug skill >/dev/null 2>&1; then
+    if run_opencode_debug debug skill >/dev/null 2>&1; then
         log_ok "opencode debug skill resolved"
     else
         log_warn "opencode debug skill FAILED"
@@ -237,7 +245,7 @@ elif command -v opencode >/dev/null 2>&1; then
     # `opencode debug agent build` is a cheap sanity probe against the
     # default primary agent. If the project's `agent.build` permission
     # block has a stale or PascalCase key, the resolver complains here.
-    if opencode debug agent build >/dev/null 2>&1; then
+    if run_opencode_debug debug agent build >/dev/null 2>&1; then
         log_ok "opencode debug agent build resolved"
     else
         log_warn "opencode debug agent build FAILED"
