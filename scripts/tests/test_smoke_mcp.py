@@ -91,6 +91,14 @@ def test_probe_remote_total_failure() -> None:
     assert "unreachable" in result["error"] or "network down" in result["error"]
 
 
+def test_probe_remote_rejects_non_https_without_network_call() -> None:
+    with mock.patch.object(smoke.urllib.request, "urlopen") as urlopen:
+        result = smoke.probe_remote("foo", "file:///etc/passwd")
+    urlopen.assert_not_called()
+    assert result["status"] == "fail"
+    assert "absolute https" in result["error"]
+
+
 # ---------------------------------------------------------------------------
 # probe_local
 # ---------------------------------------------------------------------------

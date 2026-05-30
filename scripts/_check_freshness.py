@@ -26,10 +26,13 @@ import json
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Any
 
 NETWORK_TIMEOUT_SECONDS = 5.0
+NPM_REGISTRY_HOST = "registry.npmjs.org"
+PYPI_REGISTRY_HOST = "pypi.org"
 
 _SEMVER_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)([.-].*)?$")
 _PRERELEASE_TOKEN_RE = re.compile(
@@ -61,8 +64,19 @@ def _semver_tuple(version: str) -> tuple[int, int, int] | None:
     return parts[0], parts[1], parts[2]
 
 
-def _fetch_json(url: str) -> Any:
+def _validate_registry_url(url: str, *, allowed_host: str) -> str:
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or parsed.hostname != allowed_host:
+        raise ValueError(f"unexpected registry URL host for {allowed_host}: {url}")
+    if parsed.username or parsed.password:
+        raise ValueError(f"registry URL must not include credentials: {allowed_host}")
+    return url
+
+
+def _fetch_json(url: str, *, allowed_host: str) -> Any:
+    url = _validate_registry_url(url, allowed_host=allowed_host)
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
+    # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
     with urllib.request.urlopen(req, timeout=NETWORK_TIMEOUT_SECONDS) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
@@ -70,7 +84,7 @@ def _fetch_json(url: str) -> Any:
 def probe_npm(name: str) -> tuple[str | None, str | None]:
     """Return (latest_version, error). Empty error means success."""
     try:
-        data = _fetch_json(f"https://registry.npmjs.org/{name}/latest")
+        data = _fetch_json(f"https://{NPM_REGISTRY_HOST}/{name}/latest", allowed_host=NPM_REGISTRY_HOST)
         version = data.get("version")
         if isinstance(version, str):
             return version, None
@@ -85,7 +99,7 @@ def probe_npm(name: str) -> tuple[str | None, str | None]:
 
 def probe_pypi(name: str) -> tuple[str | None, str | None]:
     try:
-        data = _fetch_json(f"https://pypi.org/pypi/{name}/json")
+        data = _fetch_json(f"https://{PYPI_REGISTRY_HOST}/pypi/{name}/json", allowed_host=PYPI_REGISTRY_HOST)
         version = (data.get("info") or {}).get("version")
         if isinstance(version, str):
             return version, None
