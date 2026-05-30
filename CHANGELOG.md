@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.11] - 2026-05-30
+
+### Fixed
+
+- Harden Claude and OpenCode release gates. Preserve documented `opencode-ai` `1.15.12`, `@opencode-ai/plugin` `1.15.12`, and `@opencode-ai/sdk` `1.15.12` baseline evidence.
+
 ## [1.1.10] - 2026-05-30
 
 ### Fixed
