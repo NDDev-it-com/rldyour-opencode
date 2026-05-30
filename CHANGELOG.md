@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.16] - 2026-05-30
+
+### Fixed
+
+- Harden public free CI policy with Scorecard and bounded artifact retention. Preserve documented `opencode-ai` `1.15.12`, `@opencode-ai/plugin` `1.15.12`, and `@opencode-ai/sdk` `1.15.12` baseline evidence.
+
 ## [1.1.15] - 2026-05-30
 
 ### Fixed

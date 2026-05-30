@@ -134,6 +134,7 @@ jobs:
           name: sbom-${{ matrix.os }}-${{ github.sha }}
           path: sbom.json
           if-no-files-found: error
+          retention-days: 30
       - name: Create release tag (workflow_dispatch only)
         if: github.event_name == 'workflow_dispatch' && matrix.os == 'ubuntu-latest'
         env:

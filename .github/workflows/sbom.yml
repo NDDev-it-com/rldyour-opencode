@@ -35,3 +35,4 @@ jobs:
           name: sbom-${{ github.event.release.tag_name || github.sha }}
           path: sbom.json
           if-no-files-found: error
+          retention-days: 14
