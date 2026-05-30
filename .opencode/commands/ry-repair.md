@@ -15,4 +15,6 @@ Repair repository contracts and AI-tool context without silently changing busine
 8. Run validators, tests, schema checks, hook/plugin checks, and docs/memory freshness checks.
 9. Finish through /ry-sync when durable artifacts changed.
 
+Reply in Russian unless the owner explicitly requests another language.
+
 Reference: .opencode/skills/ry-repair/SKILL.md, references/rldyour-contract.json

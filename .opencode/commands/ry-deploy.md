@@ -22,4 +22,6 @@ Deploy with local/GitHub/server sync, log checks, health verification, and memor
 
 Public repository exception: when the current repository is verified public, existing CI/CD workflows are automatic by default. Before and after public-repo deployment sync, verify GitHub Actions for the deployed HEAD/tag; if a required readiness/release workflow did not run because it is `workflow_dispatch`, scheduled, or release-only, trigger that existing workflow with `gh workflow run` and wait for completion. Do not edit workflows or GitHub governance surfaces without explicit owner request. See `references/public-repo-ci-policy.md`.
 
+Reply in Russian unless the owner explicitly requests another language.
+
 Reference: references/deploy-contract.md, references/flow-lifecycle.md, references/post-task-sync.md

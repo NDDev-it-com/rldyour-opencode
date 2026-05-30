@@ -103,7 +103,7 @@ function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
   return {
     rldyour_validate_config: tool({
       description:
-        "Run `bash scripts/validate_config.sh` against the active project. Returns the validator output verbatim and exits non-zero on any failure. Use to confirm opencode.json, skills, agents, commands, and VERSION are schema-correct before delivery.",
+        "Запускает `bash scripts/validate_config.sh` для активного проекта. EN: returns validator output verbatim and fails non-zero on any issue; use before delivery to confirm opencode.json, skills, agents, commands, and VERSION.",
       args: {},
       async execute(_args, ctx) {
         const cwd = ctx.directory || getCwd()
@@ -126,7 +126,7 @@ function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
 
     rldyour_check_deps: tool({
       description:
-        "Run `bash scripts/check_deps_freshness.sh --json` and return the JSON envelope listing every pinned MCP dependency in opencode.json (npm via bunx, PyPI via uvx, Dart SDK). Use when reviewing or bumping versions.",
+        "Проверяет свежесть pinned MCP dependencies через `bash scripts/check_deps_freshness.sh --json`. EN: returns JSON for npm/bunx, PyPI/uvx, and Dart SDK pins; use for version review or bumps.",
       args: {},
       async execute(_args, ctx) {
         const cwd = ctx.directory || getCwd()
@@ -149,7 +149,7 @@ function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
 
     rldyour_lsp_health: tool({
       description:
-        "Run `bash scripts/check_lsps.sh` and return language-server health for the project (PATH availability + project prereqs like pyproject.toml, tsconfig, Cargo.toml). Use when diagnosing LSP-related issues.",
+        "Проверяет health language servers через `bash scripts/check_lsps.sh`. EN: reports PATH availability and project prereqs such as pyproject.toml, tsconfig, or Cargo.toml for LSP diagnostics.",
       args: {},
       async execute(_args, ctx) {
         const cwd = ctx.directory || getCwd()
@@ -169,7 +169,7 @@ function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
 
     rldyour_git_audit: tool({
       description:
-        "Run `bash scripts/git_sync_audit.sh` and return current branch, upstream, dirty files, worktrees, and merged-branch cleanup candidates. Use as a precursor to git operations or before /ry-sync.",
+        "Аудит git state через `bash scripts/git_sync_audit.sh`. EN: reports branch, upstream, dirty files, worktrees, and merged-branch cleanup candidates before git operations or /ry-sync.",
       args: {},
       async execute(_args, ctx) {
         const cwd = ctx.directory || getCwd()
@@ -189,7 +189,7 @@ function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
 
     rldyour_fullrepo_status: tool({
       description:
-        "Run `bash scripts/fullrepo_sync.sh status-json` and return JSON describing the agent-only fullrepo branch state (branch, dirty, ahead/behind, fullrepo existence, Serena memory count). Use before /ry-sync to know whether fullrepo publish is needed.",
+        "Проверяет fullrepo state через `bash scripts/fullrepo_sync.sh status-json`. EN: returns JSON for agent-only branch, dirty/ahead/behind state, fullrepo existence, and Serena memory count before /ry-sync.",
       args: {},
       async execute(_args, ctx) {
         const cwd = ctx.directory || getCwd()

@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated consistency review: naming, style, imports, public API shape. RU: ревью консистентности нейминга, импортов и паттернов. Read-only. Explicit ry-start or ry-review only."
+description: "Ревью консистентности нейминга, стиля, импортов и public API shape. EN: orchestrated read-only consistency review. Explicit ry-start or ry-review only."
 mode: subagent
 temperature: 0.1
 steps: 36

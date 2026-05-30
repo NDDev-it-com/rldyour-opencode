@@ -1,5 +1,5 @@
 ---
-description: "Helper agent for safely editing opencode.json config with schema validation, backup, and rollback. RU: агент безопасной настройки OpenCode config с schema validation и rollback."
+description: "Агент безопасной настройки OpenCode config: schema validation, backup и rollback. EN: helper agent for safely editing opencode.json."
 mode: subagent
 temperature: 0.1
 steps: 36

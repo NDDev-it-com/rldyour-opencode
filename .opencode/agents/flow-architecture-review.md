@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated architecture review: boundaries, dependency direction, public API, data flow. RU: архитектурное ревью слоев, зависимостей и контрактов. Read-only. Explicit ry-start or ry-review only."
+description: "Архитектурное ревью слоев, зависимостей, public API и data flow. EN: orchestrated read-only architecture review. Explicit ry-start or ry-review only."
 mode: subagent
 temperature: 0.1
 steps: 36

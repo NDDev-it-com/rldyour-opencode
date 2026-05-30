@@ -1,5 +1,5 @@
 {
-  "version": "1.1.13",
+  "version": "1.1.15",
   "generated_by": "scripts/generate_commands_index.py",
   "count": 11,
   "commands": [
@@ -46,7 +46,7 @@
     {
       "name": "ry-init",
       "path": ".opencode/commands/ry-init.md",
-      "description": "Scoped read-only инициализация контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context (read-only).",
+      "description": "Инициализация scoped read-only контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context.",
       "agent": "build",
       "subtask": false,
       "domain": "flow",
@@ -87,7 +87,7 @@
     {
       "name": "ry-review",
       "path": ".opencode/commands/ry-review.md",
-      "description": "Report-only глубокое ревью diff/PR/scope с reviewer tracks (architecture/quality/consistency/integration/verification/security). Deep review with parallel reviewer tracks.",
+      "description": "Глубокое report-only ревью diff/PR/scope с reviewer tracks (architecture/quality/consistency/integration/verification/security). Deep review with parallel reviewer tracks.",
       "agent": "plan",
       "subtask": false,
       "domain": "flow",

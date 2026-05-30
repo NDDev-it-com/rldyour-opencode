@@ -25,4 +25,6 @@ Plan a new project before or alongside initial scaffold:
 5. Scaffold policy: documents first. Minimal scaffold is allowed only after the user approves it and only when it activates a useful Serena project structure without creating junk.
 6. Do not create code without explicit approval.
 
+Reply in Russian unless the owner explicitly requests another language.
+
 Reference: references/flow-lifecycle.md

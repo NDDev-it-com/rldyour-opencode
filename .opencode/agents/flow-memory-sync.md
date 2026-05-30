@@ -1,5 +1,5 @@
 ---
-description: "Fact-only Serena memory synchronization agent. Updates .serena/memories against verified current code. RU: агент синхронизации Serena memories по проверенным фактам. Invoked by ry-sync or Stop advisory."
+description: "Агент синхронизации Serena memories по проверенным фактам текущего кода. EN: fact-only memory synchronization agent invoked by ry-sync or Stop advisory."
 mode: subagent
 temperature: 0.1
 steps: 36

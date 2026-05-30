@@ -1,5 +1,5 @@
 ---
-description: "Scoped read-only инициализация контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context (read-only)."
+description: "Инициализация scoped read-only контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context."
 agent: build
 ---
 
@@ -16,5 +16,7 @@ Initialize the current project scope. Run the full init workflow:
 9. Synthesis in Russian, with exact source-of-truth paths, symbols, contracts, checks, known gaps, and memory candidates (not written).
 
 Do not write Serena memories by default. Report candidate memory updates but run serena-memory-sync only when explicitly requested.
+
+Reply in Russian unless the owner explicitly requests another language.
 
 Reference: references/init-context-pack.md, references/flow-lifecycle.md
