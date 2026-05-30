@@ -44,17 +44,29 @@ def test_contract_requires_owner_full_auto_standard_permissions() -> None:
     assert security["standard_permissions"]["top_level"] == {
         "read": "allow",
         "edit": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
         "bash": "allow",
-        "external_directory": "ask",
-        "doom_loop": "ask",
+        "task": "allow",
+        "external_directory": "allow",
+        "todowrite": "allow",
+        "question": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "repo_clone": "allow",
+        "repo_overview": "allow",
+        "lsp": "allow",
+        "doom_loop": "allow",
+        "skill": "allow",
     }
-    assert security["standard_permissions"]["build"] == {"edit": "allow", "bash": "allow"}
-    assert security["standard_permissions"]["plan"] == {"edit": "allow", "bash": "allow"}
+    assert security["standard_permissions"]["build"] == security["standard_permissions"]["top_level"]
+    assert security["standard_permissions"]["plan"] == security["standard_permissions"]["top_level"]
     assert security["read_policy"]["owner_full_auto_read"] == "allow"
     assert security["read_policy"]["source"] == "docs/decisions/010-owner-full-auto-standard-mode.md"
     assert "ry-env-protection" in security["read_policy"]["guardrail"]
-    assert security["boundary_prompt_policy"]["external_directory"] == "ask"
-    assert security["boundary_prompt_policy"]["doom_loop"] == "ask"
+    assert security["no_prompt_policy"]["external_directory"] == "allow"
+    assert security["no_prompt_policy"]["doom_loop"] == "allow"
 
 
 def test_permission_ask_not_in_lifecycle_contract() -> None:
