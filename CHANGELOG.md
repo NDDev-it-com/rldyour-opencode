@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.12] - 2026-05-30
+
+### Changed
+
+- Align standalone owner full-auto permissions with the no-prompt `oc` launcher posture and make `ry-start` reviewer fanout explicit-opt-in. Preserve documented `opencode-ai` `1.15.12`, `@opencode-ai/plugin` `1.15.12`, and `@opencode-ai/sdk` `1.15.12` baseline evidence.
+
 ## [1.1.11] - 2026-05-30
 
 ### Fixed
