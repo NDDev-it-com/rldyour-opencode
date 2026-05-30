@@ -142,6 +142,11 @@ def test_probe_npm_success(monkeypatch: pytest.MonkeyPatch) -> None:
     assert err is None
 
 
+def test_registry_url_validation_rejects_non_https() -> None:
+    with pytest.raises(ValueError, match="unexpected registry URL host"):
+        cf._validate_registry_url("file:///etc/passwd", allowed_host=cf.NPM_REGISTRY_HOST)
+
+
 def test_probe_npm_http_error(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         "urllib.request.urlopen",

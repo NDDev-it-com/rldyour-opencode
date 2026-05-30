@@ -62,6 +62,7 @@ import subprocess
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -74,6 +75,15 @@ REMOTE_TIMEOUT_SECONDS = 8.0
 LOCAL_PROBE_WINDOW_SECONDS = 3.0
 
 VALID_MODES = ("all", "static", "local-launch", "remote-head")
+
+
+def _validate_remote_url(name: str, url: str) -> str:
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or not parsed.hostname:
+        raise ValueError(f"{name}: remote MCP URL must be absolute https")
+    if parsed.username or parsed.password:
+        raise ValueError(f"{name}: remote MCP URL must not include credentials")
+    return url
 
 
 def _load_profiles() -> dict[str, str]:
@@ -99,9 +109,21 @@ def probe_remote(name: str, url: str) -> dict[str, Any]:
     detecting reachability for HEAD-rejecting ones."""
     started = time.monotonic()
     last_err: str | None = None
+    try:
+        url = _validate_remote_url(name, url)
+    except ValueError as e:
+        return {
+            "name": name,
+            "kind": "remote",
+            "url": url,
+            "status": "fail",
+            "error": str(e),
+            "latency_ms": int((time.monotonic() - started) * 1000),
+        }
     for method in ("HEAD", "GET"):
         try:
             req = urllib.request.Request(url, method=method)
+            # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
             with urllib.request.urlopen(req, timeout=REMOTE_TIMEOUT_SECONDS) as resp:
                 return {
                     "name": name,
