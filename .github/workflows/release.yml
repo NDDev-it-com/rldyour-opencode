@@ -11,11 +11,7 @@ on:
         required: true
 
 permissions:
-  contents: write
-  # id-token: write + attestations: write are intentionally NOT requested
-  # until the Sigstore-backed attest-build-provenance step is wired
-  # (ADR-007 § Future work). Granting them today without a consumer
-  # violates least-privilege per OSSF Scorecard "Token-Permissions".
+  contents: read
 
 concurrency:
   group: release-${{ github.workflow }}-${{ github.ref }}
@@ -29,6 +25,10 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     timeout-minutes: 20
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
@@ -78,7 +78,7 @@ jobs:
         # (P1-3). validate_opencode_schema.py is offline-safe (P0-2).
         run: |
           bash scripts/validate_config.sh
-          python3 scripts/check_baseline_consistency.py
+          python3 scripts/validate_opencode_baseline.py
           python3 scripts/validate_opencode_schema.py
           python3 scripts/validate_mcp_profiles.py
           python3 scripts/generate_skills_index.py --check --strict
@@ -128,13 +128,50 @@ jobs:
       - name: Generate CycloneDX SBOM
         working-directory: .opencode
         run: npm sbom --sbom-format cyclonedx > ../sbom.json
+      - name: Build release evidence and checksums
+        run: |
+          set -euo pipefail
+          mkdir -p release-evidence
+          cp sbom.json release-evidence/sbom.json
+          cp CHANGELOG.md release-evidence/CHANGELOG.md
+          cp VERSION release-evidence/VERSION
+          cp opencode.json release-evidence/opencode.json
+          cp opencode.release-safe.json release-evidence/opencode.release-safe.json
+          cp references/opencode-baseline.json release-evidence/opencode-baseline.json
+          tar -czf release-evidence.tgz release-evidence/
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum \
+              sbom.json \
+              CHANGELOG.md \
+              release-evidence.tgz \
+              > SHA256SUMS
+          else
+            shasum -a 256 \
+              sbom.json \
+              CHANGELOG.md \
+              release-evidence.tgz \
+              > SHA256SUMS
+          fi
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: sbom-${{ matrix.os }}-${{ github.sha }}
-          path: sbom.json
+          path: |
+            sbom.json
+            release-evidence.tgz
+            SHA256SUMS
           if-no-files-found: error
           retention-days: 30
+      - name: Attest release evidence bundle
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26  # v4.1.0
+        with:
+          subject-path: release-evidence.tgz
+      - name: Attest generated SBOM
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26  # v4.1.0
+        with:
+          subject-path: sbom.json
       - name: Create release tag (workflow_dispatch only)
         if: github.event_name == 'workflow_dispatch' && matrix.os == 'ubuntu-latest'
         env:
@@ -155,12 +192,19 @@ jobs:
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_VERSION" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_VERSION" sbom.json CHANGELOG.md --clobber
+            gh release upload "$RELEASE_VERSION" \
+              sbom.json \
+              CHANGELOG.md \
+              release-evidence.tgz \
+              SHA256SUMS \
+              --clobber
           else
             gh release create "$RELEASE_VERSION" \
               --verify-tag \
               --title "$RELEASE_VERSION" \
               --generate-notes \
               sbom.json \
-              CHANGELOG.md
+              CHANGELOG.md \
+              release-evidence.tgz \
+              SHA256SUMS
           fi
