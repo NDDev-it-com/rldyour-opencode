@@ -1,5 +1,5 @@
 {
-  "version": "1.1.11",
+  "version": "1.1.12",
   "generated_by": "scripts/generate_skills_index.py",
   "count": 33,
   "skills": [
@@ -471,11 +471,9 @@
         "ry-start",
         "full SDLC",
         "implement task",
-        "ship feature",
         "build feature",
         "complete lifecycle",
-        "end-to-end task",
-        "reviewer pipeline"
+        "explicit review only"
       ],
       "requires_mcp": [
         "serena",
