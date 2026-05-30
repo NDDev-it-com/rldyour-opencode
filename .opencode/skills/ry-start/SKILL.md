@@ -1,6 +1,6 @@
 ---
 name: ry-start
-description: "Полный lifecycle задачи: init, research, plan, implement, verify, review, commit, sync. Используй для: реализуй задачу, доработай, исправь качественно, сделай фичу, end-to-end, доведи до конца. EN triggers: ry-start, full SDLC, implement task, ship feature, build feature, complete lifecycle, end-to-end task, reviewer pipeline."
+description: "Полный lifecycle задачи: init, research, plan, implement, verify, commit, sync; ревью только по явному запросу. Используй для: реализуй задачу, доработай, исправь качественно, сделай фичу, end-to-end, доведи до конца. EN triggers: ry-start, full SDLC, implement task, build feature, complete lifecycle, explicit review only."
 ---
 
 # ry-start
@@ -23,24 +23,18 @@ Implement a task to a high-quality, scalable, synchronized state. Speed is secon
 10. Fix all issues in touched scope plus affected integration path. If wider technical debt is found, ask whether to expand scope.
 11. Run quality gates using project scripts, OpenCode LSP (auto-starts for detected file extensions), and detected stack checks. Use `verification-quality-gates` skill.
 12. Trigger browser validation for UI/browser-visible work unless auth blocks it; if auth blocks, report the limitation and use available evidence. Use `browser-tool-routing` and `browser-validation` skills.
-13. Trigger security review for security-sensitive changes or explicit user request. Use `owasp-top-10-implementation` and `ry-sec-review` skills.
-14. Run the review phase. Invoke up to six parallel reviewer subagents in a single Task fan-out (each with a self-contained prompt — they do not share context):
-    - `@flow-architecture-review` — boundaries, dependency direction, public API shape, data flow.
-    - `@flow-quality-review` — correctness, edge cases, error handling, resource lifecycle.
-    - `@flow-consistency-review` — naming, style, imports, project conventions.
-    - `@flow-integration-review` — cross-module contracts, schemas, configs, backward compatibility.
-    - `@flow-verification-review` — tests, quality gates, browser/server evidence.
-    - `@flow-security-review` — OWASP, auth/authz, injection, secrets (only when the touched scope is security-sensitive or the owner asks explicitly; this track runs `steps: 42` instead of `36` because it does a variant-hunt sweep on confirmed findings).
-    Consolidate findings via Severity × Disposition (see `references/reviewer-protocol.md`); fix `must-fix` + `should-fix` items; rerun only the reviewer tracks that reported issues.
+13. Apply security implementation guidance for security-sensitive changes; run `ry-sec-review` only when the owner explicitly asks for review/audit/security review.
+14. Run reviewer subagents only when the owner explicitly asks for review, audit, security review, rules review, or `ry-review`; otherwise skip the expensive review phase. Explicit review may invoke up to six parallel reviewer subagents in a single Task fan-out with self-contained read-only prompts.
 15. Run `flow-post-task-sync` before final response.
 
 ## Deploy Intent Routing
 
 If the owner request includes deploy, production, server rollout,
 sync-and-deploy, or a named deployment target, do not finish after
-implementation. After code validation, reviewer fixes, and Serena/docs sync,
-route into `/ry-deploy` with the same scope and target. If the deploy contract
-is incomplete, ask for the missing server, branch, environment, health-check,
+implementation. After code validation and Serena/docs sync,
+implementation. After code validation and Serena/docs sync, route into
+`/ry-deploy` with the same scope and target. If the deploy contract is
+incomplete, ask for the missing server, branch, environment, health-check,
 rollback, or credential decision before deploying. Never invent server access
 or deployment targets.
 
@@ -56,7 +50,7 @@ The owner normally writes prompts in Russian. `ry-start` must route helper skill
 | консоль, сеть, runtime, layout, hydration, Lighthouse, performance, browser-only failures | `browser-debug` |
 | Figma, дизайн, UI, верстка, дизайн-система, shadcn/ui, ReactBits, FSD, tokens, pixel-perfect design | `ry-design`, `figma-to-code`, `design-system-implementation`, `fsd-frontend-architecture`, `design-validation` |
 | auth/authz/API/input/file/dependency/config/secrets/payment/admin/external-integration | `owasp-top-10-implementation` |
-| security review request, sensitive scope | `ry-sec-review`, `flow-security-review` in review phase |
+| explicit review, audit, `ry-review`, `ry-sec-review`, `ry-rules-review`, reviewer subagents, security/rules review | matching reviewer tracks; security track only for explicit security-review request or security-sensitive explicit review |
 | завершение, финализация, durable code/config/docs/memory changes produced | `verification-quality-gates`, `serena-memory-sync`, `flow-post-task-sync` |
 
 ## Context Sufficiency
@@ -65,9 +59,14 @@ Do not implement from a shallow prompt. Before editing, the model must know the 
 
 If the model cannot answer the gate questions in `references/context-sufficiency-gate.md`, it must gather more evidence through Serena, LSP, `ry-explore`, browser/security/design workflows, or ask the owner with options. This is a quality guard, not a hard blocker: the correct response is to enrich context until implementation is safe.
 
-## Subagent Permission
+## Reviewer Opt-In
 
-Invoking `ry-start` is the owner's explicit permission to use parallel reviewer subagents during the review phase. Reviewer track skills are orchestrated by this command, not broad implicit-entry skills. Prompts must be self-contained and read-only for reviewers. Reviewer subagents use `mode: subagent`, `hidden: true`, `permission: { edit: "deny" }` as defined in `.opencode/agents/`.
+Invoking `ry-start` alone is not permission to use parallel reviewer subagents.
+Reviewer tracks are orchestrated only by explicit review intents such as
+`ry-review`, `ry-sec-review`, `ry-rules-review`, "сделай ревью", "security
+review", or "аудит". Prompts must be self-contained and read-only for
+reviewers. Reviewer subagents use `mode: subagent`, `hidden: true`,
+`permission: { edit: "deny" }` as defined in `.opencode/agents/`.
 
 ## Non-Negotiables
 
