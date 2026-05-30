@@ -35,10 +35,9 @@ INDEX_PATH = PLUGINS_DIR / "index.json"
 PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     "ry-bootstrap": {
         "description": (
-            "Session bootstrap. Logs a banner on session.created, pushes "
-            "MCP/workflow context on experimental.session.compacting, and "
-            "disables the synthetic autocontinue turn on overflow. RU: быстрый "
-            "старт с контекстом сессии и безопасной обработкой compaction."
+            "Быстрый старт с контекстом сессии и безопасной обработкой "
+            "compaction. EN: session bootstrap logs session.created, pushes "
+            "MCP/workflow context, and disables synthetic autocontinue on overflow."
         ),
         "category": "lifecycle",
         "writes_files": False,
@@ -46,10 +45,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-command-audit": {
         "description": (
-            "Slash-command audit log. Appends one credential-sanitized line "
-            "per command.execute.before to .serena/.command_audit.log "
-            "(256 KiB rolling cap). RU: аудит slash-команд без секретов и "
-            "с ограниченным размером журнала."
+            "Аудит slash-команд без секретов и с ограниченным размером журнала. "
+            "EN: appends one credential-sanitized command.execute.before line "
+            "to .serena/.command_audit.log with a 256 KiB rolling cap."
         ),
         "category": "observability",
         "writes_files": True,
@@ -57,10 +55,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-env-protection": {
         "description": (
-            "Best-effort sensitive-path guardrail. Blocks read/bash on .env*, "
-            ".pem, .key, .ssh/, .gnupg/, .aws/ paths plus data-movement "
-            "utilities (cp/mv/tar/zip/base64/dd/socat/...). NOT a DLP boundary. "
-            "RU: защита чувствительных путей и data-movement команд, не DLP."
+            "Защита чувствительных путей и data-movement команд, не DLP. "
+            "EN: best-effort guardrail blocks read/bash on .env*, .pem, .key, "
+            ".ssh/, .gnupg/, .aws/ and cp/mv/tar/zip/base64/dd/socat patterns."
         ),
         "category": "guardrail",
         "writes_files": False,
@@ -68,10 +65,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-flow-hooks": {
         "description": (
-            "Post-bash advice. Conventional Commits regex check on git commit "
-            "output + /ry-sync nudge after every commit/merge/cherry-pick/"
-            "rebase that changes the repo. RU: подсказки после git-мутаций и "
-            "напоминание о /ry-sync."
+            "Подсказки после git-мутаций и напоминание о /ry-sync. EN: "
+            "post-bash advice checks Conventional Commits output and nudges "
+            "after commit/merge/cherry-pick/rebase changes."
         ),
         "category": "advisory",
         "writes_files": False,
@@ -79,10 +75,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-permission-events": {
         "description": (
-            "Permission event observer. Logs permission.asked and "
-            "permission.replied bus events via the generic event hook. "
-            "Observability only; enforcement stays in ry-shell-strategy. RU: "
-            "наблюдение permission events без enforcement."
+            "Наблюдение permission events без enforcement. EN: logs "
+            "permission.asked and permission.replied bus events through the "
+            "generic event hook; enforcement stays in ry-shell-strategy."
         ),
         "category": "observability",
         "writes_files": False,
@@ -90,11 +85,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-shell-strategy": {
         "description": (
-            "Unconditional shell guardrail on tool.execute.before. Blocks "
-            "force-push without lease, catastrophic rm -rf, and --no-verify "
-            "pushes plus shell.env hardening "
-            "(GIT_TERMINAL_PROMPT=0, NO_UPDATE_NOTIFIER=1, conditional CI=1). "
-            "RU: shell/Git guardrail и non-interactive env hardening."
+            "Гардрейл Shell/Git и non-interactive env hardening. EN: "
+            "tool.execute.before blocks force-push without lease, catastrophic "
+            "rm -rf, --no-verify pushes, and sets safe shell.env defaults."
         ),
         "category": "guardrail",
         "writes_files": False,
@@ -102,9 +95,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-sync-reminder": {
         "description": (
-            "Session-idle reminder. Toast-only nudge to run /ry-sync before "
-            "ending the session; no log spam between events. RU: ненавязчивое "
-            "напоминание о финальной синхронизации."
+            "Ненавязчивое напоминание о финальной синхронизации. EN: "
+            "session-idle toast-only nudge to run /ry-sync before ending the "
+            "session, without log spam between events."
         ),
         "category": "advisory",
         "writes_files": False,
@@ -112,17 +105,10 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-system-context": {
         "description": (
-            "Injects [rldyour runtime] date/branch/head/worktree-dirty stamp "
-            "into every system prompt via experimental.chat.system.transform. "
-            "Branch and HEAD served from a per-directory TTL cache (3 s) so "
-            "in-session git checkout/switch/rebase invalidates the stamp "
-            "within one turn (audit P1-6 + integration-review F-3 + reviewer "
-            "wave 2026-05-18 closures). Status spawn has 800ms timeout. "
-            "Branch and HEAD values are sanitized via sanitizeRuntimeStamp "
-            "before the system-prompt push to defeat indirect prompt "
-            "injection through crafted branch names (reviewer wave security "
-            "F-4 closure). RU: runtime-контекст в system prompt с sanitization "
-            "ветки/HEAD."
+            "Контекст runtime в system prompt с sanitization ветки/HEAD. EN: "
+            "injects date/branch/head/worktree-dirty stamp through "
+            "experimental.chat.system.transform with TTL cache, timeout, and "
+            "branch/HEAD sanitization against indirect prompt injection."
         ),
         "category": "context-injection",
         "writes_files": False,
@@ -130,10 +116,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-tool-hints": {
         "description": (
-            "Appends routing hints to known MCP tool descriptions via "
-            "tool.definition. Encodes AGENTS.md § Tool Priority matrix in the "
-            "tool itself so the LLM sees the hint inline. RU: подсказки "
-            "маршрутизации прямо в описаниях MCP tools."
+            "Подсказки маршрутизации прямо в описаниях MCP tools. EN: appends "
+            "tool.definition hints for known MCP tools so the LLM sees the "
+            "AGENTS.md Tool Priority matrix inline."
         ),
         "category": "routing",
         "writes_files": False,
@@ -151,10 +136,9 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-tools": {
         "description": (
-            "Registers five LLM-callable custom tools (rldyour_validate_config, "
-            "_check_deps, _lsp_health, _git_audit, _fullrepo_status) wrapping "
-            "diagnostic scripts. Each tool has timeout + maxOutputBytes budget. "
-            "RU: диагностические custom tools с timeout и output budget."
+            "Диагностические custom tools с timeout и output budget. EN: "
+            "registers rldyour_validate_config, _check_deps, _lsp_health, "
+            "_git_audit, and _fullrepo_status wrappers around diagnostic scripts."
         ),
         "category": "tool-registration",
         "writes_files": False,

@@ -15,41 +15,41 @@ import type { Plugin } from "@opencode-ai/plugin"
 const HINTS: Record<string, string> = {
   // Serena (semantic code intelligence — Serena domain only)
   "serena_find_symbol":
-    "Prefer over raw `grep` when locating a known symbol; LSP-aware and faster.",
+    "Используй вместо raw `grep` для поиска известного symbol; EN: LSP-aware and faster.",
   "serena_get_symbols_overview":
-    "Use BEFORE reading a whole file — cheaper file structure overview.",
+    "Используй перед чтением всего файла; EN: cheaper file-structure overview.",
   "serena_find_referencing_symbols":
-    "Use to trace caller impact before any refactor.",
+    "Используй для трассировки caller impact перед refactor; EN: references before edits.",
   "serena_search_for_pattern":
-    "Use only for cross-cutting text sweeps; for symbol lookup prefer `find_symbol`.",
+    "Используй только для сквозных text sweeps; EN: prefer `find_symbol` for symbol lookup.",
   "serena_read_memory":
-    "Read Serena memories only when the task references prior decisions or project facts.",
+    "Читай Serena memories для прошлых решений или durable project facts; EN: not for chat logs.",
 
   // Browser (Browser domain only)
   "playwright_browser_navigate":
-    "Use for end-to-end UI validation and golden-path verification.",
+    "Используй для end-to-end UI validation и golden-path проверки; EN: browser flow proof.",
   "chrome-devtools_list_console_messages":
-    "Use for runtime browser diagnostics (errors, warnings), not UI validation.",
+    "Используй для runtime browser diagnostics ошибок/предупреждений; EN: not visual UI validation.",
   "chrome-devtools_performance_start_trace":
-    "Use only when measuring performance; avoid for routine checks.",
+    "Используй только для performance measurement; EN: avoid routine trace overhead.",
 
   // Research (Explore domain)
   "context7_resolve-library-id":
-    "Call this FIRST when you have a library name but no Context7 ID — pairs with `query-docs`.",
+    "Сначала вызывай для library name без Context7 ID; EN: pair with `query-docs`.",
   "context7_query-docs":
-    "Preferred over `websearch` for current library API documentation. Requires the Context7 ID from `resolve-library-id`.",
+    "Предпочитай для текущей library/API документации; EN: requires Context7 ID before websearch.",
   "deepwiki_ask_question":
-    "Use for public-repo architecture questions when library docs are insufficient.",
+    "Используй для architecture questions по public repos; EN: when docs are insufficient.",
   "grep_searchGitHub":
-    "Use for real production usage patterns across public GitHub repos.",
+    "Используй для production patterns в public GitHub repos; EN: real-world usage evidence.",
 
   // Security (Security domain only)
   "semgrep_semgrep_scan":
-    "Static analysis for defensive security review — outputs require manual validation.",
+    "Статический анализ для defensive security review; EN: manually validate every finding.",
 
   // Planning
   "sequential-thinking_sequentialthinking":
-    "Use for non-trivial architectural or design decisions before editing.",
+    "Используй для нетривиальных architecture/design решений перед edits; EN: plan first.",
 }
 
 export const RyToolHints: Plugin = async () => {

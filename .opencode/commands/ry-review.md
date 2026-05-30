@@ -1,5 +1,5 @@
 ---
-description: "Report-only глубокое ревью diff/PR/scope с reviewer tracks (architecture/quality/consistency/integration/verification/security). Deep review with parallel reviewer tracks."
+description: "Глубокое report-only ревью diff/PR/scope с reviewer tracks (architecture/quality/consistency/integration/verification/security). Deep review with parallel reviewer tracks."
 agent: plan
 ---
 
@@ -17,5 +17,7 @@ Deep review of a diff, PR, branch, or scope with research and reviewer subagents
    - @flow-security-review: only when scope is security-sensitive or explicitly requested.
 5. Consolidate all findings, resolve contradictions with code evidence.
 6. Produce a Russian report with exact paths, severity, confidence, evidence, impact, and fixes.
+
+Reply in Russian unless the owner explicitly requests another language.
 
 Reference: references/reviewer-protocol.md, references/flow-lifecycle.md

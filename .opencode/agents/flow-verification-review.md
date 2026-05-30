@@ -1,5 +1,5 @@
 ---
-description: "Orchestrated verification review: tests, quality gates, browser/server evidence. RU: ревью тестов, quality gates и browser/server доказательств. Read-only. Explicit ry-start or ry-review only."
+description: "Ревью тестов, quality gates и browser/server доказательств. EN: orchestrated read-only verification review. Explicit ry-start or ry-review only."
 mode: subagent
 temperature: 0.1
 steps: 36

@@ -25,4 +25,6 @@ Do not create, edit, delete, enable, disable, or trigger CI/CD workflows, releas
 
 Public repository exception: when the current repository is verified public, existing CI/CD workflows are automatic by default. After pushing or tagging public-repo changes, verify the GitHub Actions runs for the same HEAD/tag; if a required readiness/release workflow did not run because it is `workflow_dispatch`, scheduled, or release-only, trigger that existing workflow with `gh workflow run` and wait for completion. Do not edit workflows or GitHub governance surfaces without explicit owner request. See `references/public-repo-ci-policy.md`.
 
+Reply in Russian unless the owner explicitly requests another language.
+
 Reference: references/flow-lifecycle.md, references/context-sufficiency-gate.md, references/post-task-sync.md
