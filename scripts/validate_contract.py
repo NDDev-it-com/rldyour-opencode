@@ -138,6 +138,21 @@ def validate() -> dict[str, Any]:
                         problems.append(
                             "contract.security.read_policy.guardrail must mention ry-env-protection tool.execute.before"
                         )
+            no_prompt_policy = security.get("no_prompt_policy")
+            if not isinstance(no_prompt_policy, dict):
+                problems.append(
+                    "contract.security.no_prompt_policy must document owner boundary permissions"
+                )
+            else:
+                if no_prompt_policy.get("source") != "docs/decisions/010-owner-full-auto-standard-mode.md":
+                    problems.append(
+                        "contract.security.no_prompt_policy.source must point to ADR-010"
+                    )
+                for key in ("external_directory", "doom_loop"):
+                    if no_prompt_policy.get(key) != "allow":
+                        problems.append(
+                            f"contract.security.no_prompt_policy.{key} must be allow"
+                        )
                 env_guard = (contract.get("hook_lifecycle") or {}).get("tool.pre.env-protection") or {}
                 if env_guard.get("plugin") != "ry-env-protection" or env_guard.get("hook") != "tool.execute.before":
                     problems.append(
