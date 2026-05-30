@@ -50,7 +50,12 @@ def _run_opencode(*args: str) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
         timeout=60,
-        env={**os.environ, "NO_COLOR": "1"},
+        env={
+            **os.environ,
+            "NO_COLOR": "1",
+            "NPM_CONFIG_PACKAGE_LOCK": "false",
+            "npm_config_package_lock": "false",
+        },
         check=False,
     )
 
