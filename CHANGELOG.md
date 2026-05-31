@@ -8,17 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.24] - 2026-05-31
+
+### Changed
+
+- Correct public-free GitHub Actions runner coverage and CI policy. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
+
 ## [1.1.23] - 2026-05-31
 
 ### Fixed
 
-- Fix Ubuntu-only branch-protection context test fixture. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
+- Fix branch-protection context test fixture for the prior Ubuntu-hosted policy. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
 
 ## [1.1.22] - 2026-05-31
 
 ### Changed
 
-- Align public adapter CI with Ubuntu-only zero-paid-risk runner policy. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
+- Align public adapter CI with the then-current standard-runner cost guardrail. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
 
 ## [1.1.21] - 2026-05-31
 
@@ -1387,7 +1393,7 @@ Audit-driven stabilization pass closing every P0/P1 finding from four parallel e
 - **(group F)** JSON-escape `scripts/fullrepo_sync.sh status-json` output via Python helper (`json.dumps`) instead of heredoc interpolation; previously could produce malformed JSON when a branch name contained `"` or `\`.
 - **(group G)** New pytest suites: `test_fullrepo_sync.py` (publish/status/restore paths), `test_sanitize_diag.py` (every ordered redaction pattern), `test_check_deps_freshness.py` (envelope + flags). Extension of `test_validate_helpers.py` with strict YAML + FileNotFoundError + `mode: all` + forbidden-skill-field cases.
 - **(group H)** `.opencode/tsconfig.json` strict-mode plugin config + baseline `bunx tsc --noEmit`.
-- **(group I)** Expanded CI baseline — `validate.yml`, `dependency-check.yml`, `instruction-docs-check.yml`, `typecheck-plugins.yml`, `lint.yml` (ruff), `codeql.yml`, `secret-scan.yml` (gitleaks), `dependency-review.yml`, `release.yml`, `sbom.yml`. All actions pinned to commit SHA, `permissions: contents: read` per workflow, `concurrency` cancel-in-progress groups, explicit `timeout-minutes`. Ubuntu + macOS matrix for `validate`, `typecheck-plugins`, `lint`. CodeQL / gitleaks / dependency-review / SBOM stay Ubuntu-only (platform-independent). `.github/dependabot.yml` for weekly npm and github-actions ecosystem updates.
+- **(group I)** Expanded CI baseline — `validate.yml`, `dependency-check.yml`, `instruction-docs-check.yml`, `typecheck-plugins.yml`, `lint.yml` (ruff), `codeql.yml`, `secret-scan.yml` (gitleaks), `dependency-review.yml`, `release.yml`, `sbom.yml`. All actions pinned to commit SHA, `permissions: contents: read` per workflow, `concurrency` cancel-in-progress groups, explicit `timeout-minutes`. Ubuntu + macOS matrix for `validate`, `typecheck-plugins`, `lint`. CodeQL / gitleaks / dependency-review / SBOM stay Ubuntu-hosted (platform-independent). `.github/dependabot.yml` for weekly npm and github-actions ecosystem updates.
 - **(group J)** Governance scaffolding: `CONTRIBUTING.md`, `SECURITY.md` (private disclosure route), `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), `.github/CODEOWNERS`, `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config_question}.md`.
 - **(group K)** Three new ADRs (MADR 4.0.0): `005-fullrepo-snapshot-boundary.md` (declares two artifact classes: normal-branch checkout vs `fullrepo` agent-only snapshot, with snapshot-aware validation), `006-defense-in-depth-complete.md` (`tool.execute.before` unconditional + `permission.ask` deny-only, with mandatory test-side coverage for force-push / catastrophic rm / `--no-verify`), `007-ci-mirrors-local-validation.md` (local scripts are the source of truth, CI is thin wrappers; SHA-pinned actions, least-privilege permissions, concurrency groups).
 
