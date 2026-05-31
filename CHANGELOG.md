@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.26] - 2026-06-01
+
+### Security
+
+- Route Scorecard to JSON artifacts instead of code scanning alerts. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
+
 ## [1.1.25] - 2026-05-31
 
 ### Changed
