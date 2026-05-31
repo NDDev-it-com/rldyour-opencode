@@ -6,8 +6,6 @@
     "shell-strict-mode",
     "Analyze (ubuntu-latest / javascript-typescript)",
     "Analyze (ubuntu-latest / python)",
-    "Analyze (macos-latest / javascript-typescript)",
-    "Analyze (macos-latest / python)",
     "gitleaks",
     "Semgrep OSS scan"
   ],

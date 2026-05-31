@@ -38,6 +38,8 @@ runner labels and keep third-party actions pinned to full commit SHAs.
 
 - Public adapter CI must stay on standard GitHub-hosted runner labels only.
 - No self-hosted or non-standard runner labels.
+- Default, required, scheduled, and release workflows use Ubuntu standard
+  runners only under the owner zero-paid-risk policy.
 - Workflow artifacts must set explicit retention and stay at or below 30 days.
 - Path-filtered and scheduled jobs keep signal focused while preserving full
   public/free coverage.
