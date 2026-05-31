@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.25] - 2026-05-31
+
+### Changed
+
+- Refresh shared MCP runtime pins to current validated upstream versions. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
+
 ## [1.1.24] - 2026-05-31
 
 ### Changed
@@ -192,7 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenCode runtime baseline remains `opencode-ai`, `@opencode-ai/plugin`,
   and `@opencode-ai/sdk` `1.15.11`; the vendored schema and CI install
   target stay aligned with that release.
-- Shared MCP runtime pins now track `semgrep==1.164.0` and `shadcn@4.8.2`.
+- Shared MCP runtime pins now track `semgrep==1.164.0` and `shadcn@4.9.0`.
 
 ## [0.14.0] - 2026-05-27
 
