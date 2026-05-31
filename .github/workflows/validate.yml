@@ -21,13 +21,11 @@ concurrency:
 jobs:
   validate:
     strategy:
-      # Matrix the strict frontmatter validator + pytest corpus across both
-      # platforms the owner runs locally (Linux + macOS). The runner difference
-      # surfaces script portability defects (sed -i flags, mktemp semantics,
-      # readlink behaviour) before they hit a local checkout.
+      # Owner zero-paid-risk CI policy: default public adapter validation runs
+      # on Ubuntu standard runners only.
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
@@ -123,12 +121,11 @@ jobs:
 
   shell-strict-mode:
     # Tiny linter that asserts every scripts/*.sh begins with the env-bash
-    # shebang and `set -euo pipefail`. Run on Linux and macOS to prevent
-    # platform-specific shebang/line-ending regressions.
+    # shebang and `set -euo pipefail`.
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 5
     steps:

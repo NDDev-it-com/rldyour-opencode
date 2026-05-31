@@ -44,15 +44,12 @@ concurrency:
 
 jobs:
   runtime:
-    # The OpenCode CLI is published as a cross-platform binary (Linux +
-    # macOS via Bun). Running both matrices catches Bun/macOS-specific
-    # regressions (e.g. setup-bun PATH layout, dlopen surface) that the
-    # Linux-only build would miss. Windows is intentionally out of scope
-    # — OpenCode plugin spawn relies on POSIX shell semantics.
+    # Owner zero-paid-risk CI policy: runtime smoke runs on Ubuntu standard
+    # runners only. Platform-specific runtime checks remain local/manual.
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:

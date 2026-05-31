@@ -52,14 +52,14 @@ fix candidate, not a workflow bug.
 
 | Workflow file | Workflow name | Job | GitHub check context |
 |---|---|---|---|
-| `validate.yml` | `Validate rldyour-opencode` | `validate` (matrix `os: [ubuntu-latest, macos-latest]`) | `Validate rldyour-opencode / validate (ubuntu-latest)` and `Validate rldyour-opencode / validate (macos-latest)` |
-| `validate.yml` | `Validate rldyour-opencode` | `shell-strict-mode` | `Validate rldyour-opencode / shell-strict-mode (ubuntu-latest)` and `Validate rldyour-opencode / shell-strict-mode (macos-latest)` |
-| `typecheck-plugins.yml` | `Typecheck Plugins` | `typecheck` (matrix `os: [ubuntu-latest, macos-latest]`) | `Typecheck Plugins / typecheck (ubuntu-latest)` and `Typecheck Plugins / typecheck (macos-latest)` |
-| `lint.yml` | `Lint` | `ruff` (matrix `os: [ubuntu-latest, macos-latest]`) | `Lint / ruff (ubuntu-latest)` and `Lint / ruff (macos-latest)` |
-| `instruction-docs-check.yml` | `Instruction Docs Check` | `instruction-docs` | `Instruction Docs Check / instruction-docs (ubuntu-latest)` and `Instruction Docs Check / instruction-docs (macos-latest)` |
+| `validate.yml` | `Validate rldyour-opencode` | `validate` (matrix `os: [ubuntu-latest]`) | `Validate rldyour-opencode / validate (ubuntu-latest)` |
+| `validate.yml` | `Validate rldyour-opencode` | `shell-strict-mode` | `Validate rldyour-opencode / shell-strict-mode (ubuntu-latest)` |
+| `typecheck-plugins.yml` | `Typecheck Plugins` | `typecheck` (matrix `os: [ubuntu-latest]`) | `Typecheck Plugins / typecheck (ubuntu-latest)` |
+| `lint.yml` | `Lint` | `ruff` (matrix `os: [ubuntu-latest]`) | `Lint / ruff (ubuntu-latest)` |
+| `instruction-docs-check.yml` | `Instruction Docs Check` | `instruction-docs` | `Instruction Docs Check / instruction-docs (ubuntu-latest)` |
 | `secret-scan.yml` | `Secret Scan` | `gitleaks` | `Secret Scan / gitleaks` |
-| `codeql.yml` | `CodeQL` | `analyze` (matrix `os: [ubuntu-latest, macos-latest]`, `language: [javascript-typescript, python]`) | `CodeQL / Analyze (ubuntu-latest / javascript-typescript) (ubuntu-latest, javascript-typescript)` and `CodeQL / Analyze (ubuntu-latest / python) (ubuntu-latest, python)` and `CodeQL / Analyze (macos-latest / javascript-typescript) (macos-latest, javascript-typescript)` and `CodeQL / Analyze (macos-latest / python) (macos-latest, python)` |
-| `opencode-runtime.yml` | `OpenCode Runtime` | `runtime` (matrix `os: [ubuntu-latest, macos-latest]`) | `OpenCode Runtime / runtime (ubuntu-latest)` and `OpenCode Runtime / runtime (macos-latest)` |
+| `codeql.yml` | `CodeQL` | `analyze` (matrix `os: [ubuntu-latest]`, `language: [javascript-typescript, python]`) | `CodeQL / Analyze (ubuntu-latest / javascript-typescript) (ubuntu-latest, javascript-typescript)` and `CodeQL / Analyze (ubuntu-latest / python) (ubuntu-latest, python)` |
+| `opencode-runtime.yml` | `OpenCode Runtime` | `runtime` (matrix `os: [ubuntu-latest]`) | `OpenCode Runtime / runtime (ubuntu-latest)` |
 
 ### Scheduled / manual / artifact only (NOT required PR contexts)
 
@@ -105,22 +105,14 @@ gh api repos/NDDev-it-com/rldyour-opencode/branches/main/protection | jq
 gh api -X PUT repos/NDDev-it-com/rldyour-opencode/branches/main/protection \
   -F required_status_checks.strict=true \
   -F required_status_checks.contexts[]='Validate rldyour-opencode / validate (ubuntu-latest)' \
-  -F required_status_checks.contexts[]='Validate rldyour-opencode / validate (macos-latest)' \
   -F required_status_checks.contexts[]='Validate rldyour-opencode / shell-strict-mode (ubuntu-latest)' \
-  -F required_status_checks.contexts[]='Validate rldyour-opencode / shell-strict-mode (macos-latest)' \
   -F required_status_checks.contexts[]='Typecheck Plugins / typecheck (ubuntu-latest)' \
-  -F required_status_checks.contexts[]='Typecheck Plugins / typecheck (macos-latest)' \
   -F required_status_checks.contexts[]='Lint / ruff (ubuntu-latest)' \
-  -F required_status_checks.contexts[]='Lint / ruff (macos-latest)' \
   -F required_status_checks.contexts[]='Instruction Docs Check / instruction-docs (ubuntu-latest)' \
-  -F required_status_checks.contexts[]='Instruction Docs Check / instruction-docs (macos-latest)' \
   -F required_status_checks.contexts[]='Secret Scan / gitleaks' \
   -F required_status_checks.contexts[]='CodeQL / Analyze (ubuntu-latest / javascript-typescript) (ubuntu-latest, javascript-typescript)' \
   -F required_status_checks.contexts[]='CodeQL / Analyze (ubuntu-latest / python) (ubuntu-latest, python)' \
-  -F required_status_checks.contexts[]='CodeQL / Analyze (macos-latest / javascript-typescript) (macos-latest, javascript-typescript)' \
-  -F required_status_checks.contexts[]='CodeQL / Analyze (macos-latest / python) (macos-latest, python)' \
   -F required_status_checks.contexts[]='OpenCode Runtime / runtime (ubuntu-latest)' \
-  -F required_status_checks.contexts[]='OpenCode Runtime / runtime (macos-latest)' \
   -F enforce_admins=false \
   -F required_pull_request_reviews.required_approving_review_count=1 \
   -F required_pull_request_reviews.dismiss_stale_reviews=true \
