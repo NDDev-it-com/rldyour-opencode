@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.21] - 2026-05-31
+
+### Changed
+
+- Adopt OpenCode 1.15.13 runtime/plugin/sdk baseline.
+
 ## [1.1.20] - 2026-05-30
 
 ### Security
