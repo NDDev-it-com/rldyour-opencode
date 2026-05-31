@@ -1,6 +1,6 @@
 # OpenCode Plugin Patterns
 
-Reference for the advanced `@opencode-ai/plugin` hook surface used by this marketplace. Sourced from `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts` v1.15.12 (pin bumped from v1.15.3, originally introduced from v1.14.48 - the runtime hook surface and tool-ID format are unchanged across these versions); cross-checked against https://opencode.ai/docs/plugins/.
+Reference for the advanced `@opencode-ai/plugin` hook surface used by this marketplace. Sourced from `.opencode/node_modules/@opencode-ai/plugin/dist/index.d.ts` v1.15.13 (pin bumped from v1.15.3, originally introduced from v1.14.48 - the runtime hook surface and tool-ID format are unchanged across these versions); cross-checked against https://opencode.ai/docs/plugins/.
 
 ## Plugin context
 
@@ -70,9 +70,9 @@ return {
 | `tool.definition` | Sent to LLM | Modify `description` / `parameters` |
 | `shell.env` | Each shell spawn | Inject `env` vars |
 | `command.execute.before` | Slash command starts | Read `command`, `arguments`, `sessionID`; emit `parts` |
-| `permission.ask` | SDK type, source-inspected in v1.15.4 | **Forbidden for enforcement** in this repo; source/runtime inspection found no trigger path in OpenCode v1.15.4 and the current v1.15.12 baseline keeps this policy |
+| `permission.ask` | SDK type, source-inspected in v1.15.4 | **Forbidden for enforcement** in this repo; source/runtime inspection found no trigger path in OpenCode v1.15.4 and the current v1.15.13 baseline keeps this policy |
 
-> **Security note on `permission.ask`.** OpenCode's plugin SDK exposes this hook type, but v1.15.4 source/runtime inspection showed that the permission service publishes `permission.asked` / `permission.replied` bus events and does not trigger plugin-level `permission.ask`. The current v1.15.12 baseline keeps this hook forbidden for enforcement. Static permission config is the primary policy; dynamic denial must use runtime-proven hooks such as `tool.execute.before`. `scripts/check_plugin_hooks.py` rejects `permission.ask` in plugin code.
+> **Security note on `permission.ask`.** OpenCode's plugin SDK exposes this hook type, but v1.15.4 source/runtime inspection showed that the permission service publishes `permission.asked` / `permission.replied` bus events and does not trigger plugin-level `permission.ask`. The current v1.15.13 baseline keeps this hook forbidden for enforcement. Static permission config is the primary policy; dynamic denial must use runtime-proven hooks such as `tool.execute.before`. `scripts/check_plugin_hooks.py` rejects `permission.ask` in plugin code.
 
 ### Auth / provider extension
 
@@ -122,7 +122,7 @@ Each tool returns the script's combined stdout/stderr and stamps `ctx.metadata({
 
 `tool.definition` appends one short routing hint per known MCP tool ID. Hints encode the AGENTS.md tool-priority matrix (e.g., "Use Serena `find_symbol` before raw grep") so the LLM has the routing rule in the tool description itself, not just the high-level AGENTS.md instructions.
 
-HINTS keys use the OpenCode `<server>_<tool>` tool-ID format (single underscore; dashes preserved; introduced in v1.14.48, unchanged through the current v1.15.12 baseline). Example: `serena_find_symbol`, `chrome-devtools_list_console_messages`, `context7_resolve-library-id`. The Claude-Code-style `mcp__server__tool` prefix silently disables every hint and is banned by `scripts/tests/test_plugin_surface.py::test_ry_tool_hints_no_legacy_aliases`.
+HINTS keys use the OpenCode `<server>_<tool>` tool-ID format (single underscore; dashes preserved; introduced in v1.14.48, unchanged through the current v1.15.13 baseline). Example: `serena_find_symbol`, `chrome-devtools_list_console_messages`, `context7_resolve-library-id`. The Claude-Code-style `mcp__server__tool` prefix silently disables every hint and is banned by `scripts/tests/test_plugin_surface.py::test_ry_tool_hints_no_legacy_aliases`.
 
 ### Permission event audit (`.opencode/plugins/ry-permission-events.ts`)
 
@@ -138,7 +138,7 @@ HINTS keys use the OpenCode `<server>_<tool>` tool-ID format (single underscore;
 
 ### Observability: `client.app.log` + `client.tui.showToast`
 
-All 10 plugins use the OpenCode v1.14.48+ client API for user-visible and structured logging instead of `console.log` (which lands only in the server log file `~/.local/share/opencode/log/*.log` and is invisible to the user). The current runtime/plugin/SDK baseline is v1.15.12; several historical implementation notes above were originally validated against v1.15.4 and remain historical evidence only:
+All 10 plugins use the OpenCode v1.14.48+ client API for user-visible and structured logging instead of `console.log` (which lands only in the server log file `~/.local/share/opencode/log/*.log` and is invisible to the user). The current runtime/plugin/SDK baseline is v1.15.13; several historical implementation notes above were originally validated against v1.15.4 and remain historical evidence only:
 
 ```ts
 async function log(level: "info" | "warn" | "error", message: string) {

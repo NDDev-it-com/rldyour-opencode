@@ -1,17 +1,21 @@
 # OpenCode Surface Adoption
 
-Verified: 2026-05-30
+Verified: 2026-05-31
 
 Source of truth:
 - Runtime baseline: `references/opencode-baseline.json`
-- Vendored schema: `references/opencode-config.schema.v1.15.12.json`
+- Vendored schema: `references/opencode-config.schema.v1.15.13.json`
 - Official docs and changelog: `https://opencode.ai/docs/` and `https://opencode.ai/changelog`
 
 ## Decisions
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
-| OpenCode runtime/schema/package baseline | 1.15.12 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, `@opencode-ai/sdk`, and the vendored config schema are pinned to `1.15.12`; no config migration was required. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| OpenCode runtime/schema/package baseline | 1.15.13 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, `@opencode-ai/sdk`, and the vendored config schema are pinned to `1.15.13`; no config migration was required. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| Session metadata through API and SDK | 1.15.13 | Future | Runtime/API capability only; no adapter config or local plugin currently persists custom session metadata. | `scripts/check_plugin_hooks.py` |
+| Config loads from opened location upward | 1.15.13 | Operational | Matches the existing project-local `opencode.json` model and OpenCode bridge discovery; no migration required. | installed-runtime smoke |
+| Gateway Anthropic adaptive reasoning thinking-block fix | 1.15.13 | Operational | Runtime bugfix only; adapter does not add Claude Code model syntax to OpenCode config. | `scripts/validate_contract.py` |
+| Experimental resource policies in config schema | 1.15.13 | Future | Schema support is vendored; owner full-auto remains expressed through stable `permission` keys rather than experimental policy statements. | `scripts/validate_opencode_schema.py` |
 | `acp-next` prompt, slash command, and usage update forwarding | 1.15.12 | Operational | Runtime capability only; adapter command and skill declarations stay native OpenCode files. | installed-runtime smoke |
 | OpenAI responses WebSocket transport via `OPENCODE_EXPERIMENTAL_WEBSOCKETS=true` | 1.15.12 | Future | Experimental transport flag only; no owner-default config change and no release-safe example enables it. | installed-runtime smoke |
 | Adaptive reasoning controls for current Anthropic Opus-class models | 1.15.12 | Operational | Runtime behavior only; the adapter does not add Claude Code model syntax to OpenCode config. | `scripts/validate_contract.py` |
