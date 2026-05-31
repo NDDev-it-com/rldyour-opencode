@@ -44,8 +44,9 @@ concurrency:
 
 jobs:
   runtime:
-    # Owner zero-paid-risk CI policy: runtime smoke runs on Ubuntu standard
-    # runners only. Platform-specific runtime checks remain local/manual.
+    # Runtime smoke remains Ubuntu-only because it installs the pinned CLI.
+    # cross-platform.yml covers standard public Ubuntu/Windows/macOS metadata
+    # portability without heavier runtime dependencies.
     strategy:
       fail-fast: false
       matrix:
