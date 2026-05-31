@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Machine-readable rldyour workflow contract for the OpenCode adapter. Sister tool repos should map the same canonical IDs to their own native surfaces.",
-  "version": "1.1.23",
+  "version": "1.1.24",
   "updated": "2026-05-30",
   "adapter": "opencode",
   "security": {
