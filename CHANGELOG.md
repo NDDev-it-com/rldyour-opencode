@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.29] - 2026-06-01
+
+### Changed
+
+- Remove the retired Semgrep MCP server from active adapter runtime, agent, and generated tool surfaces. Preserve documented `opencode-ai` `1.15.13`, `@opencode-ai/plugin` `1.15.13`, and `@opencode-ai/sdk` `1.15.13` baseline evidence.
+
 ## [1.1.28] - 2026-06-01
 
 ### Security
