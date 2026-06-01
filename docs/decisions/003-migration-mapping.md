@@ -31,7 +31,7 @@ Chronological evolution:
 ### Claude Code (rldyour-claudecode) — 87 commits
 Chronological evolution:
 1. `f43b3db` — Bootstrap rldyour-claude marketplace
-2. `e3f6a02` — Add MCPs plugin with 13 pinned servers
+2. `e3f6a02` — Add MCPs plugin with pinned servers
 3. `4db3ec1` — Add Serena MCP plugin with lifecycle hooks
 4. `4b31968` — Add explore plugin with deep-research subagent
 5. `8caca31` — Add security plugin
@@ -91,7 +91,6 @@ Since OpenCode has NO hooks system, the lifecycle automation pattern must change
 | github | remote HTTP with auth/toolsets | `{ "type": "remote", "url": "https://api.githubcopilot.com/mcp/", "headers": { "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}", "X-MCP-Toolsets": "context,repos,issues,pull_requests,users" } }` |
 | figma | remote HTTP | `{ "type": "remote", "url": "https://mcp.figma.com/" }` |
 | openai-docs | remote HTTP | `{ "type": "remote", "url": "https://openai-mcp-serverless.vercel.app/mcp" } or remove` |
-| semgrep | stdio | `{ "type": "local", "command": ["semgrep", "mcp", "--config", "auto"] } or remove` |
 | shadcn | stdio | `{ "type": "local", "command": ["bunx", "shadcn@4.9.0", "mcp"] }` |
 | chrome-devtools | stdio | Remove — not available as npm package |
 | dart | stdio | `{ "type": "local", "command": ["dart", "mcp-server"] } or use OpenCode built-in LSP` |

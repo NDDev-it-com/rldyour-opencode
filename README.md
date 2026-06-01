@@ -13,7 +13,7 @@ A self-contained OpenCode project configuration that provides:
 - **10 slash commands** for lifecycle orchestration:
   - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-repair`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
   - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
-- **13 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, Semgrep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
+- **12 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
 - **10 TypeScript plugins** for session lifecycle, LLM augmentation, guardrails, and observability:
   - lifecycle: `ry-bootstrap` (session banner + compaction context + autocontinue), `ry-env-protection` (block sensitive reads with toast), `ry-shell-strategy` (shell env + git push guardrails), `ry-sync-reminder` (idle toast), `ry-flow-hooks` (commit advice + post-commit nudge)
   - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
@@ -74,7 +74,7 @@ A self-contained OpenCode project configuration that provides:
 | Slash commands | `.opencode/commands/*.md` | 11 |
 | Plugins | `.opencode/plugins/*.ts` | 10 |
 | Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
-| MCP servers | `opencode.json` → `mcp` | 13 |
+| MCP servers | `opencode.json` → `mcp` | 12 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
 | Reference docs (skill/agent contracts + machine contracts) | `references/*` | 22 |
 | Operator guides | `docs/*.md` | 5 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`, `contract-matrix`) |
@@ -163,7 +163,6 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 | sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
 | playwright | local (bunx) | 0.0.75 | Browser automation, UI validation |
 | chrome-devtools | local (bunx) | 1.1.1 | Chrome DevTools diagnostics |
-| semgrep | local (uvx) | 1.164.0 | Static analysis and security |
 | shadcn | local (bunx) | 4.9.0 | shadcn/ui registry access |
 | dart-flutter | local (dart) | — | Dart/Flutter project support |
 | context7 | remote | — | Current library documentation |
