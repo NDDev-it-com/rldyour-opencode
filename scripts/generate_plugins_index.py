@@ -130,7 +130,6 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
             "grep",
             "playwright",
             "chrome-devtools",
-            "semgrep",
             "sequential-thinking",
         ],
     },

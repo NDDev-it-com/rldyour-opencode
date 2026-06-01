@@ -164,12 +164,6 @@
       "enabled": true,
       "timeout": 15000
     },
-    "semgrep": {
-      "type": "local",
-      "command": ["uvx", "--from", "semgrep==1.164.0", "semgrep", "mcp"],
-      "enabled": true,
-      "timeout": 30000
-    },
     "shadcn": {
       "type": "local",
       "command": ["bunx", "shadcn@4.9.0", "mcp"],

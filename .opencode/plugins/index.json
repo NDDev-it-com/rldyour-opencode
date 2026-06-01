@@ -1,5 +1,5 @@
 {
-  "version": "1.1.28",
+  "version": "1.1.29",
   "generated_by": "scripts/generate_plugins_index.py",
   "count": 10,
   "plugins": [
@@ -111,7 +111,6 @@
         "grep",
         "playwright",
         "chrome-devtools",
-        "semgrep",
         "sequential-thinking"
       ]
     },
