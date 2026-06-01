@@ -55,10 +55,10 @@ def test_bunx_unscoped_npm_pin(tmp_path: Path) -> None:
 def test_uvx_pypi_pin(tmp_path: Path) -> None:
     cfg = _write(tmp_path, {
         "model": "x",
-        "mcp": {"sem": {"type": "local", "command": ["uvx", "--from", "semgrep==1.162.0", "semgrep", "mcp"]}},
+        "mcp": {"serena": {"type": "local", "command": ["uvx", "--from", "serena-agent==1.5.3", "serena", "start-mcp-server"]}},
     })
     pins = ep.extract_pins(cfg)
-    assert pins == [{"kind": "pypi", "server": "sem", "name": "semgrep", "version": "1.162.0"}]
+    assert pins == [{"kind": "pypi", "server": "serena", "name": "serena-agent", "version": "1.5.3"}]
 
 
 def test_uvx_pypi_pin_with_dot_in_name(tmp_path: Path) -> None:

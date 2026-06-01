@@ -160,10 +160,10 @@ def test_probe_npm_http_error(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_probe_pypi_success(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         "urllib.request.urlopen",
-        _fake_urlopen_factory({"info": {"version": "1.163.0"}}),
+        _fake_urlopen_factory({"info": {"version": "1.5.3"}}),
     )
-    latest, err = cf.probe_pypi("semgrep")
-    assert latest == "1.163.0"
+    latest, err = cf.probe_pypi("serena-agent")
+    assert latest == "1.5.3"
     assert err is None
 
 
