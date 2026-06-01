@@ -2,13 +2,15 @@
 
 ## Supported Versions
 
-Only the current numeric product release line receives security fixes. The
-current supported line is `1.1.x`; older releases are out of scope.
+Only the current exact numeric product release tag receives security fixes.
+The `1.1.x` line label tracks only the latest released patch, not every
+historical patch in the line.
 
 | Version | Supported |
 |---|---|
-| Current `1.1.x` | yes |
-| Earlier minor / patch | no |
+| Current exact tag `1.1.30` | yes |
+| Older `1.1.*` tags | no; upgrade to current exact tag |
+| Older minor / major lines | no |
 
 When a security issue is reported against an unsupported version, the project will upgrade the report to the current branch instead of patching old releases.
 
