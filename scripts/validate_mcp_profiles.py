@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Validate references/mcp-profiles.json against opencode.json and the skill index.
 
-Closes audit P1-3: the marketplace declares 13 MCP servers, and the docs
-group them into profiles (base / research / browser / security / design /
+Closes audit P1-3: the marketplace declares MCP servers, and the docs
+group them into profiles (base / research / browser / design /
 repo). This validator turns the docs grouping into a machine-readable
 contract:
 
