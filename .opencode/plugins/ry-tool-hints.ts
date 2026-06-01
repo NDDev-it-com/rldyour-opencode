@@ -43,10 +43,6 @@ const HINTS: Record<string, string> = {
   "grep_searchGitHub":
     "Используй для production patterns в public GitHub repos; EN: real-world usage evidence.",
 
-  // Security (Security domain only)
-  "semgrep_semgrep_scan":
-    "Статический анализ для defensive security review; EN: manually validate every finding.",
-
   // Planning
   "sequential-thinking_sequentialthinking":
     "Используй для нетривиальных architecture/design решений перед edits; EN: plan first.",

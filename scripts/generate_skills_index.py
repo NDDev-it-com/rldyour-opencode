@@ -102,8 +102,6 @@ REQUIRES_MCP: dict[str, list[str]] = {
     "figma-to-code": ["figma", "shadcn"],
     "design-system-implementation": ["shadcn"],
     "design-validation": ["playwright", "chrome-devtools"],
-    "owasp-top-10-implementation": ["semgrep"],
-    "ry-sec-review": ["semgrep"],
     "tech-research": ["context7", "deepwiki", "grep"],
     "web-research": [],
     "ry-init": ["serena"],
