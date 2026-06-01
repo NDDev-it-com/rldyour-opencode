@@ -1,5 +1,5 @@
 {
-  "version": "1.1.28",
+  "version": "1.1.29",
   "generated_by": "scripts/generate_skills_index.py",
   "count": 33,
   "skills": [
@@ -277,9 +277,7 @@
         "CORS",
         "secure coding"
       ],
-      "requires_mcp": [
-        "semgrep"
-      ],
+      "requires_mcp": [],
       "network": true
     },
     {
@@ -458,9 +456,7 @@
         "vulnerability review",
         "audit auth/authz/secrets/injection"
       ],
-      "requires_mcp": [
-        "semgrep"
-      ],
+      "requires_mcp": [],
       "network": true
     },
     {
