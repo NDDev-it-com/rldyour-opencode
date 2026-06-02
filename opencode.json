@@ -166,7 +166,7 @@
     },
     "shadcn": {
       "type": "local",
-      "command": ["bunx", "shadcn@4.9.0", "mcp"],
+      "command": ["bunx", "shadcn@4.10.0", "mcp"],
       "enabled": true,
       "timeout": 30000
     },
