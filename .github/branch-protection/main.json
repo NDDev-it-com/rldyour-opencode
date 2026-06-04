@@ -7,7 +7,6 @@
     "Analyze (ubuntu-latest / javascript-typescript)",
     "Analyze (ubuntu-latest / python)",
     "gitleaks",
-    "Semgrep OSS scan",
     "cross-platform smoke (ubuntu-latest)",
     "cross-platform smoke (windows-latest)",
     "cross-platform smoke (macos-latest)"

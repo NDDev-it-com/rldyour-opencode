@@ -57,6 +57,14 @@ A self-contained OpenCode project configuration that provides:
    opencode
    ```
 
+   OpenCode resolves config from the opened location upward. Run diagnostics
+   from the same project path you open in the TUI:
+
+   ```bash
+   cd /path/to/your/project
+   opencode debug config
+   ```
+
 5. Initialize project context:
    ```
    /ry-init
