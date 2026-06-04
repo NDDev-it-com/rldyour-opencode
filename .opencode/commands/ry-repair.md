@@ -9,7 +9,7 @@ Repair repository contracts and AI-tool context without silently changing busine
 2. Read AGENTS.md, .claude/CLAUDE.md, opencode.json, .opencode skills/commands/agents/plugins, Serena memories, and repository contracts.
 3. Inspect GitHub issues/PRs/history through MCP or CLI when available, then verify every issue against current code.
 4. When the root control plane is present, use `scripts/ry_repair_sync.py --plan/--check` before claiming local repo, system AI CLI config, Serena, GitHub, or fullrepo sync.
-5. Treat retired Semgrep server removal as system-wide across installed configs and active agent/tool surfaces; keep Semgrep CLI/CI separate unless the owner removes all Semgrep usage.
+5. Treat zero-active Semgrep policy as system-wide across installed configs, active agent/tool surfaces, CI workflows, runtime pins, docs, and release gates. Keep only negative validators/tests and historical changelog entries.
 6. Detect semantic entropy: stale docs, stale memories, duplicated instructions, unclear source of truth, broken validators, dead config, hook/MCP/LSP drift, missing ADR/CONTEXT/FUTURE facts.
 7. Produce a repair plan split into technical fixes and owner-decision items.
 8. Ask the owner before changing business logic, functional behavior, security posture, deployment target, data model, or ADR meaning.

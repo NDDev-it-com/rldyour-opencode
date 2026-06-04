@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-Fifteen workflows provide the public/free CI surface for the OpenCode adapter.
+Fourteen workflows provide the public/free CI surface for the OpenCode adapter.
 The repository is public, so standard GitHub-hosted runners do not consume the
 owner's private-repository Actions minutes. Keep every workflow on standard
 runner labels and keep third-party actions pinned to full commit SHAs.
@@ -17,7 +17,6 @@ runner labels and keep third-party actions pinned to full commit SHAs.
 | `opencode-runtime.yml` | Installed-runtime smoke for OpenCode-specific behavior. |
 | `actionlint.yml` | GitHub Actions syntax and expression lint. |
 | `codeql.yml` | CodeQL code scanning for Python and TypeScript. |
-| `semgrep.yml` | Semgrep OSS static analysis for Python, TypeScript, workflows, CI, and secrets. |
 | `secret-scan.yml` | Gitleaks history scan for accidental secrets. |
 | `dependency-review.yml` | Pull-request dependency diff review. |
 

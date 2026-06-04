@@ -123,7 +123,6 @@ def probe_remote(name: str, url: str) -> dict[str, Any]:
     for method in ("HEAD", "GET"):
         try:
             req = urllib.request.Request(url, method=method)
-            # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
             with urllib.request.urlopen(req, timeout=REMOTE_TIMEOUT_SECONDS) as resp:
                 return {
                     "name": name,

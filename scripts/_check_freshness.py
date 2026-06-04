@@ -76,7 +76,6 @@ def _validate_registry_url(url: str, *, allowed_host: str) -> str:
 def _fetch_json(url: str, *, allowed_host: str) -> Any:
     url = _validate_registry_url(url, allowed_host=allowed_host)
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
-    # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
     with urllib.request.urlopen(req, timeout=NETWORK_TIMEOUT_SECONDS) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
