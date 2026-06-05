@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.34] - 2026-06-05
+
+### Changed
+
+- Adopt OpenCode, `@opencode-ai/plugin`, `@opencode-ai/sdk`, and vendored config schema `1.16.0`.
+- Document OpenCode 1.16.0 managed workspace, session move, Bedrock/OpenAI, file-based discovery, `run --replay`, and runtime reliability surfaces.
+
+### Fixed
+
+- Update baseline/schema validators and generated indexes for the `1.16.0` runtime tuple.
+
 ## [1.1.33] - 2026-06-04
 
 ### Changed

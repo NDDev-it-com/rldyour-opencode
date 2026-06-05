@@ -27,9 +27,9 @@ except ImportError as _exc:  # pragma: no cover - tooling boundary
     )
     raise SystemExit(2) from _exc
 
-# v1.15.13 canonical permission key set sourced from the built-in
+# v1.16.0 canonical permission key set sourced from the built-in
 # `customize-opencode` skill (`opencode debug skill` -> the `<built-in>`
-# entry) and cross-validated against the v1.15.13 JSON Schema published
+# entry) and cross-validated against the v1.16.0 JSON Schema published
 # at https://opencode.ai/config.json. Unknown keys are silently accepted
 # by the runtime today (issue sst/opencode#15507), so this validator is
 # the project-side defense against PascalCase typos and stale keys
@@ -84,7 +84,7 @@ def _check_permission_block(label: str, perm: object) -> int:
             sorted_canon = ", ".join(sorted(CANONICAL_PERMISSION_KEYS))
             print(
                 f"[ERR] {label}: unknown permission key {key!r} "
-                f"(canonical set for v1.15.x: {sorted_canon})"
+                f"(canonical set for v1.16.0: {sorted_canon})"
             )
             errors += 1
     return errors
@@ -159,7 +159,7 @@ def validate_opencode_json(path: Path) -> int:
 
     if errors == 0 and (cfg.get("permission") or cfg.get("agent")):
         print(
-            f"[OK] Permission keys conform to v1.15.x canonical set "
+            f"[OK] Permission keys conform to v1.16.0 canonical set "
             f"({len(CANONICAL_PERMISSION_KEYS)} keys)"
         )
 
@@ -427,7 +427,7 @@ def validate_agent(agent_md: Path) -> int:
         print(f"[ERR] agent {name}: description length {len(description)} not in 1-1024")
         errors += 1
 
-    # OpenCode v1.15.x supports mode: primary | subagent | all (default all).
+    # OpenCode v1.16.0 supports mode: primary | subagent | all (default all).
     # https://opencode.ai/docs/agents
     if mode is not None and mode not in ("primary", "subagent", "all"):
         print(f"[ERR] agent {name}: invalid mode {mode!r} (expected primary | subagent | all)")
@@ -442,7 +442,7 @@ def validate_agent(agent_md: Path) -> int:
             print(f"[ERR] agent {name}: invalid color {color!r}")
             errors += 1
 
-    # Permission keys must come from the v1.15.x canonical set.
+    # Permission keys must come from the v1.16.0 canonical set.
     # Stale keys (notably `codesearch`, removed between v1.14.48 and
     # v1.15.3) and PascalCase typos are accepted silently by the runtime
     # (issue sst/opencode#15507), so project validation is the only line
@@ -453,7 +453,7 @@ def validate_agent(agent_md: Path) -> int:
                 sorted_canon = ", ".join(sorted(CANONICAL_PERMISSION_KEYS))
                 print(
                     f"[ERR] agent {name}: unknown permission key {key!r} "
-                    f"(canonical set for v1.15.x: {sorted_canon})"
+                    f"(canonical set for v1.16.0: {sorted_canon})"
                 )
                 errors += 1
 

@@ -1,19 +1,25 @@
 # OpenCode Surface Adoption
 
-Verified: 2026-05-31
+Verified: 2026-06-05
 
 Source of truth:
 - Runtime baseline: `references/opencode-baseline.json`
-- Vendored schema: `references/opencode-config.schema.v1.15.13.json`
-- Official docs and changelog: `https://opencode.ai/docs/` and `https://opencode.ai/changelog`
+- Vendored schema: `references/opencode-config.schema.v1.16.0.json`
+- Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.16.0`
 
 ## Decisions
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
-| OpenCode runtime/schema/package baseline | 1.15.13 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, `@opencode-ai/sdk`, and the vendored config schema are pinned to `1.15.13`; no config migration was required. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| OpenCode runtime/schema/package baseline | 1.16.0 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, `@opencode-ai/sdk`, and the vendored config schema are pinned to `1.16.0`; no config migration was required. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| Managed workspace cloning with dirty/untracked preservation | 1.16.0 | Operational | Runtime behavior only; keep repository git/fullrepo policy in rldyour-flow and validate workspace state with git status before release operations. | installed-runtime smoke |
+| Move sessions between workspaces/directories | 1.16.0 | Future | Runtime/session capability only; do not persist adapter assumptions until a first-party command or plugin needs to move sessions. | installed-runtime smoke |
+| OpenAI model support through AWS Bedrock | 1.16.0 | Future | Provider capability only; owner-local config keeps current model/provider policy and does not add Bedrock credentials or provider overrides. | `scripts/validate_opencode_schema.py` |
+| Skill discovery and file-based agent loading | 1.16.0 | Adopted | Plural `.opencode/skills/` and `.opencode/agents/` directories remain the native source. Generated `index.json` files stay compatibility metadata, not runtime discovery truth. | `scripts/generate_skills_index.py --check`; `scripts/validate_config.sh` |
+| `run --replay` interactive session replay | 1.16.0 | Operational | Add to installed-runtime smoke only; no repository config field is required. | installed-runtime smoke |
+| Startup and cancellation reliability fixes | 1.16.0 | Adopted | Treat shell cancellation, delegated-task reasoning variant, OpenAI websocket idle, Windows path normalization, wide-character paste, and ACP cancellation fixes as runtime correctness. No config migration is required. | `scripts/check_baseline_consistency.py` |
 | Session metadata through API and SDK | 1.15.13 | Future | Runtime/API capability only; no adapter config or local plugin currently persists custom session metadata. | `scripts/check_plugin_hooks.py` |
-| Config loads from opened location upward | 1.15.13 | Operational | Matches the existing project-local `opencode.json` model and OpenCode bridge discovery; no migration required. | installed-runtime smoke |
+| Config loads from opened location upward | 1.15.13 | Operational | Matches the existing project-local `opencode.json` model and OpenCode bridge discovery; `opencode debug config` remains the installed-runtime resolver smoke from the actual opened target. | installed-runtime smoke |
 | Gateway Anthropic adaptive reasoning thinking-block fix | 1.15.13 | Operational | Runtime bugfix only; adapter does not add Claude Code model syntax to OpenCode config. | `scripts/validate_contract.py` |
 | Experimental resource policies in config schema | 1.15.13 | Future | Schema support is vendored; owner full-auto remains expressed through stable `permission` keys rather than experimental policy statements. | `scripts/validate_opencode_schema.py` |
 | `acp-next` prompt, slash command, and usage update forwarding | 1.15.12 | Operational | Runtime capability only; adapter command and skill declarations stay native OpenCode files. | installed-runtime smoke |
