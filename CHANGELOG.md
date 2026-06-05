@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.35] - 2026-06-05
+
+### Fixed
+
+- Align OpenCode MCP profile metadata with the current release date. Preserve documented `opencode-ai` `1.16.0`, `@opencode-ai/plugin` `1.16.0`, and `@opencode-ai/sdk` `1.16.0` baseline evidence.
+
 ## [1.1.34] - 2026-06-05
 
 ### Changed
