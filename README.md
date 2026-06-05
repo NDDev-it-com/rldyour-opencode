@@ -2,7 +2,7 @@
 
 rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review. Authored by Danil Silantyev (github:rldyourmnd), CEO NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules -- all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
 
-Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.15.13 (May 2026); the OpenCode v1.14.48 -> v1.15.13 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading, config-robustness, and ACP/WebSocket runtime fixes.
+Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.16.0 (June 2026); the OpenCode v1.14.48 -> v1.16.0 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading, config-robustness, skill discovery/file-based agent loading, `run --replay`, and ACP/WebSocket runtime fixes.
 
 ## What This Is
 

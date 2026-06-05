@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -23,10 +24,40 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
+
+def _expected_opencode_version() -> str:
+    baseline = json.loads(
+        (PROJECT_ROOT / "references" / "opencode-baseline.json").read_text(encoding="utf-8")
+    )
+    return baseline["baseline"]["opencode_cli"]["version"]
+
+
+def _installed_opencode_version() -> str | None:
+    if opencode_bin is None:
+        return None
+    proc = subprocess.run(
+        ["opencode", "--version"],
+        cwd=str(PROJECT_ROOT),
+        capture_output=True,
+        text=True,
+        timeout=10,
+        check=False,
+    )
+    if proc.returncode != 0:
+        return None
+    match = re.search(r"\d+\.\d+\.\d+", proc.stdout + proc.stderr)
+    return match.group(0) if match else None
+
+
 opencode_bin = shutil.which("opencode")
+expected_opencode_version = _expected_opencode_version()
+installed_opencode_version = _installed_opencode_version()
 pytestmark = pytest.mark.skipif(
-    opencode_bin is None,
-    reason="opencode CLI not on PATH; integration check skipped (CI sandbox is fine)",
+    installed_opencode_version != expected_opencode_version,
+    reason=(
+        "opencode CLI is absent or not at the pinned baseline "
+        f"{expected_opencode_version}; installed={installed_opencode_version!r}"
+    ),
 )
 
 EXPECTED_PLUGINS = (
@@ -44,11 +75,11 @@ EXPECTED_PLUGINS = (
 
 
 def _run_opencode(*args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
+    proc = subprocess.run(
         ["opencode", *args],
         cwd=str(PROJECT_ROOT),
         capture_output=True,
-        text=True,
+        text=False,
         timeout=60,
         env={
             **os.environ,
@@ -57,6 +88,12 @@ def _run_opencode(*args: str) -> subprocess.CompletedProcess[str]:
             "npm_config_package_lock": "false",
         },
         check=False,
+    )
+    return subprocess.CompletedProcess(
+        proc.args,
+        proc.returncode,
+        proc.stdout.decode("utf-8", errors="replace"),
+        proc.stderr.decode("utf-8", errors="replace"),
     )
 
 

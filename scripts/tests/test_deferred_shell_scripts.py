@@ -196,10 +196,23 @@ def test_check_lsps_passes_when_all_stubs_present(tmp_path: Path) -> None:
 
 def test_collect_diagnostics_creates_bundle(tmp_path: Path) -> None:
     bundle_root = tmp_path / "diagnostics"
+    stub_bin = tmp_path / "bin"
+    stub_bin.mkdir()
+    opencode_stub = stub_bin / "opencode"
+    opencode_stub.write_text(
+        "#!/usr/bin/env bash\n"
+        "if [ \"${1:-}\" = \"--version\" ]; then echo '1.16.0'; exit 0; fi\n"
+        "echo '{\"stub\":\"opencode\"}'\n",
+        encoding="utf-8",
+    )
+    opencode_stub.chmod(0o755)
+    env = os.environ.copy()
+    env["PATH"] = f"{stub_bin}:{env.get('PATH', '')}"
     result = _run_script(
         SCRIPTS_DIR / "collect_diagnostics.sh",
         ["--output", str(bundle_root)],
         cwd=PROJECT_ROOT,
+        env=env,
         timeout=120,
     )
     assert result.returncode == 0
