@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.38] - 2026-06-06
+
+### Added
+
+- Add macOS cmux orchestrator/worker Flow policy, OpenCode-native cmux skills, and project-policy execution/cmux schema support.
+- Keep the OpenCode CLI, `@opencode-ai/plugin`, and `@opencode-ai/sdk` runtime baseline at `1.16.2` while adding orchestrator-mode policy surfaces.
+
+### Fixed
+
+- Preserve standard post-task sync blockers while restricting worker agents to scoped reports in orchestrator mode.
+
+
 ## [1.1.37] - 2026-06-06
 
 ### Fixed

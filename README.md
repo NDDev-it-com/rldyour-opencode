@@ -8,7 +8,7 @@ Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.16.2
 
 A self-contained OpenCode project configuration that provides:
 
-- **33 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
+- **35 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
 - **9 subagents** for specialized tasks (6 reviewer tracks, memory sync, deep research, config helper).
 - **10 slash commands** for lifecycle orchestration:
   - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-repair`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
@@ -103,7 +103,7 @@ rldyour-opencode/
 ├── .claude/CLAUDE.md           # Claude-Code-specific project memory (agent-only)
 ├── .opencode/
 │   ├── agents/   *.md          # 9 subagents (6 reviewer, memory-sync, ry-explore, customize-opencode)
-│   ├── skills/   <name>/SKILL.md  # 33 skills across 10 domains
+│   ├── skills/   <name>/SKILL.md  # 35 skills across 10 domains
 │   ├── commands/ *.md          # 10 slash commands
 │   ├── plugins/  *.ts          # 10 Bun-runtime plugins
 │   └── package.json            # @opencode-ai/plugin pin

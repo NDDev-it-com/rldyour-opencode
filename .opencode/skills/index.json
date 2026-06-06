@@ -1,7 +1,7 @@
 {
-  "version": "1.1.37",
+  "version": "1.1.38",
   "generated_by": "scripts/generate_skills_index.py",
-  "count": 33,
+  "count": 35,
   "skills": [
     {
       "name": "architecture-boundaries",
@@ -77,6 +77,22 @@
         "chrome-devtools"
       ],
       "network": true
+    },
+    {
+      "name": "cmux-orchestrator",
+      "path": ".opencode/skills/cmux-orchestrator/SKILL.md",
+      "domain": "flow",
+      "triggers": [],
+      "requires_mcp": [],
+      "network": false
+    },
+    {
+      "name": "cmux-worker",
+      "path": ".opencode/skills/cmux-worker/SKILL.md",
+      "domain": "flow",
+      "triggers": [],
+      "requires_mcp": [],
+      "network": false
     },
     {
       "name": "dependency-compatibility-policy",
