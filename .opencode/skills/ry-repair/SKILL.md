@@ -18,7 +18,7 @@ For rldyour AI CLI configuration repositories, `/ry-repair` also verifies determ
 3. Inspect Serena memories, plans, and research archives for stale facts, unsupported claims, missing taxonomy, duplicated rules, or contradictions with current code.
 4. Inspect GitHub issues, pull requests, and recent history through MCP or CLI when available. Verify every issue against current code before treating it as a fact.
 5. Inspect MCP/LSP/tooling config, plugin hook lifecycles, commands/skills/agents, CI gates, release manifests, dependency baselines, and docs source-of-truth declarations.
-6. When the root control plane is present, run `python3 scripts/ry_repair_sync.py --plan --target "$PWD"` and use `--check` before claiming local repo, system AI CLI config, Serena memory, or GitHub/fullrepo sync.
+6. When the root control plane is present, run `python3 scripts/ry_repair_sync.py --plan --target "$PWD"` and use `--check` before claiming local repo, system AI CLI config, Serena memory, or GitHub/fullrepo sync. For OS/mode work, pass explicit flags: `--os macos|linux|wsl|windows`, `--mode standard|orchestrator`, and `--cmux` only for macOS orchestrator mode.
 7. Treat zero-active Semgrep policy as system-wide: installed Claude/Codex/OpenCode configs, active agent/tool surfaces, CI workflows, runtime pins, docs, and release gates must be clean. Keep only negative validators/tests and historical changelog entries.
 8. Detect semantic entropy: duplicated docs, stale pins, conflicting instructions, dead config, unclear source-of-truth, missing ADR/CONTEXT/FUTURE facts, broken validators, adapter parity drift, and natural-language policy overrides that are not materialized in project policy JSON.
 9. Produce a repair plan that separates:

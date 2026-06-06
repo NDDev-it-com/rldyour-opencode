@@ -40,6 +40,35 @@ def test_policy_defaults_are_advisory_and_protect_dev(tmp_path: Path) -> None:
     assert payload["effective"]["fullrepo"]["mode"] == "auto"
     assert payload["effective"]["branch_cleanup"]["mode"] == "advisory"
     assert "dev" in payload["effective"]["branch_cleanup"]["protected_branches"]
+    assert payload["effective"]["execution"]["mode"] == "standard"
+    assert payload["effective"]["cmux"]["enabled"] is False
+
+
+def test_execution_and_cmux_policy_are_loaded(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    write_policy(
+        tmp_path,
+        {
+            "schema_version": 1,
+            "execution": {
+                "mode": "orchestrator",
+                "agent_role": "auto",
+                "worker_agents": ["codex", "claude", "opencode"],
+                "worker_count_min": 1,
+                "worker_count_max": 3,
+                "task_delegation": "explicit-orchestrator-only",
+            },
+            "cmux": {"enabled": True, "install_method": "brew-cask"},
+        },
+    )
+    proc = subprocess.run(["python3", str(POLICY), "--json"], cwd=tmp_path, text=True, capture_output=True)
+
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["valid"] is True
+    assert payload["effective"]["execution"]["mode"] == "orchestrator"
+    assert payload["effective"]["execution"]["worker_count_max"] == 3
+    assert payload["effective"]["cmux"]["enabled"] is True
 
 
 def test_disabled_fullrepo_status_and_publish_refusal(tmp_path: Path) -> None:
@@ -96,6 +125,27 @@ def test_tracked_ai_docs_policy_does_not_require_sync(tmp_path: Path) -> None:
     assert payload["needs_flow_sync"] is False
 
 
+def test_orchestrator_worker_reports_without_global_sync(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    (tmp_path / "README.md").write_text("repo\nworker change\n", encoding="utf-8")
+    env = {
+        **os_environ(),
+        "RLDYOUR_EXECUTION_MODE": "orchestrator",
+        "RLDYOUR_AGENT_ROLE": "worker",
+        "RLDYOUR_WORKER_ID": "worker-opencode-test",
+    }
+
+    proc = subprocess.run(["python3", str(STATE)], cwd=tmp_path, env=env, text=True, capture_output=True)
+
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["execution"]["agent_role"] == "worker"
+    assert payload["execution"]["worker_id"] == "worker-opencode-test"
+    assert "worker-report-required" in payload["blocking_reasons"]
+    assert "fullrepo-sync-required" not in payload["blocking_reasons"]
+    assert "branch-cleanup-required" not in payload["blocking_reasons"]
+
+
 def test_dev_is_not_branch_cleanup_candidate(tmp_path: Path) -> None:
     init_repo(tmp_path)
     git(tmp_path, "checkout", "-b", "dev")
@@ -107,3 +157,9 @@ def test_dev_is_not_branch_cleanup_candidate(tmp_path: Path) -> None:
     payload = json.loads(proc.stdout)
     assert "dev" not in payload["branch_cleanup_state"]["local_merged_branches"]
     assert payload["branch_cleanup_state"]["needs_cleanup"] is False
+
+
+def os_environ() -> dict[str, str]:
+    import os
+
+    return os.environ.copy()

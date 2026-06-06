@@ -43,6 +43,8 @@ OPENCODE_JSON = REPO_ROOT / "opencode.json"
 DOMAIN_BY_SKILL: dict[str, str] = {
     # Flow (7)
     "flow-post-task-sync": "flow",
+    "cmux-orchestrator": "flow",
+    "cmux-worker": "flow",
     "ry-init": "flow",
     "ry-start": "flow",
     "ry-review": "flow",

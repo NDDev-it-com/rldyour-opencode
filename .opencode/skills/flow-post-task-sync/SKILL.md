@@ -12,19 +12,20 @@ Leave the project in a synchronized, documented, committed state. This skill run
 ## Workflow
 
 1. Confirm Serena memories are current. If stale, run `serena-memory-sync` first.
-2. Inspect flow state markers (`.serena/.flow_post_task_state.json`, `.serena/.flow_sync_marker`) if present. Run git sync audit when branch/worktree cleanup is not obviously complete.
-3. Inspect uncommitted changes deeply. Separate source changes, docs, Serena knowledge, generated junk, runtime markers, and secrets.
-4. Run `instruction-docs-sync` when durable project instructions may have changed. Keep `AGENTS.md` optimized for the current agent environment.
-5. Run applicable quality checks from project scripts and detected stack checks.
-6. Commit atomically with Conventional Commits. Use separate commits for
+2. If flow state reports `execution.agent_role=worker`, do not run global sync. Return the worker JSON report to the orchestrator. Workers must not publish fullrepo, delete branches, push, install system configs, mutate project policy, or run final sync unless the orchestrator explicitly delegated that exact action.
+3. Inspect flow state markers (`.serena/.flow_post_task_state.json`, `.serena/.flow_sync_marker`) if present. Run git sync audit when branch/worktree cleanup is not obviously complete.
+4. Inspect uncommitted changes deeply. Separate source changes, docs, Serena knowledge, generated junk, runtime markers, and secrets.
+5. Run `instruction-docs-sync` when durable project instructions may have changed. Keep `AGENTS.md` optimized for the current agent environment.
+6. Run applicable quality checks from project scripts and detected stack checks.
+7. Commit atomically with Conventional Commits. Use separate commits for
    implementation, tests/validators, docs/instructions, license/metadata,
    generated artifacts, and Serena/fullrepo sync when that improves history
    clarity or reviewability.
-7. Push to upstream when configured. If no upstream exists, ask before creating one.
-8. Follow the effective `.rldyour/project-policy.json` / local / env policy before touching fullrepo or agent files. In `fullrepo.mode=disabled`, do not restore, migrate, publish, create, or install fullrepo excludes. In `normal_branch_policy.agent_files=allowed`, tracked AI instruction files are normal project files.
-9. Publish `fullrepo` only when policy requires/allows it through sync scripts. Missing fullrepo creation requires explicit policy (`create_if_missing=true`) or explicit current user instruction.
-10. Remove merged local and remote branches/worktrees only when policy allows cleanup, the branch is not protected (`main`, `dev`, `fullrepo`, etc.), the branch was created for this workflow, and no open PR depends on it. Advisory cleanup is reported, not forced.
-11. Remove `.serena/.flow_sync_marker`, `.serena/.flow_post_task_state.json`, and `.serena/.flow_blocker_ack.json` only after flow state reports no policy-allowed blocking reasons.
+8. Push to upstream when configured. If no upstream exists, ask before creating one.
+9. Follow the effective `.rldyour/project-policy.json` / local / env policy before touching fullrepo or agent files. In `fullrepo.mode=disabled`, do not restore, migrate, publish, create, or install fullrepo excludes. In `normal_branch_policy.agent_files=allowed`, tracked AI instruction files are normal project files.
+10. Publish `fullrepo` only when policy requires/allows it through sync scripts. Missing fullrepo creation requires explicit policy (`create_if_missing=true`) or explicit current user instruction.
+11. Remove merged local and remote branches/worktrees only when policy allows cleanup, the branch is not protected (`main`, `dev`, `fullrepo`, etc.), the branch was created for this workflow, and no open PR depends on it. Advisory cleanup is reported, not forced.
+12. Remove `.serena/.flow_sync_marker`, `.serena/.flow_post_task_state.json`, and `.serena/.flow_blocker_ack.json` only after flow state reports no policy-allowed blocking reasons.
 
 ## Loop Guard
 
