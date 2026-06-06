@@ -1,17 +1,24 @@
 # OpenCode Surface Adoption
 
-Verified: 2026-06-05
+Verified: 2026-06-06
 
 Source of truth:
 - Runtime baseline: `references/opencode-baseline.json`
-- Vendored schema: `references/opencode-config.schema.v1.16.0.json`
-- Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.16.0`
+- Vendored schema: `references/opencode-config.schema.v1.16.2.json`
+- Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.16.2`
 
 ## Decisions
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
-| OpenCode runtime/schema/package baseline | 1.16.0 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, `@opencode-ai/sdk`, and the vendored config schema are pinned to `1.16.0`; no config migration was required. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| OpenCode runtime/schema/package baseline | 1.16.2 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, `@opencode-ai/sdk`, and the vendored config schema are pinned to `1.16.2`; the schema content is byte-identical to the previously vendored `v1.16.0` snapshot, but the filename tracks the current runtime baseline. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| Provider-compatible reasoning summaries | 1.16.2 | Adopted | Reasoning summaries are runtime-gated by provider capability. Do not assume GPT-5 or OpenAI-compatible providers support every summary mode, and do not add speculative provider overrides. | installed-runtime smoke; `scripts/validate_config.sh` |
+| Refuse loose edit matches | 1.16.2 | Adopted | Treat this as runtime safety. Adapter plugins and docs should still produce exact edit/search context; no config migration is required. | installed-runtime smoke |
+| Backgroundable running subagents | 1.16.2 | Operational | Running subagents can be sent to the background. Repository truth remains docs/config/Serena; background sessions are runtime state, not committed project state. | installed-runtime smoke |
+| Session system-context persistence | 1.16.2 | Operational | Runtime sessions persist system context updates during long conversations, but durable project truth remains `opencode.json`, docs, and Serena memories. | installed-runtime smoke |
+| Snowflake Cortex provider support | 1.16.2 | Future | Optional provider capability only. Do not commit Snowflake credentials or switch the owner-default provider without explicit owner policy. | `scripts/validate_opencode_schema.py` |
+| Permission replies use the correct session directory | 1.16.2 | Adopted | Aligns with project-local config resolution. Continue validating the opened target with `opencode debug config`. | installed-runtime smoke |
+| Dedicated TUI config and provider options | current docs | Adopted | Keep active `opencode.json` free of legacy top-level `theme`, `keybinds`, and `tui` keys; TUI state belongs in dedicated `tui.json` / `OPENCODE_TUI_CONFIG`. Provider options such as `timeout`, `chunkTimeout`, and `setCacheKey` are explicit only when owner policy requires them. | `scripts/validate_config.sh`; `scripts/validate_opencode_schema.py` |
 | Managed workspace cloning with dirty/untracked preservation | 1.16.0 | Operational | Runtime behavior only; keep repository git/fullrepo policy in rldyour-flow and validate workspace state with git status before release operations. | installed-runtime smoke |
 | Move sessions between workspaces/directories | 1.16.0 | Future | Runtime/session capability only; do not persist adapter assumptions until a first-party command or plugin needs to move sessions. | installed-runtime smoke |
 | OpenAI model support through AWS Bedrock | 1.16.0 | Future | Provider capability only; owner-local config keeps current model/provider policy and does not add Bedrock credentials or provider overrides. | `scripts/validate_opencode_schema.py` |
