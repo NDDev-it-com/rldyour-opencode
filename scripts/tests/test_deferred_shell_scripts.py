@@ -39,6 +39,12 @@ def _copy_script(tmp_root: Path, name: str) -> Path:
     dst = scripts_dir / name
     dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
     dst.chmod(0o755)
+    if name == "flow_post_task_state.sh":
+        for companion in ("flow_post_task_state.py", "project_flow_policy.py"):
+            companion_src = SCRIPTS_DIR / companion
+            companion_dst = scripts_dir / companion
+            companion_dst.write_text(companion_src.read_text(encoding="utf-8"), encoding="utf-8")
+            companion_dst.chmod(0o755)
     return dst
 
 

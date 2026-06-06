@@ -21,10 +21,10 @@ Leave the project in a synchronized, documented, committed state. This skill run
    generated artifacts, and Serena/fullrepo sync when that improves history
    clarity or reviewability.
 7. Push to upstream when configured. If no upstream exists, ask before creating one.
-8. Keep normal branch history clean from agent-only files. Ensure `.git/info/exclude` contains the rldyour fullrepo block and move tracked agent-only files out of the current branch only when the project is ready for that migration.
-9. Publish the complete project snapshot to `fullrepo` through sync scripts. This uses safe `--force-with-lease`, not a blind force push.
-10. Remove merged local and remote branches/worktrees only after verifying they are merged into `main` and no open PR depends on them. Leave protected branches such as `main` and `fullrepo`; report any ambiguous branch ownership instead of deleting silently.
-11. Remove `.serena/.flow_sync_marker` and `.serena/.flow_post_task_state.json` after successful sync.
+8. Follow the effective `.rldyour/project-policy.json` / local / env policy before touching fullrepo or agent files. In `fullrepo.mode=disabled`, do not restore, migrate, publish, create, or install fullrepo excludes. In `normal_branch_policy.agent_files=allowed`, tracked AI instruction files are normal project files.
+9. Publish `fullrepo` only when policy requires/allows it through sync scripts. Missing fullrepo creation requires explicit policy (`create_if_missing=true`) or explicit current user instruction.
+10. Remove merged local and remote branches/worktrees only when policy allows cleanup, the branch is not protected (`main`, `dev`, `fullrepo`, etc.), the branch was created for this workflow, and no open PR depends on it. Advisory cleanup is reported, not forced.
+11. Remove `.serena/.flow_sync_marker`, `.serena/.flow_post_task_state.json`, and `.serena/.flow_blocker_ack.json` only after flow state reports no policy-allowed blocking reasons.
 
 ## Loop Guard
 
@@ -36,13 +36,13 @@ Do not edit runtime marker files except to remove them after sync. If a sync hoo
 
 ## Fullrepo Branch
 
-`fullrepo` is the portable AI-context branch. It contains the normal branch tree plus agent-only files such as project `AGENTS.md`, `.serena` knowledge, `.opencode/` agents/skills/commands, `.claude`, `.cursor/rules`, `.agents/skills`, and similar agent workflow files. The main branch should not track those files in normal projects; they should be restored locally from `fullrepo` and ignored through `.git/info/exclude`.
+`fullrepo` is the default portable AI-context branch for rldyour-managed projects. Project policy may set `fullrepo.mode=disabled|advisory|auto|required` and may allow tracked instruction/AI files in normal branches. Runtime markers, caches, local env files, browser artifacts, and secrets remain forbidden in every mode.
 
 ### Fullrepo Workflow
 
-1. **Bootstrap** (`--bootstrap-init`): restore agent-only files from `fullrepo` to local working tree if `fullrepo` exists; publish local agent-only files to `fullrepo` if it does not exist.
-2. **Migrate** (`--migrate-main`): remove tracked agent-only files from `main` branch index after they are published to `fullrepo`. Add them to `.git/info/exclude`.
-3. **Publish** (`--publish`): sync current agent-only files to `fullrepo` branch. Uses `--force-with-lease` for safety.
+1. **Bootstrap** (`bootstrap-init`): restore agent-only files from `fullrepo` only when policy allows it. Creating missing fullrepo requires `fullrepo.create_if_missing=true` or explicit current user instruction.
+2. **Migrate**: remove tracked agent-only files from `main` only when project policy says they should be fullrepo-managed.
+3. **Publish** (`publish`): sync current agent-only files to `fullrepo` only when policy allows it. Uses `--force-with-lease` for safety.
 4. **Verify**: after publish, confirm `fullrepo` contains the expected files and `main` does not track agent-only files.
 
 ## Output

@@ -7,7 +7,7 @@ description: "Синхронизация AGENTS.md и .claude/CLAUDE.md из п�
 
 ## Purpose
 
-Keep project instruction files current after meaningful work without creating a second source of truth or leaking agent-only files into normal branches.
+Keep project instruction files current after meaningful work without creating a second source of truth or violating the effective project policy for agent files.
 
 This skill runs after Serena memory sync and before quality checks, commits, GitHub sync, and `fullrepo` publish.
 
@@ -15,7 +15,7 @@ This skill runs after Serena memory sync and before quality checks, commits, Git
 
 - `AGENTS.md`: OpenCode-native project instructions. Source of truth for any AI agent working in the repository.
 
-This file is agent-only in normal product repositories: keep it local, ignore it through `.git/info/exclude`, and publish it through `fullrepo`.
+By default this file is agent-only in rldyour-managed product repositories: keep it local, ignore it through `.git/info/exclude`, and publish it through `fullrepo`. If project policy sets `instruction_docs.mode=tracked-normal-branch` or `normal_branch_policy.agent_files=allowed`, treat it as a normal tracked project file.
 
 ## Source Of Truth
 
@@ -40,7 +40,7 @@ Do not copy chat history, future plans, speculation, secrets, tokens, cookies, o
    - permission model and per-agent overrides.
 3. Keep the file independently useful and optimized for OpenCode agents. Do not include instructions that only apply to other CLI tools unless the repository is explicitly multi-tool.
 4. Validate that all referenced paths, commands, skills, and agents actually exist.
-5. Let `flow-post-task-sync` commit normal tracked files, then publish agent-only instruction files through `fullrepo`.
+5. Let `flow-post-task-sync` commit tracked instruction files or publish agent-only instruction files through `fullrepo` according to effective project policy.
 
 ## Freshness Rules
 
