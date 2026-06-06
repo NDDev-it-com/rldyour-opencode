@@ -14,7 +14,7 @@
 
 Keep it concise. It is loaded as a high-signal entry point at session start, so it should contain high-signal project rules only.
 
-For normal product repositories, project-root `AGENTS.md` is agent-only context. Keep it local and in the `fullrepo` branch, and add it to `.git/info/exclude` through the rldyour fullrepo workflow instead of tracking it in normal branches. Repositories that are themselves agent tooling may intentionally track instruction templates as product artifacts.
+For default rldyour-managed product repositories, project-root `AGENTS.md` is agent-only context. Keep it local and in the `fullrepo` branch, and add it to `.git/info/exclude` through the rldyour fullrepo workflow instead of tracking it in normal branches. Project policy may explicitly set `normal_branch_policy.agent_files=allowed` or `instruction_docs.mode=tracked-normal-branch`; then `AGENTS.md` is a normal tracked project file.
 
 ## opencode.json And .opencode/
 
@@ -29,7 +29,7 @@ Update `opencode.json` and `.opencode/` files when:
 - MCP server configuration changes.
 - Quality gate commands change.
 
-For normal product repositories, `.opencode/` files are agent-only context and follow the same `fullrepo` branch policy as `AGENTS.md`.
+For default rldyour-managed product repositories, `.opencode/` files are agent-only context and follow the same `fullrepo` branch policy as `AGENTS.md`. In tracked-normal-branch projects, configured instruction files may be committed as first-class project files.
 
 ## REVIEW.md
 
@@ -78,7 +78,7 @@ Use the **bare** template variant for minimal overhead, **full** variant for imp
 
 ## Agent-Only Files And Fullrepo
 
-Agent-only files that reveal or preserve AI workflow state should not be committed to normal project branches. Store them locally, ignore them through `.git/info/exclude`, and publish them to the `fullrepo` branch.
+Default rldyour-managed policy keeps agent-only files that reveal or preserve AI workflow state out of normal project branches. Store them locally, ignore them through `.git/info/exclude`, and publish them to the `fullrepo` branch. Foreign or colleague-owned repositories may opt into tracked AI instruction files through `.rldyour/project-policy.json`.
 
 Default agent-only paths include:
 

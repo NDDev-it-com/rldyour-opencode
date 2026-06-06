@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.37] - 2026-06-06
+
+### Fixed
+
+- Add schema-backed project Flow policy so Flow state, fullrepo sync, branch cleanup, and OpenCode skill guidance honor repository-specific workflow constraints while preserving the current OpenCode `1.16.2` runtime/plugin/SDK baseline.
+
 ## [1.1.36] - 2026-06-06
 
 ### Changed

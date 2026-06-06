@@ -1,0 +1,109 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import subprocess
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+POLICY = REPO_ROOT / "scripts" / "project_flow_policy.py"
+STATE = REPO_ROOT / "scripts" / "flow_post_task_state.py"
+FULLREPO = REPO_ROOT / "scripts" / "fullrepo_sync.sh"
+
+
+def git(cwd: Path, *args: str) -> str:
+    proc = subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True, text=True)
+    return proc.stdout.strip()
+
+
+def init_repo(path: Path) -> None:
+    git(path, "init")
+    git(path, "checkout", "-b", "main")
+    git(path, "config", "user.email", "opencode-policy@example.invalid")
+    git(path, "config", "user.name", "OpenCode Policy")
+    (path / "README.md").write_text("repo\n", encoding="utf-8")
+    git(path, "add", "README.md")
+    git(path, "commit", "-m", "init")
+
+
+def write_policy(root: Path, payload: dict) -> None:
+    (root / ".rldyour").mkdir(exist_ok=True)
+    (root / ".rldyour/project-policy.json").write_text(json.dumps(payload), encoding="utf-8")
+
+
+def test_policy_defaults_are_advisory_and_protect_dev(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    proc = subprocess.run(["python3", str(POLICY), "--json"], cwd=tmp_path, text=True, capture_output=True)
+
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["effective"]["fullrepo"]["mode"] == "auto"
+    assert payload["effective"]["branch_cleanup"]["mode"] == "advisory"
+    assert "dev" in payload["effective"]["branch_cleanup"]["protected_branches"]
+
+
+def test_disabled_fullrepo_status_and_publish_refusal(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    write_policy(tmp_path, {"schema_version": 1, "fullrepo": {"mode": "disabled"}})
+    git(tmp_path, "add", ".rldyour/project-policy.json")
+    git(tmp_path, "commit", "-m", "policy")
+    (tmp_path / "AGENTS.md").write_text("agent docs\n", encoding="utf-8")
+
+    status = subprocess.run(["bash", str(FULLREPO), "status-json"], cwd=tmp_path, text=True, capture_output=True)
+    publish = subprocess.run(["bash", str(FULLREPO), "publish"], cwd=tmp_path, text=True, capture_output=True)
+
+    assert status.returncode == 0, status.stderr
+    payload = json.loads(status.stdout)
+    assert payload["mode"] == "disabled"
+    assert payload["fullrepo_needs_attention"] is False
+    assert payload["worktree_agent_paths"] == []
+    assert publish.returncode == 1
+    assert "fullrepo disabled by project policy" in publish.stderr
+
+
+def test_tracked_ai_docs_policy_does_not_require_sync(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    write_policy(
+        tmp_path,
+        {
+            "schema_version": 1,
+            "fullrepo": {"mode": "disabled"},
+            "normal_branch_policy": {
+                "agent_files": "allowed",
+                "ai_marker_additions": "allowed",
+                "instruction_docs": "tracked-normal-branch",
+            },
+            "instruction_docs": {"mode": "tracked-normal-branch"},
+            "branch_cleanup": {"mode": "advisory", "protected_branches": ["main", "dev"]},
+            "stop_hook": {"block_on_fullrepo": False, "block_on_branch_cleanup": False},
+        },
+    )
+    (tmp_path / "AGENTS.md").write_text("agent docs\n", encoding="utf-8")
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / ".claude/CLAUDE.md").write_text("claude docs\n", encoding="utf-8")
+    (tmp_path / ".serena/memories").mkdir(parents=True)
+    (tmp_path / ".serena/memories/CORE-01-INDEX.md").write_text("memory\n", encoding="utf-8")
+    git(tmp_path, "add", ".")
+    git(tmp_path, "commit", "-m", "track ai docs")
+
+    proc = subprocess.run(["python3", str(STATE)], cwd=tmp_path, text=True, capture_output=True)
+
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["project_policy"]["source"] == ".rldyour/project-policy.json"
+    assert payload["fullrepo_needs_attention"] is False
+    assert payload["blocking_reasons"] == []
+    assert payload["needs_flow_sync"] is False
+
+
+def test_dev_is_not_branch_cleanup_candidate(tmp_path: Path) -> None:
+    init_repo(tmp_path)
+    git(tmp_path, "checkout", "-b", "dev")
+    git(tmp_path, "checkout", "main")
+
+    proc = subprocess.run(["python3", str(STATE)], cwd=tmp_path, text=True, capture_output=True)
+
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert "dev" not in payload["branch_cleanup_state"]["local_merged_branches"]
+    assert payload["branch_cleanup_state"]["needs_cleanup"] is False

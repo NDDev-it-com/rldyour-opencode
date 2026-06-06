@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR=$(CDPATH="" cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+POLICY_SCRIPT=${RLDYOUR_PROJECT_POLICY_SCRIPT:-"${SCRIPT_DIR}/project_flow_policy.py"}
+RLDYOUR_PROJECT_POLICY_SOURCE=${RLDYOUR_PROJECT_POLICY_SOURCE:-built-in\ defaults}
+RLDYOUR_PROJECT_POLICY_SOURCE_KIND=${RLDYOUR_PROJECT_POLICY_SOURCE_KIND:-default}
+RLDYOUR_FULLREPO_MODE=${RLDYOUR_FULLREPO_MODE:-auto}
+RLDYOUR_FULLREPO_RESTORE=${RLDYOUR_FULLREPO_RESTORE:-1}
+RLDYOUR_FULLREPO_PUBLISH=${RLDYOUR_FULLREPO_PUBLISH:-1}
+RLDYOUR_FULLREPO_MIGRATE_MAIN=${RLDYOUR_FULLREPO_MIGRATE_MAIN:-1}
+RLDYOUR_FULLREPO_INSTALL_EXCLUDE=${RLDYOUR_FULLREPO_INSTALL_EXCLUDE:-1}
+RLDYOUR_FULLREPO_CREATE_IF_MISSING=${RLDYOUR_FULLREPO_CREATE_IF_MISSING:-0}
+
 AGENT_ONLY_PATTERNS=(
   "AGENTS.md"
   ".serena/"
@@ -16,6 +27,7 @@ RUNTIME_EXCLUDE_PATTERNS=(
   ".serena/project.local.yml"
   ".serena/.flow_sync_marker"
   ".serena/.flow_post_task_state.json"
+  ".serena/.flow_blocker_ack.json"
   ".serena/.sync_marker"
   ".serena/.serena_sync_state.json"
   ".serena/.auto_sync_head"
@@ -71,6 +83,33 @@ Options:
 EOF
 }
 
+load_project_policy() {
+  if command -v python3 >/dev/null 2>&1 && [ -f "$POLICY_SCRIPT" ]; then
+    eval "$(python3 "$POLICY_SCRIPT" --shell 2>/dev/null || true)"
+  fi
+}
+
+policy_json() {
+  if command -v python3 >/dev/null 2>&1 && [ -f "$POLICY_SCRIPT" ]; then
+    python3 "$POLICY_SCRIPT" --json 2>/dev/null || printf '{}'
+  else
+    printf '{}'
+  fi
+}
+
+refuse_fullrepo_action_if_policy_disallows() {
+  local action=$1 allowed=${2:-1}
+  load_project_policy
+  if [ "$RLDYOUR_FULLREPO_MODE" = "disabled" ]; then
+    echo "[fullrepo] Error: fullrepo disabled by project policy (${RLDYOUR_PROJECT_POLICY_SOURCE}); refused ${action}" >&2
+    exit 1
+  fi
+  if [ "$allowed" != "1" ]; then
+    echo "[fullrepo] Error: fullrepo ${action} disabled by project policy (${RLDYOUR_PROJECT_POLICY_SOURCE})" >&2
+    exit 1
+  fi
+}
+
 git_identity_env() {
   export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-Danil Silantyev}"
   export GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-rldyourmnd@users.noreply.github.com}"
@@ -89,7 +128,7 @@ current_branch() {
 is_dirty() {
   # Whitelisted runtime markers must not flip the working tree to "dirty";
   # they are regenerated every session and never committed.
-  local marker_re='\.serena/\.(flow_(sync_marker|post_task_state\.json)|sync_marker|serena_sync_state\.json|auto_sync_head|active_workflow_intent\.json|dirty_stop_ack|gitignore)$'
+  local marker_re='\.serena/\.(flow_(sync_marker|post_task_state\.json|blocker_ack\.json)|sync_marker|serena_sync_state\.json|auto_sync_head|active_workflow_intent\.json|dirty_stop_ack|gitignore)$'
   git status --porcelain 2>/dev/null | grep -vqE "$marker_re"
 }
 
@@ -165,24 +204,34 @@ PY
 }
 
 cmd_install_exclude() {
+  refuse_fullrepo_action_if_policy_disallows "install-exclude" "$RLDYOUR_FULLREPO_INSTALL_EXCLUDE"
   install_exclude_patterns
 }
 
 cmd_bootstrap_init() {
-  install_exclude_patterns
+  refuse_fullrepo_action_if_policy_disallows "restore" "$RLDYOUR_FULLREPO_RESTORE"
+  if [ "$RLDYOUR_FULLREPO_INSTALL_EXCLUDE" = "1" ]; then
+    install_exclude_patterns
+  fi
 
   echo "[fullrepo] Checking fullrepo branch..."
   if git branch -r | grep -q "origin/$FULLREPO_BRANCH" 2>/dev/null; then
     echo "[fullrepo] Restoring agent-only files from origin/$FULLREPO_BRANCH..."
     cmd_restore
   else
-    echo "[fullrepo] No origin/$FULLREPO_BRANCH found. Run 'publish' to create it."
+    if [ "$RLDYOUR_FULLREPO_CREATE_IF_MISSING" = "1" ]; then
+      echo "[fullrepo] No origin/$FULLREPO_BRANCH found. Creating it because project policy allows create_if_missing."
+      cmd_publish
+    else
+      echo "[fullrepo] No origin/$FULLREPO_BRANCH found. Creation skipped by project policy."
+    fi
   fi
 
   echo "[fullrepo] Bootstrap complete."
 }
 
 cmd_restore() {
+  refuse_fullrepo_action_if_policy_disallows "restore" "$RLDYOUR_FULLREPO_RESTORE"
   local root
   root=$(git_root) || { echo "Error: not in a git repo" >&2; exit 1; }
 
@@ -234,6 +283,7 @@ _restore_cleanup() {
 }
 
 cmd_publish() {
+  refuse_fullrepo_action_if_policy_disallows "publish" "$RLDYOUR_FULLREPO_PUBLISH"
   local root original_branch
   root=$(git_root) || { echo "Error: not in a git repo" >&2; exit 1; }
   original_branch=$(current_branch)
@@ -243,7 +293,9 @@ cmd_publish() {
     exit 1
   fi
 
-  install_exclude_patterns
+  if [ "$RLDYOUR_FULLREPO_INSTALL_EXCLUDE" = "1" ]; then
+    install_exclude_patterns
+  fi
 
   if is_dirty; then
     echo "[fullrepo] Error: refusing to publish while non-runtime tracked/untracked files are dirty" >&2
@@ -470,6 +522,56 @@ expected_fullrepo_tree() {
 cmd_status_json() {
   local root
   root=$(git_root) || { echo '{"error":"not in a git repo"}' >&2; exit 1; }
+  load_project_policy
+
+  if [ "$RLDYOUR_FULLREPO_MODE" = "disabled" ]; then
+    local branch ahead behind mem_count policy_payload
+    branch=$(current_branch)
+    ahead=$(ahead_count)
+    behind=$(behind_count)
+    if [ -d "$root/.serena/memories" ]; then
+      mem_count=$(find "$root/.serena/memories" -name "*.md" | wc -l | tr -d ' ')
+    else
+      mem_count="0"
+    fi
+    policy_payload=$(policy_json)
+    BRANCH="$branch" AHEAD="$ahead" BEHIND="$behind" MEM="$mem_count" POLICY_JSON="$policy_payload" python3 -c '
+import json, os
+try:
+    policy = json.loads(os.environ.get("POLICY_JSON") or "{}")
+except json.JSONDecodeError:
+    policy = {}
+print(json.dumps({
+    "branch": os.environ["BRANCH"],
+    "dirty": "clean",
+    "ahead": int(os.environ["AHEAD"]),
+    "behind": int(os.environ["BEHIND"]),
+    "fullrepo_local": False,
+    "fullrepo_remote": False,
+    "fullrepo_branch": "fullrepo",
+    "remote_fullrepo_exists": False,
+    "serena_memory_count": int(os.environ["MEM"]),
+    "expected_fullrepo_tree": "",
+    "local_fullrepo_sha": "",
+    "remote_fullrepo_sha": "",
+    "local_fullrepo_matches_worktree": True,
+    "remote_fullrepo_matches_worktree": True,
+    "exclude_installed": False,
+    "tracked_agent_paths": [],
+    "worktree_agent_paths": [],
+    "mode": "disabled",
+    "fullrepo_needs_attention": False,
+    "project_policy": {
+        "source": policy.get("source"),
+        "source_kind": policy.get("source_kind"),
+        "valid": policy.get("valid"),
+        "profile": (policy.get("effective") or {}).get("profile") if isinstance(policy.get("effective"), dict) else None,
+        "effective": policy.get("effective", {}),
+    },
+}, indent=2))
+'
+    return
+  fi
 
   local branch dirty ahead behind fullrepo_local fullrepo_remote mem_count
   local expected_tree local_tree remote_tree remote_sha local_sha
@@ -493,14 +595,21 @@ cmd_status_json() {
   # JSON-escape via Python so a branch name containing `"`, `\`, or any
   # control char cannot produce malformed output. Booleans and integers
   # are passed via env to keep the shell -> Python boundary explicit.
+  local policy_payload
+  policy_payload=$(policy_json)
   BRANCH="$branch" DIRTY="$dirty" \
   AHEAD="$ahead" BEHIND="$behind" \
   FL="$fullrepo_local" FR="$fullrepo_remote" \
   MEM="$mem_count" EXPECTED_TREE="$expected_tree" \
   LOCAL_SHA="$local_sha" LOCAL_TREE="$local_tree" \
   REMOTE_SHA="$remote_sha" REMOTE_TREE="$remote_tree" \
+  POLICY_JSON="$policy_payload" MODE="$RLDYOUR_FULLREPO_MODE" \
   python3 -c '
 import json, os
+try:
+    policy = json.loads(os.environ.get("POLICY_JSON") or "{}")
+except json.JSONDecodeError:
+    policy = {}
 print(json.dumps({
     "branch": os.environ["BRANCH"],
     "dirty": os.environ["DIRTY"],
@@ -508,12 +617,25 @@ print(json.dumps({
     "behind": int(os.environ["BEHIND"]),
     "fullrepo_local": os.environ["FL"] == "true",
     "fullrepo_remote": os.environ["FR"] == "true",
+    "fullrepo_branch": "fullrepo",
+    "remote_fullrepo_exists": os.environ["FR"] == "true",
     "serena_memory_count": int(os.environ["MEM"]),
     "expected_fullrepo_tree": os.environ["EXPECTED_TREE"],
     "local_fullrepo_sha": os.environ["LOCAL_SHA"][:12],
     "remote_fullrepo_sha": os.environ["REMOTE_SHA"][:12],
     "local_fullrepo_matches_worktree": bool(os.environ["LOCAL_TREE"] and os.environ["LOCAL_TREE"] == os.environ["EXPECTED_TREE"]),
     "remote_fullrepo_matches_worktree": bool(os.environ["REMOTE_TREE"] and os.environ["REMOTE_TREE"] == os.environ["EXPECTED_TREE"]),
+    "exclude_installed": False,
+    "tracked_agent_paths": [],
+    "worktree_agent_paths": [],
+    "mode": os.environ["MODE"],
+    "project_policy": {
+        "source": policy.get("source"),
+        "source_kind": policy.get("source_kind"),
+        "valid": policy.get("valid"),
+        "profile": (policy.get("effective") or {}).get("profile") if isinstance(policy.get("effective"), dict) else None,
+        "effective": policy.get("effective", {}),
+    },
 }, indent=2))
 '
 }

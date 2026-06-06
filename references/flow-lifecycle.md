@@ -23,7 +23,7 @@ Core order:
 
 1. Git sync audit: dirty state, current branch, upstream ahead/behind, worktrees, local/remote branches.
 2. If uncommitted, unmerged, or stale merged branch/worktree state exists, deeply review it. If correct and consistent, synchronize it into `main`, merge safe branches, push, and remove merged worktrees/branches. If risky, ask the user with concrete options.
-3. Bootstrap agent-only context before treating `AGENTS.md`, `.serena/*`, `.opencode/*`, or similar files as missing. Restore agent-only files from an existing `fullrepo`, publish a complete `HEAD + agent-only` snapshot when no `fullrepo` exists, install `.git/info/exclude`, and remove tracked agent-only files from the current branch index when migration is needed.
+3. Resolve project policy before treating `AGENTS.md`, `.serena/*`, `.opencode/*`, or similar files as missing. Restore agent-only files from an existing `fullrepo` only when policy allows it. Creating a missing `fullrepo` branch requires `fullrepo.create_if_missing=true` or explicit current user instruction.
 4. Serena readiness: `check_onboarding_performed`, onboarding if needed, `list_memories`, relevant `read_memory`.
 5. Scope detection: project, module, sphere, or feature. For a sphere such as backend, inspect the whole sphere and its integration points.
 6. Semantic map: `get_symbols_overview`, targeted `find_symbol`, `find_referencing_symbols`, `search_for_pattern` only when needed.
