@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.36] - 2026-06-06
+
+### Changed
+
+- Refresh Claude Code 2.1.167 and OpenCode 1.16.2 runtime baselines.
+
 ## [1.1.35] - 2026-06-05
 
 ### Fixed
