@@ -1,6 +1,6 @@
 ---
 name: cmux-orchestrator
-description: "Запускает macOS cmux orchestrator workflow: один user-facing orchestrator делегирует worker terminals, собирает отчеты, валидирует и синхронизирует. EN: cmux orchestrator, multi-agent terminal workflow."
+description: "Запускает macOS cmux orchestrator workflow: один user-facing orchestrator делегирует worker terminals, собирает отчеты, валидирует и синхронизирует. Используй для: cmux orchestrator, multi-agent terminal workflow, macOS orchestrated agents. EN triggers: cmux orchestrator, multi-agent terminal workflow, macOS orchestrated agents."
 ---
 
 # cmux-orchestrator

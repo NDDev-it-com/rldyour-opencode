@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.39] - 2026-06-06
+
+### Fixed
+
+- Repair OpenCode cmux skill routing metadata and contract inventory tests for the new orchestrator/worker skill surfaces.
+- Preserve the OpenCode CLI, `@opencode-ai/plugin`, and `@opencode-ai/sdk` runtime baseline at `1.16.2`.
+
 ## [1.1.38] - 2026-06-06
 
 ### Added
