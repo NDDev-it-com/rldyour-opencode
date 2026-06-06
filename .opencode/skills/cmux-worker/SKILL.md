@@ -1,6 +1,6 @@
 ---
 name: cmux-worker
-description: "Описывает worker role внутри macOS cmux orchestrator: scoped work, JSON report, без push/fullrepo/system install/project policy mutation. EN: cmux worker role."
+description: "Описывает worker role внутри macOS cmux orchestrator: scoped work, JSON report, без push/fullrepo/system install/project policy mutation. Используй для: cmux worker, scoped worker report, delegated terminal task. EN triggers: cmux worker role, scoped worker report, delegated terminal task."
 ---
 
 # cmux-worker
