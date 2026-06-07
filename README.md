@@ -241,6 +241,7 @@ See `docs/observability.md` for full triage flow.
 - Commits: Conventional Commits v1.0.0; atomic per logical unit.
 - Versioning: SemVer; CHANGELOG follows Keep a Changelog 1.1.0.
 - Ignored agent-only files (`AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, etc.) are overlaid onto the current `HEAD` tree and published via the generated `fullrepo` branch managed by `scripts/fullrepo_sync.sh`.
+- This is the default rldyour-owned repository policy. In external or colleague-owned repositories, `.rldyour/project-policy.json` is the executable source of truth and may disable fullrepo, allow instruction docs on normal branches, and disable branch-cleanup blockers.
 
 ## License
 

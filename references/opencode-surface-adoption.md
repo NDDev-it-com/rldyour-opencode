@@ -7,7 +7,7 @@ Source of truth:
 - Vendored schema: `references/opencode-config.schema.v1.16.2.json`
 - Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.16.2`
 
-## Decisions
+## Current adopted surface: 1.16.2
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
@@ -25,6 +25,14 @@ Source of truth:
 | Skill discovery and file-based agent loading | 1.16.0 | Adopted | Plural `.opencode/skills/` and `.opencode/agents/` directories remain the native source. Generated `index.json` files stay compatibility metadata, not runtime discovery truth. | `scripts/generate_skills_index.py --check`; `scripts/validate_config.sh` |
 | `run --replay` interactive session replay | 1.16.0 | Operational | Add to installed-runtime smoke only; no repository config field is required. | installed-runtime smoke |
 | Startup and cancellation reliability fixes | 1.16.0 | Adopted | Treat shell cancellation, delegated-task reasoning variant, OpenAI websocket idle, Windows path normalization, wide-character paste, and ACP cancellation fixes as runtime correctness. No config migration is required. | `scripts/check_baseline_consistency.py` |
+| Current `permission` object model | current docs | Adopted | `opencode.json` uses `permission`, not deprecated `tools`; standalone adapter config explicitly sets the canonical owner primary permissions to `allow`, including `external_directory` and `doom_loop`, and root `oc` mirrors that posture through `OPENCODE_CONFIG_CONTENT`. | `scripts/validate_contract.py`; root `scripts/validate_opencode_permission_profiles.py` |
+
+## Historical baseline notes: 1.15.13 and earlier
+
+Historical rows remain only as evidence for why current policy exists. They are not the active runtime baseline; `references/opencode-baseline.json` and the current adopted surface above define the active baseline.
+
+| Surface | Introduced | Decision | Implementation | Validator |
+| --- | --- | --- | --- | --- |
 | Session metadata through API and SDK | 1.15.13 | Future | Runtime/API capability only; no adapter config or local plugin currently persists custom session metadata. | `scripts/check_plugin_hooks.py` |
 | Config loads from opened location upward | 1.15.13 | Operational | Matches the existing project-local `opencode.json` model and OpenCode bridge discovery; `opencode debug config` remains the installed-runtime resolver smoke from the actual opened target. | installed-runtime smoke |
 | Gateway Anthropic adaptive reasoning thinking-block fix | 1.15.13 | Operational | Runtime bugfix only; adapter does not add Claude Code model syntax to OpenCode config. | `scripts/validate_contract.py` |
@@ -39,7 +47,6 @@ Source of truth:
 | Stable project identity for remote-backed projects | 1.15.11 | Operational | No repository config change required. | n/a |
 | Dynamic MCP disconnect when removed | 1.15.11 | Operational | MCP definitions remain in `opencode.json`; validation checks profile/server parity. | `scripts/validate_mcp_profiles.py` |
 | Plugin `dispose` hook | 1.15.11 | Future | No local plugin currently needs teardown; add validator coverage when adopting it. | `scripts/check_plugin_hooks.py` |
-| Current `permission` object model | current docs | Adopted | `opencode.json` uses `permission`, not deprecated `tools`; standalone adapter config explicitly sets the canonical owner primary permissions to `allow`, including `external_directory` and `doom_loop`, and root `oc` mirrors that posture through `OPENCODE_CONFIG_CONTENT`. | `scripts/validate_contract.py`; root `scripts/validate_opencode_permission_profiles.py` |
 
 ## Owner Full-Auto Policy
 
