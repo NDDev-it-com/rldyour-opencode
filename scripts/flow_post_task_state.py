@@ -41,6 +41,14 @@ def _stdout(*args: str) -> str:
     return _git(*args).stdout.strip()
 
 
+def _subprocess_timeout() -> float:
+    raw = os.environ.get("RLDYOUR_FLOW_SUBPROCESS_TIMEOUT_SECONDS", "10")
+    try:
+        return max(0.1, float(raw))
+    except ValueError:
+        return 10.0
+
+
 def _runtime_path(path: str) -> bool:
     normalized = path.strip("/")
     return any(normalized == item or normalized.startswith(item.rstrip("/") + "/") for item in RUNTIME_IGNORED)
@@ -230,7 +238,16 @@ def _fullrepo_state() -> dict[str, Any]:
     script = SCRIPT_DIR / "fullrepo_sync.sh"
     if not script.is_file():
         return {}
-    proc = subprocess.run(["bash", str(script), "status-json"], check=False, capture_output=True, text=True)
+    try:
+        proc = subprocess.run(
+            ["bash", str(script), "status-json"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=_subprocess_timeout(),
+        )
+    except subprocess.TimeoutExpired:
+        return {}
     if proc.returncode != 0 or not proc.stdout.strip():
         return {}
     try:
