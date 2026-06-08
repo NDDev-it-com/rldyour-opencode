@@ -1,6 +1,6 @@
 ---
 name: design-validation
-description: "Браузер-валидация дизайн-имплементации после UI/Figma/shadcn/ReactBits работы через Playwright + Chrome DevTools MCP. Используй для: проверь дизайн, проверь верстку, адаптив, скриншоты, проверь визуальное соответствие макету. EN triggers: validate design, check layout, responsive validation, pixel-perfect check, design screenshots, design QA, compare to Figma frame."
+description: "Браузер-валидация дизайн-имплементации через Figma, Playwright CLI и Chrome DevTools MCP. Используй для: проверь дизайн, проверь верстку, адаптив, скриншоты, visual diff. EN triggers: validate design, responsive validation, pixel-perfect check, design screenshots, compare to Figma frame."
 ---
 
 # Design Validation
@@ -49,12 +49,12 @@ Do not commit browser artifacts. Delete them after the task unless the user expl
 
 ## Validation Workflow
 
-1. Use Playwright MCP (`playwright_*`) for browser flow reproduction, screenshots, accessibility snapshots, and assertions.
-2. Use Chrome DevTools MCP (`chrome-devtools_*`) for console/network/runtime/layout/performance diagnosis when relevant.
-3. Compare against Figma context (`figma_*`) and screenshots.
-4. For visual regression, use Playwright's built-in `toHaveScreenshot()` snapshot comparison when the project already adopted it; do not introduce Percy/Chromatic without explicit user request.
+1. Use Figma source inspection for frame, token, component, text, and constraint facts.
+2. Use Playwright CLI for browser flow reproduction, screenshots, snapshots, viewport matrices, accessibility-relevant visual evidence, and visual diff evidence.
+3. Use Chrome DevTools MCP for computed style, layout, console, network, runtime, performance, memory, or Lighthouse diagnosis when relevant.
+4. Compare reference and actual screenshot evidence; use project-native screenshot comparison only when already adopted.
 5. Fix mismatches and re-run checks.
-6. Report remaining mismatches or blockers explicitly.
+6. Report remaining mismatches or blockers explicitly with reference, actual screenshot, diff/deviation, and evidence paths.
 
 ## Done Criteria
 
