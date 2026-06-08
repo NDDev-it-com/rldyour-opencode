@@ -58,9 +58,20 @@ You MUST follow these steps in order. Skipping a step is forbidden.
 1. Run `bash` to capture current state:
    - `git rev-parse HEAD` → `HEAD_FULL`
    - `git rev-parse --short=7 HEAD` → `HEAD_SHA`
-2. Check serena memory state by listing all memories.
-3. Run `serena_list_memories` → memory index.
-4. If memories are already current (all have `Last commit` matching HEAD), exit immediately with `{"status":"already_current","head_sha":"<sha>"}` and STOP. Do not run any memory writes.
+   - `git rev-parse --show-toplevel` → `TARGET_REPO_ROOT`
+2. Verify Serena targets the same repository before memory writes:
+   - If the active Serena project is absent or does not resolve to `TARGET_REPO_ROOT`, activate `TARGET_REPO_ROOT` before `serena_list_memories`, `serena_read_memory`, `serena_write_memory`, or `serena_edit_memory`.
+   - If the active project cannot be corrected, do not write through Serena tools and do not use the fallback edit tool outside the target repository's `.serena/memories/` directory. Emit `{"status":"blocked","reason":"serena_project_mismatch","target_repo_root":"<path>"}`.
+3. Check serena memory state by listing all memories.
+4. Run `serena_list_memories` → memory index.
+5. If memories are already current (all have `Last commit` matching HEAD), exit immediately with `{"status":"already_current","head_sha":"<sha>"}` and STOP. Do not run any memory writes.
+
+For superprojects with nested Git repositories, root and every nested
+repository that owns `.serena/memories/` are separate sync targets. The parent
+orchestrator must invoke this agent once per affected target repository, and
+each invocation must use that target repository's own `TARGET_REPO_ROOT` and
+HEAD. Never update adapter memories while Serena is still activated on the
+superproject root.
 
 ### Step 2 — Diff and impact map
 
