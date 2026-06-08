@@ -96,7 +96,7 @@ Since OpenCode has NO hooks system, the lifecycle automation pattern must change
 | github | remote HTTP with auth/toolsets | `{ "type": "remote", "url": "https://api.githubcopilot.com/mcp/", "headers": { "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}", "X-MCP-Toolsets": "context,repos,issues,pull_requests,users" } }` |
 | figma | remote HTTP | `{ "type": "remote", "url": "https://mcp.figma.com/" }` |
 | openai-docs | remote HTTP | `{ "type": "remote", "url": "https://openai-mcp-serverless.vercel.app/mcp" } or remove` |
-| shadcn | stdio | `{ "type": "local", "command": ["bunx", "shadcn@4.10.0", "mcp"] }` |
+| shadcn | stdio | `{ "type": "local", "command": ["bunx", "shadcn@4.11.0", "mcp"] }` |
 | chrome-devtools | stdio | Remove — not available as npm package |
 | dart | stdio | `{ "type": "local", "command": ["dart", "mcp-server"] } or use OpenCode built-in LSP` |
 
