@@ -1,7 +1,7 @@
 {
-  "version": "1.1.43",
+  "version": "1.1.44",
   "generated_by": "scripts/generate_skills_index.py",
-  "count": 35,
+  "count": 38,
   "skills": [
     {
       "name": "architecture-boundaries",
@@ -24,15 +24,14 @@
       "path": ".opencode/skills/browser-debug/SKILL.md",
       "domain": "browser",
       "triggers": [
-        "browser bug",
-        "debug UI",
-        "console errors",
-        "network failure",
-        "hydration error",
-        "fix browser issue",
-        "Lighthouse audit",
-        "layout broken",
-        "runtime exception"
+        "browser debug",
+        "console",
+        "network",
+        "runtime",
+        "layout",
+        "memory",
+        "performance",
+        "Lighthouse"
       ],
       "requires_mcp": [
         "chrome-devtools"
@@ -44,15 +43,15 @@
       "path": ".opencode/skills/browser-tool-routing/SKILL.md",
       "domain": "browser",
       "triggers": [
-        "pick browser MCP",
-        "validation vs diagnosis",
-        "screenshot vs debug",
-        "which browser tool",
-        "route browser task",
-        "Playwright vs DevTools"
+        "browser tool routing",
+        "UI validation",
+        "screenshots",
+        "visual QA",
+        "console",
+        "network",
+        "performance"
       ],
       "requires_mcp": [
-        "playwright",
         "chrome-devtools"
       ],
       "network": true
@@ -64,16 +63,13 @@
       "triggers": [
         "validate UI",
         "browser check",
-        "e2e test",
         "regression test",
         "responsive check",
         "business logic in browser",
-        "take screenshot",
-        "pixel-perfect validation",
+        "screenshot",
         "visual QA"
       ],
       "requires_mcp": [
-        "playwright",
         "chrome-devtools"
       ],
       "network": true
@@ -145,15 +141,13 @@
       "domain": "browser",
       "triggers": [
         "validate design",
-        "check layout",
         "responsive validation",
         "pixel-perfect check",
         "design screenshots",
-        "design QA",
         "compare to Figma frame"
       ],
       "requires_mcp": [
-        "playwright",
+        "figma",
         "chrome-devtools"
       ],
       "network": true
@@ -305,6 +299,21 @@
       "network": true
     },
     {
+      "name": "playwright-cli-validation",
+      "path": ".opencode/skills/playwright-cli-validation/SKILL.md",
+      "domain": "browser",
+      "triggers": [
+        "Playwright CLI validation",
+        "screenshots",
+        "snapshots",
+        "headed browser",
+        "traces",
+        "responsive"
+      ],
+      "requires_mcp": [],
+      "network": true
+    },
+    {
       "name": "project-instructions-policy",
       "path": ".opencode/skills/project-instructions-policy/SKILL.md",
       "domain": "rules",
@@ -370,7 +379,6 @@
       "requires_mcp": [
         "figma",
         "shadcn",
-        "playwright",
         "chrome-devtools"
       ],
       "network": true
@@ -594,6 +602,22 @@
       "network": false
     },
     {
+      "name": "visual-diff-review",
+      "path": ".opencode/skills/visual-diff-review/SKILL.md",
+      "domain": "browser",
+      "triggers": [
+        "visual diff",
+        "pixel-perfect",
+        "compare with Figma",
+        "compare with reference image"
+      ],
+      "requires_mcp": [
+        "figma",
+        "chrome-devtools"
+      ],
+      "network": true
+    },
+    {
       "name": "web-research",
       "path": ".opencode/skills/web-research/SKILL.md",
       "domain": "explore",
@@ -606,6 +630,20 @@
         "news search",
         "web search",
         "current state of X"
+      ],
+      "requires_mcp": [],
+      "network": true
+    },
+    {
+      "name": "webwright-task",
+      "path": ".opencode/skills/webwright-task/SKILL.md",
+      "domain": "browser",
+      "triggers": [
+        "Webwright task",
+        "long-horizon web task",
+        "RPA",
+        "extraction",
+        "final_script"
       ],
       "requires_mcp": [],
       "network": true
