@@ -15,7 +15,7 @@ def test_live_contract_is_valid() -> None:
 def test_contract_counts_cover_runtime_surfaces() -> None:
     result = validate_contract.validate()
     counts = result["counts"]
-    assert counts["skills"] == 35
+    assert counts["skills"] == 38
     assert counts["commands"] == 11
     assert counts["agents"] == 9
     assert counts["plugins"] == 10
