@@ -7,6 +7,11 @@
 > agent configs — all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
 > The ADR text itself is preserved unchanged. See `.serena/memories/CORE-02-PROJECT-SHAPE.md`
 > for current config facts.
+>
+> **Browser-provider supersession (2026-06-08).** The MCP mapping table below
+> is historical migration evidence. Current active browser automation uses
+> Webwright, Playwright CLI, and Chrome DevTools MCP; Playwright MCP is not an
+> active OpenCode MCP server.
 
 ## Commit History Analysis
 
@@ -84,7 +89,7 @@ Since OpenCode has NO hooks system, the lifecycle automation pattern must change
 |---|---|---|
 | serena-agent | stdio with `--context=agent` | `{ "type": "local", "command": ["npx", "-y", "@anthropic/serena-mcp@1.3.0", "--context", "agent"] }` |
 | sequential-thinking | stdio npm package | `{ "type": "local", "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking@2025.12.18"] }` |
-| playwright | stdio npm package | `{ "type": "local", "command": ["npx", "-y", "@playwright/mcp@0.0.75"] }` |
+| playwright | stdio npm package | Historical only: retired Playwright MCP mapping; current provider is Playwright CLI, not an MCP server. |
 | context7 | remote HTTP | `{ "type": "remote", "url": "https://mcp.context7.com/mcp" }` |
 | deepwiki | remote HTTP | `{ "type": "remote", "url": "https://mcp.deepwiki.com/mcp" }` |
 | grep | remote HTTP | `{ "type": "remote", "url": "https://mcp.grep.app" }` |
