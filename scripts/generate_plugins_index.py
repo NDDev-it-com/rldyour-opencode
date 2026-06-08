@@ -128,7 +128,6 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
             "context7",
             "deepwiki",
             "grep",
-            "playwright",
             "chrome-devtools",
             "sequential-thinking",
         ],

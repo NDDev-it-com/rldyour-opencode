@@ -66,13 +66,17 @@ DOMAIN_BY_SKILL: dict[str, str] = {
     # Explore (2)
     "tech-research": "explore",
     "web-research": "explore",
-    # Browser (3)
+    # Browser (6)
     "browser-tool-routing": "browser",
     "browser-validation": "browser",
     "browser-debug": "browser",
+    "playwright-cli-validation": "browser",
+    "webwright-task": "browser",
+    "visual-diff-review": "browser",
     # design-validation is single-purpose browser validation that depends on
-    # Playwright + Chrome DevTools MCP. AGENTS.md L48 reserves those MCPs for
-    # the Browser domain, so the skill belongs to Browser despite its name.
+    # Playwright CLI, Chrome DevTools MCP, and optional Figma source facts.
+    # AGENTS.md reserves browser providers for the Browser domain, so the skill
+    # belongs to Browser despite its name.
     # Reviewer wave 2026-05-18 architecture F-1 closure. `ry-design` keeps a
     # composite multi-domain exception (see AGENTS.md § Domain Boundaries).
     "design-validation": "browser",
@@ -97,13 +101,14 @@ REQUIRES_MCP: dict[str, list[str]] = {
     "serena-code-workflow": ["serena"],
     "serena-memory-sync": ["serena"],
     "serena-lsp-integration": ["serena"],
-    "browser-tool-routing": ["playwright", "chrome-devtools"],
-    "browser-validation": ["playwright", "chrome-devtools"],
+    "browser-tool-routing": ["chrome-devtools"],
+    "browser-validation": ["chrome-devtools"],
     "browser-debug": ["chrome-devtools"],
-    "ry-design": ["figma", "shadcn", "playwright", "chrome-devtools"],
+    "ry-design": ["figma", "shadcn", "chrome-devtools"],
     "figma-to-code": ["figma", "shadcn"],
     "design-system-implementation": ["shadcn"],
-    "design-validation": ["playwright", "chrome-devtools"],
+    "design-validation": ["figma", "chrome-devtools"],
+    "visual-diff-review": ["figma", "chrome-devtools"],
     "tech-research": ["context7", "deepwiki", "grep"],
     "web-research": [],
     "ry-init": ["serena"],
@@ -121,6 +126,9 @@ NETWORK_SKILLS = {
     "browser-validation",
     "browser-debug",
     "browser-tool-routing",
+    "playwright-cli-validation",
+    "webwright-task",
+    "visual-diff-review",
     "figma-to-code",
     "ry-design",
     "design-validation",

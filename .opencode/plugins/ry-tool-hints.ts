@@ -25,9 +25,7 @@ const HINTS: Record<string, string> = {
   "serena_read_memory":
     "Читай Serena memories для прошлых решений или durable project facts; EN: not for chat logs.",
 
-  // Browser (Browser domain only)
-  "playwright_browser_navigate":
-    "Используй для end-to-end UI validation и golden-path проверки; EN: browser flow proof.",
+  // Browser DevTools diagnosis (Browser domain only). Playwright CLI is routed by skills, not MCP tool hints.
   "chrome-devtools_list_console_messages":
     "Используй для runtime browser diagnostics ошибок/предупреждений; EN: not visual UI validation.",
   "chrome-devtools_performance_start_trace":
