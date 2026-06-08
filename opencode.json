@@ -9,36 +9,85 @@
   "shell": "/bin/bash",
   "lsp": {
     "ruff": {
-      "command": ["ruff", "server"],
-      "extensions": [".py", ".pyi"]
+      "command": [
+        "ruff",
+        "server"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ]
     },
     "vscode-html": {
-      "command": ["vscode-html-language-server", "--stdio"],
-      "extensions": [".html", ".htm"]
+      "command": [
+        "vscode-html-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".html",
+        ".htm"
+      ]
     },
     "vscode-css": {
-      "command": ["vscode-css-language-server", "--stdio"],
-      "extensions": [".css", ".scss", ".sass", ".less"]
+      "command": [
+        "vscode-css-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".css",
+        ".scss",
+        ".sass",
+        ".less"
+      ]
     },
     "vscode-json": {
-      "command": ["vscode-json-language-server", "--stdio"],
-      "extensions": [".json", ".jsonc"]
+      "command": [
+        "vscode-json-language-server",
+        "--stdio"
+      ],
+      "extensions": [
+        ".json",
+        ".jsonc"
+      ]
     },
     "docker": {
-      "command": ["docker-language-server", "start", "--stdio"],
-      "extensions": [".dockerfile"]
+      "command": [
+        "docker-language-server",
+        "start",
+        "--stdio"
+      ],
+      "extensions": [
+        ".dockerfile"
+      ]
     },
     "taplo": {
-      "command": ["taplo", "lsp", "stdio"],
-      "extensions": [".toml"]
+      "command": [
+        "taplo",
+        "lsp",
+        "stdio"
+      ],
+      "extensions": [
+        ".toml"
+      ]
     },
     "marksman": {
-      "command": ["marksman", "server"],
-      "extensions": [".md", ".mdx", ".markdown"]
+      "command": [
+        "marksman",
+        "server"
+      ],
+      "extensions": [
+        ".md",
+        ".mdx",
+        ".markdown"
+      ]
     },
     "qmlls": {
-      "command": ["qmlls"],
-      "extensions": [".qml"]
+      "command": [
+        "qmlls"
+      ],
+      "extensions": [
+        ".qml"
+      ]
     }
   },
   "permission": {
@@ -118,28 +167,48 @@
   "mcp": {
     "serena": {
       "type": "local",
-      "command": ["uvx", "--from", "serena-agent==1.5.3", "--python", "3.13", "--prerelease", "allow", "serena", "start-mcp-server", "--project-from-cwd", "--context=agent", "--enable-web-dashboard", "False", "--open-web-dashboard", "False"],
+      "command": [
+        "uvx",
+        "--from",
+        "serena-agent==1.5.3",
+        "--python",
+        "3.13",
+        "--prerelease",
+        "allow",
+        "serena",
+        "start-mcp-server",
+        "--project-from-cwd",
+        "--context=agent",
+        "--enable-web-dashboard",
+        "False",
+        "--open-web-dashboard",
+        "False"
+      ],
       "enabled": true,
       "timeout": 30000
     },
     "sequential-thinking": {
       "type": "local",
-      "command": ["bunx", "@modelcontextprotocol/server-sequential-thinking@2025.12.18"],
+      "command": [
+        "bunx",
+        "@modelcontextprotocol/server-sequential-thinking@2025.12.18"
+      ],
       "enabled": true,
       "environment": {
         "DISABLE_THOUGHT_LOGGING": "true"
       },
       "timeout": 30000
     },
-    "playwright": {
-      "type": "local",
-      "command": ["bunx", "@playwright/mcp@0.0.75", "--headless", "--caps=network,storage,testing,devtools"],
-      "enabled": true,
-      "timeout": 30000
-    },
     "chrome-devtools": {
       "type": "local",
-      "command": ["bunx", "chrome-devtools-mcp@1.1.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"],
+      "command": [
+        "bunx",
+        "chrome-devtools-mcp@1.1.1",
+        "--headless",
+        "--isolated",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ],
       "enabled": true,
       "timeout": 30000
     },
@@ -166,13 +235,21 @@
     },
     "shadcn": {
       "type": "local",
-      "command": ["bunx", "shadcn@4.10.0", "mcp"],
+      "command": [
+        "bunx",
+        "shadcn@4.10.0",
+        "mcp"
+      ],
       "enabled": true,
       "timeout": 30000
     },
     "dart-flutter": {
       "type": "local",
-      "command": ["dart", "mcp-server", "--force-roots-fallback"],
+      "command": [
+        "dart",
+        "mcp-server",
+        "--force-roots-fallback"
+      ],
       "enabled": true,
       "timeout": 30000
     },
@@ -199,7 +276,10 @@
       "timeout": 15000
     }
   },
-  "instructions": ["AGENTS.md", "references/public-repo-ci-policy.md"],
+  "instructions": [
+    "AGENTS.md",
+    "references/public-repo-ci-policy.md"
+  ],
   "compaction": {
     "auto": true,
     "prune": true,
