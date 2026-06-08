@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.48] - 2026-06-09
+
+### Changed
+
+- Refresh Chrome DevTools MCP baseline to 1.2.0. Preserve documented `opencode-ai` `1.16.2`, `@opencode-ai/plugin` `1.16.2`, and `@opencode-ai/sdk` `1.16.2` baseline evidence.
+
 ## [1.1.47] - 2026-06-09
 
 ### Changed
