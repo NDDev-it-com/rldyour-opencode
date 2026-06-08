@@ -13,7 +13,8 @@ A self-contained OpenCode project configuration that provides:
 - **10 slash commands** for lifecycle orchestration:
   - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-repair`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
   - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
-- **12 MCP servers** pre-configured (Serena, Sequential Thinking, Playwright, Chrome DevTools, Context7, DeepWiki, Grep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
+- **11 MCP servers** pre-configured (Serena, Sequential Thinking, Chrome DevTools, Context7, DeepWiki, Grep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
+- **Provider-routed browser automation**: Webwright for long-horizon or reusable web workflows, Playwright CLI for UI evidence/screenshots/snapshots/traces, and Chrome DevTools MCP for DevTools/debug/performance/memory/Lighthouse diagnosis.
 - **10 TypeScript plugins** for session lifecycle, LLM augmentation, guardrails, and observability:
   - lifecycle: `ry-bootstrap` (session banner + compaction context + autocontinue), `ry-env-protection` (block sensitive reads with toast), `ry-shell-strategy` (shell env + git push guardrails), `ry-sync-reminder` (idle toast), `ry-flow-hooks` (commit advice + post-commit nudge)
   - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
