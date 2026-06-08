@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.44] - 2026-06-08
+
+### Changed
+
+- Re-architect browser providers around Webwright, Playwright CLI, and Chrome DevTools MCP. Preserve documented `opencode-ai` `1.16.2`, `@opencode-ai/plugin` `1.16.2`, and `@opencode-ai/sdk` `1.16.2` baseline evidence.
+
 ## [1.1.43] - 2026-06-07
 
 ### Fixed
