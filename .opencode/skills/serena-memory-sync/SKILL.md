@@ -135,13 +135,17 @@ Do not write:
 
 ## Sync Workflow
 
-1. Inspect git state: current HEAD, recent commits, changed files, and non-memory diffs.
-2. Use Serena first: `list_memories`, `read_memory` for relevant files, then `get_symbols_overview`, targeted `find_symbol`, and `find_referencing_symbols` for changed code.
-3. Update or create memory files with verified facts only, using the memory body template. Remove or correct stale statements instead of preserving outdated text.
-4. Save non-trivial plans to `.serena/plans/` only when they will help future sessions continue work.
-5. Save long research summaries to `.serena/research/` only when the research was complex, source-backed, and likely reusable.
-6. Keep exact paths, symbol names, commands, contracts, invariants, verification checks, and behavior. Avoid generic advice.
-7. In repositories where `.serena` knowledge is tracked, commit knowledge-only changes. In fullrepo-managed repositories, acknowledge current memories and clear runtime sync markers; publish to `fullrepo` as part of sync workflow.
+1. Resolve the concrete Git target:
+   - Run `git rev-parse --show-toplevel`, `git rev-parse HEAD`, and `git rev-parse --short=7 HEAD` from the repository being synchronized.
+   - Before any Serena MCP memory write, verify the active Serena project resolves to that Git root. If it does not, activate the intended repository path first.
+   - In superprojects, process root and every nested repository with `.serena/memories/` separately; each memory set is synchronized against its own repository HEAD, not the superproject HEAD.
+2. Inspect git state: current HEAD, recent commits, changed files, and non-memory diffs.
+3. Use Serena first: `list_memories`, `read_memory` for relevant files, then `get_symbols_overview`, targeted `find_symbol`, and `find_referencing_symbols` for changed code.
+4. Update or create memory files with verified facts only, using the memory body template. Remove or correct stale statements instead of preserving outdated text.
+5. Save non-trivial plans to `.serena/plans/` only when they will help future sessions continue work.
+6. Save long research summaries to `.serena/research/` only when the research was complex, source-backed, and likely reusable.
+7. Keep exact paths, symbol names, commands, contracts, invariants, verification checks, and behavior. Avoid generic advice.
+8. In repositories where `.serena` knowledge is tracked, commit knowledge-only changes. In fullrepo-managed repositories, acknowledge current memories and clear runtime sync markers; publish to `fullrepo` as part of sync workflow.
 
 ## Quality Rules
 
