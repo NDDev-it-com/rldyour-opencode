@@ -137,7 +137,7 @@ def test_probe_npm_success(monkeypatch: pytest.MonkeyPatch) -> None:
         "urllib.request.urlopen",
         _fake_urlopen_factory({"version": "2.0.0"}),
     )
-    latest, err = cf.probe_npm("@playwright/mcp")
+    latest, err = cf.probe_npm("@playwright/cli")
     assert latest == "2.0.0"
     assert err is None
 
