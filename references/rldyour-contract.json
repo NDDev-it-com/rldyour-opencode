@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Machine-readable rldyour workflow contract for the OpenCode adapter. Sister tool repos should map the same canonical IDs to their own native surfaces.",
-  "version": "1.1.43",
+  "version": "1.1.44",
   "updated": "2026-06-07",
   "adapter": "opencode",
   "security": {
@@ -131,7 +131,10 @@
     "security.review": "ry-sec-review",
     "serena.code-workflow": "serena-code-workflow",
     "serena.lsp-integration": "serena-lsp-integration",
-    "serena.memory-sync": "serena-memory-sync"
+    "serena.memory-sync": "serena-memory-sync",
+    "browser.playwright-cli-validation": "playwright-cli-validation",
+    "browser.webwright-task": "webwright-task",
+    "browser.visual-diff-review": "visual-diff-review"
   },
   "commands": {
     "design.ry-design": "ry-design",
@@ -229,5 +232,28 @@
       "event_type": "session.idle",
       "class": "advisory"
     }
+  },
+  "browser_providers": {
+    "policy": "root config/browser-automation-policy.json",
+    "required_common_providers": [
+      "webwright",
+      "playwright-cli",
+      "chrome-devtools-mcp"
+    ],
+    "mcp_providers": [
+      "chrome-devtools-mcp"
+    ],
+    "cli_providers": [
+      "playwright-cli"
+    ],
+    "task_harness_providers": [
+      "webwright"
+    ],
+    "webwright_support": "adapter-owned-cli-wrapper; upstream-native NOT_PROVEN"
+  },
+  "skill_routes": {
+    "browser.playwright-cli-validation": "playwright-cli-validation",
+    "browser.webwright-task": "webwright-task",
+    "browser.visual-diff-review": "visual-diff-review"
   }
 }

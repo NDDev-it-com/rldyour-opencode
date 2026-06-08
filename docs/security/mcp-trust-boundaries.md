@@ -21,13 +21,12 @@ CI, and which to gate behind explicit user authorization. It complements
 - **network-optional**: Remote endpoint that works without auth but with
   reduced rate limits if the API key is missing.
 
-## 12 servers (opencode.json @ HEAD)
+## 11 servers (opencode.json @ HEAD)
 
 | Server | Type | Trust class | Secrets | Network | Repo read | Repo write | CI mode |
 |---|---|---|---|---|---|---|---|
 | `serena` | local (uvx) | local-only | none | none | yes | no | local-launch |
 | `sequential-thinking` | local (bunx) | local-only | none | none | no | no | local-launch |
-| `playwright` | local (bunx) | local-only | none | yes (target site) | no | no | local-launch |
 | `chrome-devtools` | local (bunx) | local-only | none | yes (target site) | no | no | local-launch |
 | `shadcn` | local (bunx) | local-only | none | yes (registry) | no | yes (component scaffold) | local-launch |
 | `dart-flutter` | local (dart) | local-only | none | none | yes | yes | local-launch |
