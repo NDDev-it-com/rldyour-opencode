@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.51] - 2026-06-09
+
+### Fixed
+
+- Correct OpenCode README inventory counts (38 skills, 11 slash commands, 11 MCP), refresh v1.16.2 permission-key wording, add CI badges and Support section, normalize Code of Conduct to US English.
+
 ## [1.1.50] - 2026-06-09
 
 ### Fixed
