@@ -8,17 +8,17 @@ We pledge to act and interact in ways that contribute to an open, welcoming, div
 
 ## Our Standards
 
-Examples of behaviour that contributes to a positive environment:
+Examples of behavior that contributes to a positive environment:
 
 - Demonstrating empathy and kindness toward other people.
 - Being respectful of differing opinions, viewpoints, and experiences.
 - Giving and gracefully accepting constructive feedback.
-- Accepting responsibility and apologising to those affected by our mistakes, and learning from the experience.
+- Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience.
 - Focusing on what is best not just for us as individuals, but for the overall community.
 
-Examples of unacceptable behaviour:
+Examples of unacceptable behavior:
 
-- The use of sexualised language or imagery, and sexual attention or advances of any kind.
+- The use of sexualized language or imagery, and sexual attention or advances of any kind.
 - Trolling, insulting or derogatory comments, and personal or political attacks.
 - Public or private harassment.
 - Publishing others' private information without their explicit permission.
@@ -26,7 +26,7 @@ Examples of unacceptable behaviour:
 
 ## Enforcement Responsibilities
 
-Project maintainers are responsible for clarifying and enforcing our standards of acceptable behaviour and will take appropriate and fair corrective action in response to any behaviour that they deem inappropriate, threatening, offensive, or harmful.
+Project maintainers are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
 
 ## Scope
 
@@ -34,7 +34,7 @@ This Code of Conduct applies within all community spaces, and also applies when 
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the project maintainer via the contact channels listed in `SECURITY.md`. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainer via the contact channels listed in `SECURITY.md`. All complaints will be reviewed and investigated promptly and fairly.
 
 ## Attribution
 

@@ -1,6 +1,12 @@
 # rldyour-opencode
 
-rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review. Authored by Danil Silantyev (github:rldyourmnd), CEO NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules -- all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
+[![validate](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/validate.yml)
+[![CodeQL](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/NDDev-it-com/rldyour-opencode/badge)](https://scorecard.dev/viewer/?uri=github.com/NDDev-it-com/rldyour-opencode)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Latest Release](https://img.shields.io/github/v/release/NDDev-it-com/rldyour-opencode)](https://github.com/NDDev-it-com/rldyour-opencode/releases/latest)
+
+`rldyour-opencode` is a rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review. It is authored by Danil Silantyev (github:rldyourmnd), CEO NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules — all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
 
 Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.16.2 (June 2026); the OpenCode v1.14.48 -> v1.16.2 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading, config-robustness, skill discovery/file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
 
@@ -8,9 +14,9 @@ Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.16.2
 
 A self-contained OpenCode project configuration that provides:
 
-- **35 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
+- **38 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
 - **9 subagents** for specialized tasks (6 reviewer tracks, memory sync, deep research, config helper).
-- **10 slash commands** for lifecycle orchestration:
+- **11 slash commands** for lifecycle orchestration:
   - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-repair`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
   - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
 - **11 MCP servers** pre-configured (Serena, Sequential Thinking, Chrome DevTools, Context7, DeepWiki, Grep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
@@ -79,11 +85,11 @@ A self-contained OpenCode project configuration that provides:
 | Cross-tool instructions | `AGENTS.md` | 1 |
 | Claude Code project memory (agent-only) | `.claude/CLAUDE.md` | 1 |
 | Subagents | `.opencode/agents/*.md` | 9 |
-| Skills | `.opencode/skills/<name>/SKILL.md` | 33 |
+| Skills | `.opencode/skills/<name>/SKILL.md` | 38 |
 | Slash commands | `.opencode/commands/*.md` | 11 |
 | Plugins | `.opencode/plugins/*.ts` | 10 |
 | Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
-| MCP servers | `opencode.json` → `mcp` | 12 |
+| MCP servers | `opencode.json` → `mcp` | 11 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
 | Reference docs (skill/agent contracts + machine contracts) | `references/*` | 22 |
 | Operator guides | `docs/*.md` | 5 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`, `contract-matrix`) |
@@ -104,8 +110,8 @@ rldyour-opencode/
 ├── .claude/CLAUDE.md           # Claude-Code-specific project memory (agent-only)
 ├── .opencode/
 │   ├── agents/   *.md          # 9 subagents (6 reviewer, memory-sync, ry-explore, customize-opencode)
-│   ├── skills/   <name>/SKILL.md  # 35 skills across 10 domains
-│   ├── commands/ *.md          # 10 slash commands
+│   ├── skills/   <name>/SKILL.md  # 38 skills across 10 domains
+│   ├── commands/ *.md          # 11 slash commands
 │   ├── plugins/  *.ts          # 10 Bun-runtime plugins
 │   └── package.json            # @opencode-ai/plugin pin
 ├── .serena/
@@ -137,7 +143,7 @@ rldyour-opencode/
 | `/ry-rules-review` | `plan` | Audit implementation against rldyour rules (report-only) |
 
 `build` remains the implementation agent, and its repository configuration uses
-owner-standard full-auto permissions for OpenCode's canonical v1.15.x keys,
+owner-standard full-auto permissions for OpenCode's canonical v1.16.2 keys,
 including `read`, `edit`, `bash`, `task`, `external_directory`, and
 `doom_loop`. The `plan` primary agent uses the same full-auto baseline. The
 root owner `oc` launcher mirrors that no-prompt posture through
@@ -177,7 +183,7 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 | deepwiki | remote | — | Repository documentation |
 | grep | remote | — | Search across public GitHub repos |
 | figma | remote | — | Figma design context |
-| github | remote | toolsets: context,repos,issues,pull_requests,users | GitHub Copilot MCP (requires PAT) |
+| github | remote | toolsets: context,repos,issues,pull_requests,users | Remote GitHub MCP endpoint (requires PAT) |
 | openai-docs | remote | — | Official OpenAI/Codex documentation |
 
 ## Models
@@ -242,6 +248,14 @@ See `docs/observability.md` for full triage flow.
 - Versioning: SemVer; CHANGELOG follows Keep a Changelog 1.1.0.
 - Ignored agent-only files (`AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, etc.) are overlaid onto the current `HEAD` tree and published via the generated `fullrepo` branch managed by `scripts/fullrepo_sync.sh`.
 - This is the default rldyour-owned repository policy. In external or colleague-owned repositories, `.rldyour/project-policy.json` is the executable source of truth and may disable fullrepo, allow instruction docs on normal branches, and disable branch-cleanup blockers.
+
+## Support And Feedback
+
+- **Issues**: [github.com/NDDev-it-com/rldyour-opencode/issues](https://github.com/NDDev-it-com/rldyour-opencode/issues) - bug reports, regression evidence, missing-component requests.
+- **Discussions**: [github.com/NDDev-it-com/rldyour-opencode/discussions](https://github.com/NDDev-it-com/rldyour-opencode/discussions) - general questions, workflow advice, configuration clarifications, sharing usage patterns.
+- **Releases**: [github.com/NDDev-it-com/rldyour-opencode/releases](https://github.com/NDDev-it-com/rldyour-opencode/releases) - numeric product tags (`X.Y.Z`) with release notes from CHANGELOG.
+
+This is a personal marketplace - response time is best-effort, no SLA. Feel free to fork and tailor to your own workflow.
 
 ## License
 
