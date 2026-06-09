@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.52] - 2026-06-10
+
+### Fixed
+
+- Add the owner status line: Claude Code statusLine installer stage, Codex managed [tui].status_line, and the OpenCode status-line non-availability adoption decision. Preserve documented `opencode-ai` `1.16.2`, `@opencode-ai/plugin` `1.16.2`, and `@opencode-ai/sdk` `1.16.2` baseline evidence.
+
 ## [1.1.51] - 2026-06-09
 
 ### Fixed
