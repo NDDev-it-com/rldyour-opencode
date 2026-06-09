@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.54] - 2026-06-10
+
+### Fixed
+
+- Add the cmux delegation and completion-signal contract to the cmux orchestrator and worker skills, verified against manaflow-ai/cmux v0.64.14. Preserve documented `opencode-ai` `1.16.2`, `@opencode-ai/plugin` `1.16.2`, and `@opencode-ai/sdk` `1.16.2` baseline evidence.
+
 ## [1.1.53] - 2026-06-10
 
 ### Fixed
