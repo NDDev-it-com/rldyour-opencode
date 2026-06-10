@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.57] - 2026-06-10
+
+### Fixed
+
+- Define the ry-repair consumer system-sync mode for configuration repositories: update the checkout from GitHub and converge the installed system without authoring repository changes. Preserve documented `opencode-ai` `1.17.1`, `@opencode-ai/plugin` `1.17.1`, and `@opencode-ai/sdk` `1.17.1` baseline evidence.
+
 ## [1.1.56] - 2026-06-10
 
 ### Changed
