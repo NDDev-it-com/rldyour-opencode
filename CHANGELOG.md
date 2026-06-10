@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.58] - 2026-06-10
+
+### Fixed
+
+- Unify skill descriptions to the canonical russian-first shape with routing-term coverage, align runtime-marker sets and review gating wording across adapters, and repair the OpenCode ry-repair inventory step. Preserve documented `opencode-ai` `1.17.1`, `@opencode-ai/plugin` `1.17.1`, and `@opencode-ai/sdk` `1.17.1` baseline evidence.
+
 ## [1.1.57] - 2026-06-10
 
 ### Fixed
