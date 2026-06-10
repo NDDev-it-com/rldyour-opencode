@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.55] - 2026-06-10
+
+### Added
+
+- Add the macOS-only rldyour-orchestrator surface: dedicated cmux orchestrator/worker skills with declarative orchestrator activation via ry-init, OS-gated installs, and removal of the orchestrator env switch. Preserve documented `opencode-ai` `1.16.2`, `@opencode-ai/plugin` `1.16.2`, and `@opencode-ai/sdk` `1.16.2` baseline evidence.
+
 ## [1.1.54] - 2026-06-10
 
 ### Fixed
