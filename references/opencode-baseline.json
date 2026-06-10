@@ -5,23 +5,23 @@
   "updated": "2026-06-08",
   "baseline": {
     "opencode_cli": {
-      "version": "1.16.2",
+      "version": "1.17.1",
       "npm_package": "opencode-ai",
-      "ref": "https://github.com/anomalyco/opencode/releases/tag/v1.16.2"
+      "ref": "https://github.com/anomalyco/opencode/releases/tag/v1.17.1"
     },
     "plugin_sdk": {
-      "version": "1.16.2",
+      "version": "1.17.1",
       "npm_package": "@opencode-ai/plugin",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.16.2"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.17.1"
     },
     "sdk": {
-      "version": "1.16.2",
+      "version": "1.17.1",
       "npm_package": "@opencode-ai/sdk",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.16.2"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.17.1"
     },
     "config_schema": {
-      "version": "v1.16.2",
-      "vendored_at": "references/opencode-config.schema.v1.16.2.json",
+      "version": "v1.17.1",
+      "vendored_at": "references/opencode-config.schema.v1.17.1.json",
       "external_refs_vendored_at": [
         "references/models.dev-model-schema.json"
       ],

@@ -1,13 +1,24 @@
 # OpenCode Surface Adoption
 
-Verified: 2026-06-08
+Verified: 2026-06-10
 
 Source of truth:
 - Runtime baseline: `references/opencode-baseline.json`
-- Vendored schema: `references/opencode-config.schema.v1.16.2.json`
-- Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.16.2`
+- Vendored schema: `references/opencode-config.schema.v1.17.1.json`
+- Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.17.1`
 
-## Current adopted surface: 1.16.2
+## Current adopted surface: 1.17.1
+
+| Surface | Introduced | Decision | Implementation | Validator |
+| --- | --- | --- | --- | --- |
+| OpenCode runtime/schema/package baseline | 1.17.1 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` are pinned to `1.17.1`; the vendored config schema is `references/opencode-config.schema.v1.17.1.json` fetched from the live `https://opencode.ai/config.json`. The plugin and TUI type definitions are byte-identical to `1.16.2`, so no plugin migration is required. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| Top-level `references` config key | 1.17.0 | Future | The schema adds `references` ("Named git or local directory references", git/local sub-types); `1.17.1` adds per-reference usage descriptions and `@`-autocomplete hiding, and the deprecated singular `reference` key continues to load under `references`. The adapter does not currently need named reference entries; adopt when an owner workflow requires shared reference directories. | `scripts/validate_opencode_schema.py` |
+| `fff`-backed file search and `X-Session-Id` proxy headers | 1.17.0 | Operational | Faster project file search and sticky-routing session headers are runtime behavior; no config migration is required. | installed-runtime smoke |
+| MCP reliability fixes (abort signals, pagination, capabilities, timeouts, clean setup failures) | 1.17.0-1.17.1 | Adopted | MCP tool calls receive abort signals, catalogs paginate, servers respect advertised capabilities and configured timeouts for prompt/resource requests, and client-setup failures fail cleanly. Treat as runtime correctness; `opencode.json` MCP definitions stay unchanged. | `scripts/validate_mcp_profiles.py`; `scripts/smoke_mcp_capabilities.py` |
+| Claude Fable reasoning support | 1.17.0 | Operational | Runtime adds Claude Fable reasoning handling and fixes Anthropic fallback responses (`1.17.1`); provider/model selection stays owner policy in `opencode.json`. | installed-runtime smoke |
+| TUI footer/status-line content customization | not available in 1.17.1 stable config | Future | The stable `opencode.json`/`tui.json` surface still exposes no footer or status-line content keys in `1.17.1`. The experimental `@opencode-ai/plugin` TUI slot API (`app_bottom`, `home_footer`, `sidebar_footer` slots) has existed unchanged since `1.16.2` and remains experimental; the built-in session footer is not plugin-customizable through it. The owner status-line requirement stays covered by Claude Code `statusLine` and Codex `[tui].status_line`; adopt here when a stable surface lands. | `scripts/validate_opencode_schema.py`; installed-runtime smoke |
+
+## Historical baseline notes: 1.16.2
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
@@ -26,7 +37,7 @@ Source of truth:
 | `run --replay` interactive session replay | 1.16.0 | Operational | Add to installed-runtime smoke only; no repository config field is required. | installed-runtime smoke |
 | Startup and cancellation reliability fixes | 1.16.0 | Adopted | Treat shell cancellation, delegated-task reasoning variant, OpenAI websocket idle, Windows path normalization, wide-character paste, and ACP cancellation fixes as runtime correctness. No config migration is required. | `scripts/check_baseline_consistency.py` |
 | Current `permission` object model | current docs | Adopted | `opencode.json` uses `permission`, not deprecated `tools`; standalone adapter config explicitly sets the canonical owner primary permissions to `allow`, including `external_directory` and `doom_loop`, and root `oc` mirrors that posture through `OPENCODE_CONFIG_CONTENT`. | `scripts/validate_contract.py`; root `scripts/validate_opencode_permission_profiles.py` |
-| TUI status line / footer content customization | not available in 1.16.2 | Future | OpenCode `1.16.2` exposes no config or plugin surface for footer/status-line content: the TypeScript TUI hardcodes the session footer, `tui.json` covers only theme/keybinds/scroll/attention/prompt keys, and plugin TUI hooks are limited to `tui.prompt.append`, `tui.command.execute`, and `tui.toast.show`. Model, context tokens/percentage, and session cost are already shown natively in the TUI sidebar context panel, so the owner status-line requirement is covered by Claude Code `statusLine` and Codex `[tui].status_line` while OpenCode stays on the native sidebar. Adopt immediately when upstream adds a status-line surface to the config schema or plugin API. | `scripts/validate_opencode_schema.py`; installed-runtime smoke |
+| TUI status line / footer content customization | not available in 1.16.2 stable config | Future | Historical decision, corrected: the stable `opencode.json`/`tui.json` surface exposed no footer/status-line content keys, while the experimental `@opencode-ai/plugin` TUI slot API already carried `app_bottom`/`home_footer`/`sidebar_footer` slots in `1.16.2` (unchanged in `1.17.1`); the built-in session footer was never plugin-customizable. The owner status-line requirement is covered by Claude Code `statusLine` and Codex `[tui].status_line`. | superseded by the 1.17.1 row above |
 
 ## Historical baseline notes: 1.15.13 and earlier
 
