@@ -155,7 +155,7 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
 # The plugin SDK returns a Hooks object where keys are hook names. We match
 # both string-key form (`"tool.execute.before": ...`) and bare-identifier
 # form (`event: ...`). Recognised hook names are listed in the
-# @opencode-ai/plugin@1.16.2 SDK; unknown keys are surfaced as warnings.
+# @opencode-ai/plugin@1.17.1 SDK; unknown keys are surfaced as warnings.
 RECOGNISED_HOOKS = {
     "event",
     "config",

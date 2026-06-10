@@ -8,7 +8,7 @@
 
 `rldyour-opencode` is a rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review. It is authored by Danil Silantyev (github:rldyourmnd), CEO NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules — all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
 
-Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.16.2 (June 2026); the OpenCode v1.14.48 -> v1.16.2 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading, config-robustness, skill discovery/file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
+Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.1 (June 2026); the OpenCode v1.14.48 -> v1.17.1 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading, config-robustness, skill discovery/file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
 
 ## What This Is
 
@@ -143,7 +143,7 @@ rldyour-opencode/
 | `/ry-rules-review` | `plan` | Audit implementation against rldyour rules (report-only) |
 
 `build` remains the implementation agent, and its repository configuration uses
-owner-standard full-auto permissions for OpenCode's canonical v1.16.2 keys,
+owner-standard full-auto permissions for OpenCode's canonical v1.17.1 keys,
 including `read`, `edit`, `bash`, `task`, `external_directory`, and
 `doom_loop`. The `plan` primary agent uses the same full-auto baseline. The
 root owner `oc` launcher mirrors that no-prompt posture through

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Refresh the OpenCode runtime baseline to `opencode-ai` `1.17.1` with `@opencode-ai/plugin` `1.17.1` and `@opencode-ai/sdk` `1.17.1`; vendor the v1.17.1 config schema and record the 1.17.x surface decisions (`references` config key, MCP reliability fixes, TUI footer status unchanged).
+
 
 ## [1.1.55] - 2026-06-10
 
