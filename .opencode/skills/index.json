@@ -77,7 +77,7 @@
     {
       "name": "cmux-orchestrator",
       "path": ".opencode/skills/cmux-orchestrator/SKILL.md",
-      "domain": "flow",
+      "domain": "orchestrator",
       "triggers": [
         "cmux orchestrator",
         "multi-agent terminal workflow",
@@ -89,7 +89,7 @@
     {
       "name": "cmux-worker",
       "path": ".opencode/skills/cmux-worker/SKILL.md",
-      "domain": "flow",
+      "domain": "orchestrator",
       "triggers": [
         "cmux worker role",
         "scoped worker report",
