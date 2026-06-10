@@ -81,7 +81,8 @@
       "triggers": [
         "cmux orchestrator",
         "multi-agent terminal workflow",
-        "macOS orchestrated agents"
+        "delegate workers",
+        "collect worker reports"
       ],
       "requires_mcp": [],
       "network": false
@@ -92,8 +93,8 @@
       "domain": "orchestrator",
       "triggers": [
         "cmux worker role",
-        "scoped worker report",
-        "delegated terminal task"
+        "scoped worker task",
+        "worker JSON report"
       ],
       "requires_mcp": [],
       "network": false
@@ -162,7 +163,6 @@
         "implement frame",
         "design handoff",
         "Figma URL",
-        "build mockup",
         "pixel-perfect from Figma"
       ],
       "requires_mcp": [
