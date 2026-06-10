@@ -77,6 +77,7 @@ from __future__ import annotations
 import filecmp
 import os
 import shutil
+import sys
 from pathlib import Path
 
 source_root = Path(os.environ["RLDYOUR_OPENCODE_ROOT"]).resolve()
@@ -105,11 +106,25 @@ global_paths = [
 source_paths = project_paths + (global_paths if global_config else [])
 excluded_parts = {"node_modules", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "cache"}
 excluded_suffixes = {".pyc"}
+# macOS-only orchestrator skills: cmux (manaflow-ai/cmux) is a macOS
+# application, so Linux/WSL/Windows installs never receive these skills.
+MACOS_ONLY_SKILLS = {"cmux-orchestrator", "cmux-worker"}
+
+
+def is_macos_only_skill_path(rel_parts: tuple[str, ...]) -> bool:
+    if sys.platform == "darwin":
+        return False
+    for index, part in enumerate(rel_parts):
+        if part == "skills" and index + 1 < len(rel_parts) and rel_parts[index + 1] in MACOS_ONLY_SKILLS:
+            return True
+    return False
 
 
 def should_copy(path: Path) -> bool:
     rel_parts = path.relative_to(source_root).parts
     if any(part in excluded_parts for part in rel_parts):
+        return False
+    if is_macos_only_skill_path(rel_parts):
         return False
     return path.suffix not in excluded_suffixes
 

@@ -73,7 +73,7 @@ def test_every_skill_has_a_known_domain() -> None:
     index = json.loads(INDEX_PATH.read_text(encoding="utf-8"))
     valid_domains = {
         "flow", "serena", "rules", "explore", "browser",
-        "design", "security", "lsp", "docs-sync",
+        "design", "security", "lsp", "docs-sync", "orchestrator",
     }
     for skill in index["skills"]:
         assert skill["domain"] in valid_domains, (
