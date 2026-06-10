@@ -24,7 +24,7 @@ Implement a task to a high-quality, scalable, synchronized state. Speed is secon
 11. Run quality gates using project scripts, OpenCode LSP (auto-starts for detected file extensions), and detected stack checks. Use `verification-quality-gates` skill.
 12. Trigger browser validation for UI/browser-visible work unless auth blocks it; if auth blocks, report the limitation and use available evidence. Use `browser-tool-routing` and `browser-validation` skills.
 13. Apply security implementation guidance for security-sensitive changes; run `ry-sec-review` only when the owner explicitly asks for review/audit/security review.
-14. Run reviewer subagents only when the owner explicitly asks for review, audit, security review, rules review, or `ry-review`; otherwise skip the expensive review phase. Explicit review may invoke up to six parallel reviewer subagents in a single Task fan-out with self-contained read-only prompts.
+14. Run reviewer subagents only when the owner explicitly asks for review, audit, security review, rules review, or `ry-review`; otherwise skip the expensive review phase. Reviewer output transport follows `references/reviewer-protocol.md`: file-first reports plus compact summaries. Explicit review may invoke up to six parallel reviewer subagents in a single Task fan-out with self-contained read-only prompts.
 15. Run `flow-post-task-sync` before final response.
 
 ## Deploy Intent Routing
