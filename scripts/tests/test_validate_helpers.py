@@ -281,11 +281,11 @@ def test_command_missing_description(tmp_path: Path) -> None:
     assert vh.validate_command(p) > 0
 
 
-# ---------- Permission keys (v1.17.1 canonical set) ----------
+# ---------- Permission keys (v1.17.3 canonical set) ----------
 
 
 def test_canonical_permission_keys_has_expected_size() -> None:
-    """v1.17.1 canonical set has 17 keys (verified via built-in customize-opencode skill)."""
+    """v1.17.3 canonical set has 17 keys (verified via built-in customize-opencode skill)."""
     assert len(vh.CANONICAL_PERMISSION_KEYS) == 17
 
 
@@ -359,7 +359,7 @@ def test_opencode_json_rejects_agent_unknown_permission_key(tmp_path: Path) -> N
 
 
 def test_opencode_json_accepts_all_mode(tmp_path: Path) -> None:
-    """v1.17.1 agent.mode accepts `all` (per built-in customize-opencode skill)."""
+    """v1.17.3 agent.mode accepts `all` (per built-in customize-opencode skill)."""
     cfg = tmp_path / "opencode.json"
     cfg.write_text(
         '{"model": "x", "agent": {"foo": {"mode": "all"}}}',
@@ -451,7 +451,7 @@ def test_opencode_json_missing_file_returns_err(
 
 
 def test_agent_mode_all_accepted(tmp_path: Path) -> None:
-    """OpenCode v1.17.1 docs (https://opencode.ai/docs/agents) allow
+    """OpenCode v1.17.3 docs (https://opencode.ai/docs/agents) allow
     mode: primary | subagent | all. The validator must accept `all`
     alongside primary/subagent so a future config using mode: all does
     not trip a false-negative."""

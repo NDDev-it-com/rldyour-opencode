@@ -1,7 +1,7 @@
 """Tests for `scripts/validate_opencode_schema.py`.
 
 The validator pins the OpenCode JSON Schema offline under
-`references/opencode-config.schema.v1.17.1.json`. These tests exercise
+`references/opencode-config.schema.v1.17.3.json`. These tests exercise
 the happy path (the real `opencode.json` validates) and a couple of
 representative violations so the contract can't silently drift.
 """
@@ -17,7 +17,7 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "scripts" / "validate_opencode_schema.py"
-DEFAULT_SCHEMA = REPO_ROOT / "references" / "opencode-config.schema.v1.17.1.json"
+DEFAULT_SCHEMA = REPO_ROOT / "references" / "opencode-config.schema.v1.17.3.json"
 DEFAULT_CONFIG = REPO_ROOT / "opencode.json"
 
 JSONSCHEMA_AVAILABLE = importlib.util.find_spec("jsonschema") is not None

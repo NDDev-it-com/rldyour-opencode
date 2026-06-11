@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.1.59] - 2026-06-11
+
+### Changed
+
+- Refresh release-readiness baselines and validation boundaries. Preserve documented `opencode-ai` `1.17.3`, `@opencode-ai/plugin` `1.17.3`, and `@opencode-ai/sdk` `1.17.3` baseline evidence.
+
 ## [1.1.58] - 2026-06-10
 
 ### Fixed
