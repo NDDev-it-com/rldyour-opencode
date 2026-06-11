@@ -5,8 +5,8 @@
   "description": "rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review.",
   "type": "module",
   "dependencies": {
-    "@opencode-ai/plugin": "1.17.1",
-    "@opencode-ai/sdk": "1.17.1"
+    "@opencode-ai/plugin": "1.17.3",
+    "@opencode-ai/sdk": "1.17.3"
   },
   "license": "AGPL-3.0-or-later",
   "author": {
