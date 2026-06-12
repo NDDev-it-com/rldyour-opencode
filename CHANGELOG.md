@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.2.2] - 2026-06-12
+
+### Changed
+
+- Refresh runtime baselines to OpenCode `1.17.4`, `@opencode-ai/plugin` `1.17.4`, and `@opencode-ai/sdk` `1.17.4`; vendor the matching config schema snapshot.
+
 ## [1.2.1] - 2026-06-12
 
 ### Fixed
