@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.3.2] - 2026-06-12
+
+### Fixed
+
+- State the current 1.3.x support line explicitly in public security policy. Preserve documented `opencode-ai` `1.17.4`, `@opencode-ai/plugin` `1.17.4`, and `@opencode-ai/sdk` `1.17.4` baseline evidence.
+
 ## [1.3.1] - 2026-06-12
 
 ### Fixed
