@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.3.0] - 2026-06-12
+
+### Changed
+
+- Align the public adapter with the coordinated four-configuration 1.3.0 stable contract. Preserve documented `opencode-ai` `1.17.4`, `@opencode-ai/plugin` `1.17.4`, and `@opencode-ai/sdk` `1.17.4` baseline evidence.
+
 ## [1.2.2] - 2026-06-12
 
 ### Changed
