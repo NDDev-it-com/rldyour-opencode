@@ -104,6 +104,7 @@ global_paths = [
     (Path("references"), Path("references")),
 ]
 source_paths = project_paths + (global_paths if global_config else [])
+optional_source_paths = {Path("AGENTS.md")}
 excluded_parts = {"node_modules", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "cache"}
 excluded_suffixes = {".pyc"}
 # macOS-only orchestrator skills: cmux (manaflow-ai/cmux) is a macOS
@@ -171,6 +172,9 @@ for src_rel, dst_rel in source_paths:
     src = source_root / src_rel
     dst = target / dst_rel
     if not src.exists():
+        if src_rel in optional_source_paths:
+            actions.append(f"skip optional missing {src_rel}; restore fullrepo to install this agent-only file")
+            continue
         raise SystemExit(f"missing source path: {src}")
     if dst.resolve() == src.resolve():
         actions.append(f"unchanged self path {dst_rel}")
