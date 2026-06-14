@@ -1,137 +1,123 @@
 # rldyour-opencode
 
+`rldyour-opencode` is the rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review.
+
 [![validate](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/validate.yml)
 [![CodeQL](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/NDDev-it-com/rldyour-opencode/badge)](https://scorecard.dev/viewer/?uri=github.com/NDDev-it-com/rldyour-opencode)
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Latest Release](https://img.shields.io/github/v/release/NDDev-it-com/rldyour-opencode)](https://github.com/NDDev-it-com/rldyour-opencode/releases/latest)
 
-`rldyour-opencode` is a rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review. It is authored by Danil Silantyev (github:rldyourmnd), CEO NDDev. Russian-first SDLC workflow, Serena integration, MCP transport, code review, design, security, LSP, and engineering rules — all native to the OpenCode AI coding agent format (no Claude Code or Codex residue).
+`rldyour-opencode` is the rldyour AI CLI configuration for OpenCode: local TypeScript plugins, MCP/LSP, permissions, slash commands, subagents, browser/design workflows, and security review. Russian-first SDLC workflow, Serena integration, full-auto owner posture - all native to the OpenCode AI coding agent format.
 
-Validated against OpenCode, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.6 (June 2026); the OpenCode v1.14.48 -> v1.17.6 plugin pin bumps preserve the runtime hook surface and tool-ID naming while picking up current plugin-loading, config-robustness, skill discovery/file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
+## Current Baseline
 
-## What This Is
+| Field | Value |
+|---|---|
+| Adapter version | 1.3.3 |
+| Runtime baseline | OpenCode 1.17.6 |
+| GitHub release tag | 1.3.3 |
+| Pinned commit | `8f43c4ce024ccef893949e00e5e5c1d1a45573d8` |
 
-A self-contained OpenCode project configuration that provides:
+Runtime baseline source: `references/opencode-baseline.json`. Pinned commit from `config/repositories.json` in the control-plane superproject.
 
-- **38 skills** for automatic workflow routing across 10 domains (SDLC, Serena, rules, explore, browser, design, security, LSP, docs sync, config).
-- **9 subagents** for specialized tasks (6 reviewer tracks, memory sync, deep research, config helper).
-- **11 slash commands** for lifecycle orchestration:
-  - `/ry-init`, `/ry-start`, `/ry-review`, `/ry-repair`, `/ry-newp`, `/ry-deploy`, `/ry-sync`
-  - `/ry-design`, `/ry-explore`, `/ry-sec-review`, `/ry-rules-review`
-- **11 MCP servers** pre-configured (Serena, Sequential Thinking, Chrome DevTools, Context7, DeepWiki, Grep, shadcn, dart-flutter, Figma, GitHub, OpenAI docs).
-- **Provider-routed browser automation**: Webwright for long-horizon or reusable web workflows, Playwright CLI for UI evidence/screenshots/snapshots/traces, and Chrome DevTools MCP for DevTools/debug/performance/memory/Lighthouse diagnosis.
-- **10 TypeScript plugins** for session lifecycle, LLM augmentation, guardrails, and observability:
-  - lifecycle: `ry-bootstrap` (session banner + compaction context + autocontinue), `ry-env-protection` (block sensitive reads with toast), `ry-shell-strategy` (shell env + git push guardrails), `ry-sync-reminder` (idle toast), `ry-flow-hooks` (commit advice + post-commit nudge)
-  - LLM-side: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions)
-  - Runtime context + permission events: `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt), `ry-permission-events` (observability-only `permission.asked` / `permission.replied` event audit)
-- **8 custom LSP servers** on top of OpenCode's 35+ built-ins (ruff, vscode-html, vscode-css, vscode-json, docker, taplo, marksman, qmlls).
-- **Owner-standard full-auto permissions** by default: primary agents allow read/edit/bash/web/LSP/skill/task/external-directory/doom-loop actions without prompts; reviewer subagents are read-only with git-only bash allowlists, and deterministic `tool.execute.before` guardrails still block the repository's high-impact dangerous shell patterns.
-- **Release-safe overlay**: `opencode.release-safe.json` keeps native static read-deny patterns for `.env`, private keys, tokens, credentials, and shell/edit ask posture for public OSS examples and conservative installs. The owner `opencode.json` remains the local YOLO profile.
+Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.6 (June 2026). The v1.14.48 → v1.17.6 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin-loading, skill discovery and file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
 
-## Quick Start
+## What This Repository Provides
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/NDDev-it-com/rldyour-opencode.git
-   cd rldyour-opencode
-   ```
+`rldyour-opencode` is a self-contained OpenCode project configuration package - not a fork of the OpenCode runtime. Drop `opencode.json` and `.opencode/` into any project and OpenCode resolves the full configuration: 38 skills across 10 workflow domains, 9 subagents, 11 slash commands, 10 TypeScript plugins, 11 MCP servers, 8 custom LSP servers, and owner-standard full-auto permissions. The adapter is authored by Danil Silantyev (github:rldyourmnd), CEO NDDev, and is licensed under AGPL-3.0-or-later. Implementation changes belong in this repository; the control-plane superproject (`rldyour-ai-cli-tools`) only advances the submodule pin.
 
-2. Copy the configuration into your project:
-   ```bash
-   cp opencode.json /path/to/your/project/opencode.json
-   cp -r .opencode /path/to/your/project/.opencode
-   cp AGENTS.md /path/to/your/project/AGENTS.md
-   ```
+## Native Boundaries
 
-3. Authenticate the primary OpenCode provider via TUI (recommended) or env vars:
-   ```bash
-   # primary provider for top-level model `opencode-go/glm-5.1` — log in interactively
-   opencode auth login          # or use /providers inside the TUI
+OpenCode's native config surfaces that this adapter populates:
 
-   # MCP env vars (placeholder values — replace with real credentials in your shell or .env)
-   export GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_PLACEHOLDER_TOKEN  # required for GitHub MCP
-   export CONTEXT7_API_KEY=YOUR_PLACEHOLDER_KEY               # optional, higher Context7 rate
+- **Master config**: `opencode.json` (JSON or JSONC) - model, MCP, LSP, agents, watchers, compaction, permission rules.
+- **Release-safe overlay**: `opencode.release-safe.json` - conservative static read-deny patterns for `.env`, private keys, tokens, and shell/edit ask posture for public OSS examples.
+- **Agent-only context**: `AGENTS.md` (cross-tool root instructions), `.claude/CLAUDE.md` (Claude Code project memory - agent-only, not on `main`).
+- **`.opencode/` directory layout**:
+  - `agents/*.md` - 9 subagents (6 reviewer tracks, memory-sync, ry-explore, customize-opencode)
+  - `skills/<name>/SKILL.md` - 38 skills across 10 domains
+  - `commands/*.md` - 11 slash commands
+  - `plugins/*.ts` - 10 Bun-runtime TypeScript local plugins
+  - `package.json` - `@opencode-ai/plugin` pin for local Bun dependency resolution
+- **Permission keys (canonical v1.17.6)**: `read`, `edit`, `bash`, `task`, `external_directory`, `doom_loop` - used in `opencode.json` `permission.*` fields.
+- **MCP JSON**: declared under `mcp` in `opencode.json`; local servers use `bunx` (npm) or `uvx` (Python) or `dart` (Dart SDK) launchers - never `npx`.
 
-   # Alternative OpenCode providers (optional — only when switching the top-level model)
-   # export ANTHROPIC_API_KEY=YOUR_PLACEHOLDER_KEY
-   # export OPENAI_API_KEY=YOUR_PLACEHOLDER_KEY
-   ```
+Source-only artifacts (scripts, tests, CI workflows, reference docs, ADRs) are not loaded by OpenCode at runtime; they exist for validation and release hygiene only.
 
-4. Run OpenCode in your project:
-   ```bash
-   cd /path/to/your/project
-   opencode
-   ```
+## Install / Update / ry-repair
 
-   OpenCode resolves config from the opened location upward. Run diagnostics
-   from the same project path you open in the TUI:
+**Install** - clone and copy into your project:
 
-   ```bash
-   cd /path/to/your/project
-   opencode debug config
-   ```
+```bash
+git clone https://github.com/NDDev-it-com/rldyour-opencode.git
+cd rldyour-opencode
+cp opencode.json /path/to/your/project/opencode.json
+cp -r .opencode /path/to/your/project/.opencode
+cp AGENTS.md /path/to/your/project/AGENTS.md
+```
 
-5. Initialize project context:
-   ```
-   /ry-init
-   ```
+**Authenticate** - log in to your provider interactively, then set any required MCP env vars:
 
-## Catalog
+```bash
+opencode auth login
+export GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_PLACEHOLDER_TOKEN  # required for GitHub MCP
+export CONTEXT7_API_KEY=YOUR_PLACEHOLDER_KEY               # optional
+```
+
+**Run**:
+
+```bash
+cd /path/to/your/project
+opencode
+```
+
+**Check resolved config** (authoritative):
+
+```bash
+opencode debug config
+```
+
+**Diagnose runtime** (MCP, LSP binaries, agent/skill/command discovery, git):
+
+```bash
+bash scripts/doctor_opencode.sh
+```
+
+**Owner launcher** (`oc`) - the `rldyour-ai-cli-tools` root provides `scripts/install_yolo_launchers.sh --apply`, which installs the `oc` wrapper that injects an allow-all `OPENCODE_CONFIG_CONTENT` override and sets `OPENCODE_DISABLE_CLAUDE_CODE=1` so root skill resolution uses `.opencode/skills`. Use `oc` for the trusted owner workstation full-auto posture.
+
+**Convergence** - inside any project where this config is active, run `/ry-repair` to repair stale docs, memories, contracts, hooks, MCP/LSP config, CI, and AI-tool context.
+
+**Update** - pull the latest adapter tag, re-copy `opencode.json` and `.opencode/`, then run `opencode debug config` to confirm runtime resolved correctly. Check `CHANGELOG.md` and `references/opencode-baseline.json` for any dependency bumps that require re-authentication or pin updates.
+
+## Active Catalog
 
 | Layer | Where | Count |
 |---|---|---|
 | Master config | `opencode.json` | 1 |
+| Release-safe overlay | `opencode.release-safe.json` | 1 |
 | Cross-tool instructions | `AGENTS.md` | 1 |
 | Claude Code project memory (agent-only) | `.claude/CLAUDE.md` | 1 |
 | Subagents | `.opencode/agents/*.md` | 9 |
 | Skills | `.opencode/skills/<name>/SKILL.md` | 38 |
 | Slash commands | `.opencode/commands/*.md` | 11 |
 | Plugins | `.opencode/plugins/*.ts` | 10 |
-| Custom diagnostic tools | `.opencode/plugins/ry-tools.ts` | 5 |
+| Custom diagnostic tools (LLM-callable) | `.opencode/plugins/ry-tools.ts` | 5 |
 | MCP servers | `opencode.json` → `mcp` | 11 |
 | Custom LSP servers | `opencode.json` → `lsp` | 8 |
-| Reference docs (skill/agent contracts + machine contracts) | `references/*` | 22 |
-| Operator guides | `docs/*.md` | 5 (`release-process`, `dependency-updates`, `rollback-restore`, `observability`, `contract-matrix`) |
+| Reference docs (contracts + machine metadata) | `references/*` | 22 |
+| Operator guides | `docs/*.md` | 5 |
 | Architecture decision archive | `docs/decisions/*.md` | 10 |
-| Diagnostic scripts (bash + python) | `scripts/` | 30 (17 python files + 13 bash entry points, including `check_plugin_hooks.py` and `validate_contract.py`) |
-| Pytest suites | `scripts/tests/*.py` | 26 (includes plugin hook and adapter contract validators, public-repo CI/CD automation policy, and the release-baseline changelog regression) |
-| CI workflows | `.github/workflows/*.yml` | 11 (`validate`, `dependency-check`, `instruction-docs-check`, `typecheck-plugins`, `lint`, `codeql`, `secret-scan`, `dependency-review`, `release`, `sbom`, `opencode-runtime`) |
+| Diagnostic scripts (bash + Python) | `scripts/` | 30 |
+| Pytest suites | `scripts/tests/*.py` | 26 |
+| CI workflows | `.github/workflows/*.yml` | 11 |
 
-### Project structure
-
-```
-rldyour-opencode/
-├── AGENTS.md                   # cross-tool root instructions
-├── opencode.json               # master OpenCode config (model, MCP, LSP, agent, watcher, compaction)
-├── VERSION, CHANGELOG.md
-├── README.md, LICENSE, .env.example
-├── pyrightconfig.json          # Python static type config for scripts/
-├── .claude/CLAUDE.md           # Claude-Code-specific project memory (agent-only)
-├── .opencode/
-│   ├── agents/   *.md          # 9 subagents (6 reviewer, memory-sync, ry-explore, customize-opencode)
-│   ├── skills/   <name>/SKILL.md  # 38 skills across 10 domains
-│   ├── commands/ *.md          # 11 slash commands
-│   ├── plugins/  *.ts          # 10 Bun-runtime plugins
-│   └── package.json            # @opencode-ai/plugin pin
-├── .serena/
-│   ├── memories/  *.md         # 6 verified knowledge files (AREA-NN-SLUG.md taxonomy)
-│   └── project.yml             # Serena project config
-├── references/   *             # durable contracts + machine-readable adapter metadata
-├── docs/
-│   ├── release-process.md, dependency-updates.md, rollback-restore.md, observability.md, contract-matrix.md
-│   └── decisions/  001..010.md # 10 MADR-style ADRs
-├── scripts/                    # 30 bash + python diagnostic / validation / smoke scripts
-│   └── tests/  *.py            # 26 pytest suites
-└── .github/workflows/          # 11 least-privilege, SHA-pinned CI/release workflows
-```
-
-## Commands
+### Slash Commands
 
 | Command | Agent | Purpose |
 |---|---|---|
 | `/ry-init` | `build` | Scoped read-only project context with Serena-first discovery |
-| `/ry-start` | `build` | Full task lifecycle: init → research → plan → implement → verify → sync; review only by explicit request |
+| `/ry-start` | `build` | Full task lifecycle: init → research → plan → implement → verify → sync |
 | `/ry-review` | `plan` | Report-only deep review with parallel reviewer subagents |
 | `/ry-repair` | `build` | Repair stale docs, memories, contracts, hooks, MCP/LSP config, CI, and AI-tool context |
 | `/ry-newp` | `build` | Plan a new project (skeptical questions, research, ADRs, architecture docs) |
@@ -142,35 +128,9 @@ rldyour-opencode/
 | `/ry-sec-review` | `plan` | Defensive Mythos-style security review |
 | `/ry-rules-review` | `plan` | Audit implementation against rldyour rules (report-only) |
 
-`build` remains the implementation agent, and its repository configuration uses
-owner-standard full-auto permissions for OpenCode's canonical v1.17.6 keys,
-including `read`, `edit`, `bash`, `task`, `external_directory`, and
-`doom_loop`. The `plan` primary agent uses the same full-auto baseline. The
-root owner `oc` launcher mirrors that no-prompt posture through
-`OPENCODE_CONFIG_CONTENT` for the trusted workstation.
-Reviewer subagents remain stricter (`edit: "deny"`, git-only read bash
-allowlists) because their role contract is report-only review, not
-implementation.
+### MCP Servers
 
-## Reviewer Subagents
-
-All reviewer tracks are `mode: subagent`, `hidden: true`, `edit: deny`, with `bash` allowlist limited to read-only git verbs. Invoke directly via `@<name>` or transitively via `/ry-review`; `/ry-start` only routes them when the user explicitly asks for review, audit, security review, or rules review.
-
-| Agent | Color | Focus |
-|---|---|---|
-| `@flow-architecture-review` | `#3b82f6` | Boundaries, dependency direction, public API, data flow |
-| `@flow-quality-review` | `success` | Correctness, edge cases, error handling, resource lifecycle |
-| `@flow-consistency-review` | `#a855f7` | Naming, style, imports, project conventions |
-| `@flow-integration-review` | `warning` | Cross-module contracts, schemas, configs, backward compatibility |
-| `@flow-verification-review` | `#ec4899` | Tests, quality gates, browser/server evidence |
-| `@flow-security-review` | `error` | OWASP Top 10, auth/authz, injection, secrets (defensive-only) |
-| `@flow-memory-sync` | `#eab308` | Fact-only Serena memory synchronization |
-| `@ry-explore` | `info` | Deep multi-source research (90 reasoning steps; inherits top-level `model`) |
-| `@customize-opencode` | `accent` | Safely edit `opencode.json` with validation, backup, rollback |
-
-## MCP Servers
-
-Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `uvx` for Python, `dart` for Dart SDK — never `npx`.
+Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `uvx` for Python, `dart` for Dart SDK.
 
 | Server | Type | Version | Purpose |
 |---|---|---|---|
@@ -178,21 +138,29 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 | sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
 | chrome-devtools | local (bunx) | 1.2.0 | Chrome DevTools diagnostics |
 | shadcn | local (bunx) | 4.11.0 | shadcn/ui registry access |
-| dart-flutter | local (dart) | — | Dart/Flutter project support |
-| context7 | remote | — | Current library documentation |
-| deepwiki | remote | — | Repository documentation |
-| grep | remote | — | Search across public GitHub repos |
-| figma | remote | — | Figma design context |
+| dart-flutter | local (dart) | - | Dart/Flutter project support |
+| context7 | remote | - | Current library documentation |
+| deepwiki | remote | - | Repository documentation |
+| grep | remote | - | Search across public GitHub repos |
+| figma | remote | - | Figma design context |
 | github | remote | toolsets: context,repos,issues,pull_requests,users | Remote GitHub MCP endpoint (requires PAT) |
-| openai-docs | remote | — | Official OpenAI/Codex documentation |
+| openai-docs | remote | - | Official OpenAI/Codex documentation |
 
-## Models
+### TypeScript Plugins
 
-The marketplace ships with `opencode-go/glm-5.1` as the top-level default — owner's working provider. Subagents inherit this model (no per-agent override at HEAD). Switch any field to a different provider via `provider/model-id` format.
+10 Bun-runtime plugins loaded from `.opencode/plugins/*.ts`:
 
-Versioning note: root `VERSION` is the marketplace/product release version.
-`.opencode/package.json.version` is a private local plugin package version for
-Bun dependency resolution and intentionally does not mirror root `VERSION`.
+- **Lifecycle**: `ry-bootstrap` (session banner + compaction context + autocontinue), `ry-env-protection` (block sensitive reads with toast), `ry-shell-strategy` (shell env + git push guardrails), `ry-sync-reminder` (idle toast), `ry-flow-hooks` (commit advice + post-commit nudge).
+- **LLM-side**: `ry-tools` (5 custom diagnostic tools the LLM can call), `ry-command-audit` (credential-sanitized slash-command audit log), `ry-tool-hints` (routing nudges injected into MCP tool descriptions).
+- **Runtime context + permission events**: `ry-system-context` (date + branch + HEAD SHA + dirty state injected into every system prompt), `ry-permission-events` (observability-only `permission.asked` / `permission.replied` event audit).
+
+### LSP Servers
+
+8 custom LSP servers on top of OpenCode's 35+ built-ins: `ruff`, `vscode-html`, `vscode-css`, `vscode-json`, `docker`, `taplo`, `marksman`, `qmlls`.
+
+### Models
+
+The marketplace ships with `opencode-go/glm-5.1` as the top-level default. Subagents inherit the top-level model.
 
 | Slot | Default in this repo | Common Anthropic alternative |
 |---|---|---|
@@ -201,20 +169,44 @@ Bun dependency resolution and intentionally does not mirror root `VERSION`.
 | `default_agent` | `build` | `build` |
 | Reviewer / memory-sync / explore subagents | inherit top-level `model` | inherit top-level `model` |
 
-To switch:
+Run `opencode models <provider>` to list every accepted ID. To switch provider, edit `"model"` in `opencode.json` and confirm with `opencode debug config`.
 
-```bash
-opencode auth login                            # authenticate with the new provider
-# edit opencode.json:  "model": "anthropic/claude-sonnet-4-6"
-opencode debug config | grep -E '"model":'     # confirm runtime resolved the change
-```
+## Browser / Design / DevTools Routing
 
-Run `opencode models <provider>` to list every accepted ID. All current IDs are validated by `opencode debug config` (the same runtime smoke `scripts/validate_config.sh` invokes when the CLI is on PATH).
+Three browser providers are active, each with a distinct role:
+
+- **Webwright skill** - long-horizon or reusable web workflows, multi-step task automation, and web research tasks where a persistent browser session adds value.
+- **Playwright CLI** - UI evidence collection: screenshots, snapshots, traces, visual diffs, and page-state assertions. Invoke via the `playwright-cli` skill.
+- **Chrome DevTools MCP** (`chrome-devtools`, version 1.2.0) - DevTools-level diagnosis: console messages, network requests, heap snapshots, performance traces, Lighthouse audits, and memory profiling. Use when you need browser internals rather than just page screenshots.
+
+The `/ry-design` command routes through Figma MCP (design context and asset download), shadcn/ui MCP (registry access), and Chrome DevTools MCP (validation). DeepWiki, Context7, and Grep MCP support research and documentation retrieval during design and exploration tasks.
+
+## Memory / Fullrepo Model
+
+Normal `main` history carries only product artifacts: `opencode.json`, `.opencode/`, scripts, tests, CI workflows, docs, and reference files.
+
+Agent-only files - `AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*.md`, `.serena/project.yml`, `.serena/newproj/` - are overlaid onto the current `HEAD` tree and published via the generated `fullrepo` branch managed by `scripts/fullrepo_sync.sh`. Normal `main` history does not carry these files.
+
+Serena memories live under `.serena/memories/` using the `AREA-NN-SLUG.md` taxonomy (6 verified knowledge files at HEAD). The freshness contract: memories are updated only from verified current code, git diffs, and tests - never from speculation, plans, or chat history. Run the `flow-memory-sync` subagent (or `/ry-sync`) after committed task waves to keep memories current.
+
+In external or colleague-owned repositories, `.rldyour/project-policy.json` may disable fullrepo, allow instruction docs on normal branches, and disable branch-cleanup blockers. The default rldyour-owned policy applies here.
+
+## Security Boundary
+
+Owner full-auto posture is intentional and explicitly acknowledged. The primary `build` and `plan` agents use OpenCode's canonical v1.17.6 permission keys with `"allow"` for `read`, `edit`, `bash`, `task`, `external_directory`, and `doom_loop`. This is not a sandbox - it is a trusted owner workstation posture designed for maximum autonomy.
+
+The `oc` launcher (from `scripts/install_yolo_launchers.sh --apply`) injects an allow-all `OPENCODE_CONFIG_CONTENT` environment override and sets `OPENCODE_DISABLE_CLAUDE_CODE=1`, mirroring the same no-prompt posture at the OS launcher level.
+
+Reviewer subagents are explicitly stricter: `edit: "deny"`, `bash` allowlists limited to read-only git verbs. Their role contract is report-only review, not implementation.
+
+The `ry-env-protection` plugin blocks reads of `.env`, private key files, tokens, and credentials with a toast notification before the LLM sees them. The `opencode.release-safe.json` overlay provides a conservative alternative profile for public OSS examples and cautious installs.
+
+MCP secrets (`GITHUB_PERSONAL_ACCESS_TOKEN`, `CONTEXT7_API_KEY`, etc.) are passed as environment variables and are never committed. Use `.env.example` as a reference; never populate `.env` with real values in version control. Security vulnerabilities should be reported via GitHub Security Advisories - do not file public issues.
 
 ## Validation
 
 ```bash
-bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter (strict YAML) + VERSION semver
+bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter + VERSION semver
 uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/
 bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
 python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
@@ -230,33 +222,25 @@ opencode debug agent <name>                                # validate individual
 opencode models anthropic                                  # list available models for the active provider
 ```
 
-Public repositories use automatic CI/CD by default. `opencode.json` loads
-`references/public-repo-ci-policy.md` through `instructions`; keep
-`share: "manual"` unchanged because it controls OpenCode session sharing, not
-GitHub Actions execution.
+CI mirrors core checks via `.github/workflows/validate.yml` on every push/PR to `main`. `.github/workflows/dependency-check.yml` runs weekly to surface MCP pin freshness. Public repositories use standard GitHub-hosted runners; keep `share: "manual"` unchanged (it controls OpenCode session sharing, not CI execution). See `docs/observability.md` for the full triage flow.
 
-CI mirrors the core checks via `.github/workflows/validate.yml` on every push/PR to `main`. `.github/workflows/dependency-check.yml` runs weekly to surface MCP pin freshness via `GITHUB_STEP_SUMMARY`.
+Commands marked NOT_PROVEN (e.g., live MCP probes) require network access and installed binaries; skip them in offline or CI-only environments.
 
-See `docs/observability.md` for full triage flow.
+## Release / Rollback
 
-## Convention
+Releases are tag-driven. Every product version must have a matching numeric GitHub Release at `github.com/NDDev-it-com/rldyour-opencode/releases`. A `VERSION` file update alone is not sufficient.
 
-- User-facing communication: **Russian** by default.
-- Repository artifacts (docs, prompts, scripts, commits, memories): **English**.
-- Identifiers: ASCII, kebab-case.
-- Commits: Conventional Commits v1.0.0; atomic per logical unit.
-- Versioning: SemVer; CHANGELOG follows Keep a Changelog 1.1.0.
-- Ignored agent-only files (`AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, etc.) are overlaid onto the current `HEAD` tree and published via the generated `fullrepo` branch managed by `scripts/fullrepo_sync.sh`.
-- This is the default rldyour-owned repository policy. In external or colleague-owned repositories, `.rldyour/project-policy.json` is the executable source of truth and may disable fullrepo, allow instruction docs on normal branches, and disable branch-cleanup blockers.
+Version movement follows the control-plane policy: default is patch (`+0.0.1`) after a public release exists; minor and major bumps are owner-directed decisions only. `CHANGELOG.md` follows Keep a Changelog 1.1.0. `SECURITY.md` lists the exact supported version tag.
 
-## Support And Feedback
+**Rollback**: to revert to a prior release, check out the numeric tag (`git checkout X.Y.Z`), re-copy `opencode.json` and `.opencode/` into your project, and re-run `opencode debug config`. See `docs/rollback-restore.md` for the full rollback and restore procedure. Dependency update policy is in `docs/dependency-updates.md`.
 
+## Support / License
+
+- **License**: AGPL-3.0-or-later
+- **Author**: Danil Silantyev (github:rldyourmnd), CEO NDDev
 - **Issues**: [github.com/NDDev-it-com/rldyour-opencode/issues](https://github.com/NDDev-it-com/rldyour-opencode/issues) - bug reports, regression evidence, missing-component requests.
 - **Discussions**: [github.com/NDDev-it-com/rldyour-opencode/discussions](https://github.com/NDDev-it-com/rldyour-opencode/discussions) - general questions, workflow advice, configuration clarifications, sharing usage patterns.
 - **Releases**: [github.com/NDDev-it-com/rldyour-opencode/releases](https://github.com/NDDev-it-com/rldyour-opencode/releases) - numeric product tags (`X.Y.Z`) with release notes from CHANGELOG.
+- **Security**: Report vulnerabilities via [GitHub Security Advisories](https://github.com/NDDev-it-com/rldyour-opencode/security/advisories) - do not file public issues for security vulnerabilities.
 
 This is a personal marketplace - response time is best-effort, no SLA. Feel free to fork and tailor to your own workflow.
-
-## License
-
-AGPL-3.0-or-later
