@@ -14,10 +14,10 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | 1.3.3 |
+| Adapter version | 1.3.4 |
 | Runtime baseline | OpenCode 1.17.6 |
-| GitHub release tag | 1.3.3 |
-| Pinned commit | `8f43c4ce024ccef893949e00e5e5c1d1a45573d8` |
+| GitHub release tag | 1.3.4 |
+| Pinned commit | `0bd05254427a00a290eb25a01cd3f18359191c05` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Pinned commit from `config/repositories.json` in the control-plane superproject.
 
