@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Refresh OpenCode runtime baseline to 1.17.5 (npm latest; MCP-session and TUI reliability fixes, no schema or permission changes)
+- Refresh OpenCode runtime baseline to 1.17.6 (npm latest; MCP-session and TUI reliability fixes, no schema or permission changes)
 
 ## [1.3.2] - 2026-06-12
 

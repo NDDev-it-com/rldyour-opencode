@@ -12,23 +12,23 @@
   },
   "baseline": {
     "opencode_cli": {
-      "version": "1.17.5",
+      "version": "1.17.6",
       "npm_package": "opencode-ai",
-      "ref": "https://www.npmjs.com/package/opencode-ai/v/1.17.5"
+      "ref": "https://www.npmjs.com/package/opencode-ai/v/1.17.6"
     },
     "plugin_sdk": {
-      "version": "1.17.5",
+      "version": "1.17.6",
       "npm_package": "@opencode-ai/plugin",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.17.5"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.17.6"
     },
     "sdk": {
-      "version": "1.17.5",
+      "version": "1.17.6",
       "npm_package": "@opencode-ai/sdk",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.17.5"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.17.6"
     },
     "config_schema": {
-      "version": "v1.17.5",
-      "vendored_at": "references/opencode-config.schema.v1.17.5.json",
+      "version": "v1.17.6",
+      "vendored_at": "references/opencode-config.schema.v1.17.6.json",
       "external_refs_vendored_at": [
         "references/models.dev-model-schema.json"
       ],
