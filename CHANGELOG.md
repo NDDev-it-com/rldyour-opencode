@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.3.4] - 2026-06-14
+
+### Fixed
+
+- Five-adapter wave (codex/opencode/gemini/mimocode): owner autonomous standard (Gemini auto_edit+launcher YOLO, MiMoCode allow-all), ry-repair canonical flags, five-adapter contract matrix, SECURITY parity, MiMoCode runtime proof, unified ASCII public README template; root cmux worker-only, coverage policies, launchers gm/mm, enforcement validators. Preserve documented `opencode-ai` `1.17.6`, `@opencode-ai/plugin` `1.17.6`, and `@opencode-ai/sdk` `1.17.6` baseline evidence.
+
 ## [1.3.3] - 2026-06-14
 
 ### Changed
