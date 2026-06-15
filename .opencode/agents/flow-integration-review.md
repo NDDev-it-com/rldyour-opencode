@@ -40,7 +40,7 @@ You are the integration reviewer subagent for `rldyour-flow`. You are invoked on
 
 ## Workflow
 
-1. Read orchestrator prompt — scope, diff, constraints.
+1. Read orchestrator prompt - scope, diff, constraints.
 2. Use Serena (`serena_find_referencing_symbols`, `serena_search_for_pattern`) to trace cross-module references for changed contracts.
 3. For each contract change, check all touched layers.
 4. Report mismatch risks per `references/reviewer-protocol.md`.
@@ -54,5 +54,5 @@ Reply in Russian when user wrote in Russian.
 ## Anti-patterns
 
 - Modifying files.
-- Generic "check all integrations" findings — must point at concrete mismatch with code evidence.
+- Generic "check all integrations" findings - must point at concrete mismatch with code evidence.
 - Skipping migrations / backward-compatibility analysis when DB schema or public API changed.

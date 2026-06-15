@@ -13,7 +13,7 @@ This repository pins exact versions for every external dependency to keep startu
 | `.opencode/package.json` | `@opencode-ai/plugin` | OpenCode auto-pins to its own runtime version on `bun install`; do not change manually unless intentionally diverging |
 | `.github/workflows/*.yml` | GitHub Actions `uses:` pins | accept Dependabot PRs only after verifying SHA + inline tag comments with `scripts/check_action_pins.py --remote` |
 | `opencode.json` → `model` / `small_model` | Anthropic model IDs | run `opencode models anthropic` for the authoritative list before changing |
-| `opencode.json` → `lsp.<key>.command` | language servers (ruff, marksman, taplo, …) | follow `references/lsp-server-matrix.md`; check brew/`pipx` before bumping |
+| `opencode.json` → `lsp.<key>.command` | language servers (ruff, marksman, taplo, ...) | follow `references/lsp-server-matrix.md`; check brew/`pipx` before bumping |
 
 ## Workflow
 
@@ -37,7 +37,7 @@ For GitHub Actions updates, keep three facts in lockstep:
 ## Supply-chain rules
 
 - Always pin to an exact version (`==X.Y.Z`, `@X.Y.Z`, `==X.Y.Z`); never use loose ranges like `^X` or `latest`.
-- Prefer `bunx` for npm packages and `uvx` for Python — both run isolated, both verify the package source before execution.
+- Prefer `bunx` for npm packages and `uvx` for Python - both run isolated, both verify the package source before execution.
 - Reject any package whose maintainer list, license, or homepage cannot be verified against `references/sources.md` policy.
 - Never silently downgrade a tool that another skill depends on; raise it through ADR (MADR 4.0.0) when affected.
 

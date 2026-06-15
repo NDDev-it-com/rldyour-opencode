@@ -4,7 +4,7 @@ This document classifies every MCP server declared in `opencode.json` by trust
 class. Use it when deciding which MCP to call from a skill, which to enable in
 CI, and which to gate behind explicit user authorization. It complements
 `docs/observability.md` (triage) and `.opencode/plugins/ry-env-protection.ts`
-(read-side guardrail — best-effort, not DLP).
+(read-side guardrail - best-effort, not DLP).
 
 ## Trust classes
 
@@ -54,7 +54,7 @@ CI, and which to gate behind explicit user authorization. It complements
 - Tokens for `github` and `figma` should be **fine-grained, scoped to the
   minimum repositories/teams required**, and rotated quarterly. Do not use
   classic GitHub PATs except for explicit short-term troubleshooting.
-- `context7` is the only remote MCP whose API key is **optional** — the
+- `context7` is the only remote MCP whose API key is **optional** - the
   endpoint works without authentication at a lower rate limit. Add the env
   var only when you hit a documented rate limit.
 - Do not commit `.env*` files. The `ry-env-protection` plugin guards against
@@ -62,7 +62,7 @@ CI, and which to gate behind explicit user authorization. It complements
   exfiltration; rely on `gitleaks` (`secret-scan.yml`) and GitHub secret
   scanning as the durable boundary.
 - When a remote MCP is unreachable in CI, prefer reporting `unreachable` and
-  continuing the workflow over hard-failing — the dependency-check workflow
+  continuing the workflow over hard-failing - the dependency-check workflow
   publishes the smoke envelope as `GITHUB_STEP_SUMMARY` so owners can see
   the state without breaking PR merges.
 

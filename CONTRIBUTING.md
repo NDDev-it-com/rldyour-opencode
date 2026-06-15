@@ -21,7 +21,7 @@ The marketplace splits into two artifact classes:
 | Normal-branch runtime | `opencode.json`, `README.md`, `VERSION`, `CHANGELOG.md`, `.env.example`, `scripts/`, `docs/`, `references/`, `.github/`, `.opencode/{agents,skills,commands,plugins}/` | `main` |
 | Agent-only context | `AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, `.serena/project.yml` | `fullrepo` (orphan) |
 
-The `fullrepo` branch is managed via `scripts/fullrepo_sync.sh`. Do not commit agent-only paths to `main` — they are excluded via `.git/info/exclude`.
+The `fullrepo` branch is managed via `scripts/fullrepo_sync.sh`. Do not commit agent-only paths to `main` - they are excluded via `.git/info/exclude`.
 
 ## Local development setup
 
@@ -99,7 +99,7 @@ classic PAT. Setup checklist:
 5. Set the `GITHUB_PERSONAL_ACCESS_TOKEN` variable in the same shell
    session that starts OpenCode (export it from your profile or pass
    it through your secret manager). Do NOT write the value into any
-   tracked file — `.env*` is git-ignored and blocked at runtime by
+   tracked file - `.env*` is git-ignored and blocked at runtime by
    the `ry-env-protection` plugin.
 
 Classic PATs are blocked by policy except for explicit short-term

@@ -43,7 +43,7 @@ Coordinate with `rldyour-security` skills (`owasp-top-10-implementation`, `ry-se
 
 ## Workflow
 
-1. Read orchestrator prompt — scope, diff, constraints.
+1. Read orchestrator prompt - scope, diff, constraints.
 2. Recon: entry points, trust boundaries, data flows, privileged operations.
 3. Hypothesize: generate concrete "what could go wrong" scenarios for the changed scope.
 4. Trace each high-risk hypothesis source-to-sink with code evidence.

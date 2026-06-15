@@ -4,7 +4,7 @@
 > below (`claude-sonnet-4-20250514`, `claude-haiku-4-20250514`,
 > `claude-opus-4-20250514`) are historical and produce `ConfigInvalidError`
 > against OpenCode v1.14.30+. As of 0.10.1, no model IDs are hardcoded in
-> agent configs — all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
+> agent configs - all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
 > The ADR text itself is preserved unchanged. See `.serena/memories/CORE-02-PROJECT-SHAPE.md`
 > for current config facts.
 
@@ -22,11 +22,11 @@ Body content in Markdown...
 ```
 
 ### Rules (from OpenCode docs):
-- `name` — required, 1-64 chars, lowercase alphanumeric + single hyphens, must match directory name
-- `description` — required, 1-1024 chars, specific enough for agent to choose correctly
-- `license` — optional
-- `compatibility` — optional
-- `metadata` — optional string-to-string map
+- `name` - required, 1-64 chars, lowercase alphanumeric + single hyphens, must match directory name
+- `description` - required, 1-1024 chars, specific enough for agent to choose correctly
+- `license` - optional
+- `compatibility` - optional
+- `metadata` - optional string-to-string map
 - NO `allowed-tools`, NO `disable-model-invocation`, NO `model`, NO `effort`, NO `maxTurns`, NO `paths`, NO `context`, NO `agent`
 - Tool routing is done through AGENTS.md instructions and agent `permission` config
 
@@ -68,16 +68,16 @@ Additional prompt content...
 ```
 
 ### Rules (from OpenCode docs):
-- `description` — required
-- `mode` — `primary` or `subagent`
-- `model` — provider/model-id format (e.g., `anthropic/claude-sonnet-4-20250514`)
-- `temperature` — 0.0-1.0
-- `top_p` — 0.0-1.0
-- `steps` — max agentic iterations (replaces deprecated `maxSteps`)
-- `permission` — granular allow/ask/deny with glob patterns
-- `hidden` — boolean, hides from @ autocomplete for subagents
-- `color` — hex color or theme color name
-- `prompt` — custom system prompt (can use `{file:./prompts/build.txt}` reference)
+- `description` - required
+- `mode` - `primary` or `subagent`
+- `model` - provider/model-id format (e.g., `anthropic/claude-sonnet-4-20250514`)
+- `temperature` - 0.0-1.0
+- `top_p` - 0.0-1.0
+- `steps` - max agentic iterations (replaces deprecated `maxSteps`)
+- `permission` - granular allow/ask/deny with glob patterns
+- `hidden` - boolean, hides from @ autocomplete for subagents
+- `color` - hex color or theme color name
+- `prompt` - custom system prompt (can use `{file:./prompts/build.txt}` reference)
 - Additional keys are passed through to the provider as model options
 
 ### Permission keys:
@@ -99,8 +99,8 @@ Additional prompt content...
 | `question` | `question` |
 
 ### Built-in agents (can override):
-- `build` — default primary, all tools enabled
-- `plan` — primary planning context; this repository keeps edit/bash allowed
+- `build` - default primary, all tools enabled
+- `plan` - primary planning context; this repository keeps edit/bash allowed
   by owner-standard full-auto policy
 
 ### Subagent invocation:
@@ -267,19 +267,19 @@ MCP tool names follow pattern: `mcp__<servername>__<toolname>` (shown in permiss
 
 ## Key Differences from Codex/Claude Code Implementation
 
-1. **No hooks lifecycle** — All lifecycle automation (Serena sync, commit advice, context bootstrap) moves to:
+1. **No hooks lifecycle** - All lifecycle automation (Serena sync, commit advice, context bootstrap) moves to:
    - AGENTS.md instructions (advisory)
    - `/ry-init` and `/ry-sync` commands (user-invoked)
    - Agent system prompts (enforcement through agent permission config)
 
-2. **No marketplace.json** — All config in `opencode.json` and `.opencode/` directory
+2. **No marketplace.json** - All config in `opencode.json` and `.opencode/` directory
 
-3. **Skill frontmatter is minimal** — Only `name` and `description`. No `allowed-tools`, `model`, `effort`, `maxTurns`. Tool access is per-agent, model selection is per-agent or per-command.
+3. **Skill frontmatter is minimal** - Only `name` and `description`. No `allowed-tools`, `model`, `effort`, `maxTurns`. Tool access is per-agent, model selection is per-agent or per-command.
 
-4. **Agent format uses YAML frontmatter in .md** — Similar to Claude Code but with different keys (`mode`, `steps`, `permission` dict instead of `maxTurns`, `disallowedTools`)
+4. **Agent format uses YAML frontmatter in .md** - Similar to Claude Code but with different keys (`mode`, `steps`, `permission` dict instead of `maxTurns`, `disallowedTools`)
 
-5. **Permission system is powerful** — Glob patterns on bash commands, per-tool allow/ask/deny, per-agent overrides
+5. **Permission system is powerful** - Glob patterns on bash commands, per-tool allow/ask/deny, per-agent overrides
 
-6. **Built-in websearch** — Available with `OPENCODE_ENABLE_EXA=1` env var or via Zen provider
+6. **Built-in websearch** - Available with `OPENCODE_ENABLE_EXA=1` env var or via Zen provider
 
-7. **Built-in LSP** — 30+ servers, much more than Codex (none) or Claude Code (manual `.lsp.json`)
+7. **Built-in LSP** - 30+ servers, much more than Codex (none) or Claude Code (manual `.lsp.json`)

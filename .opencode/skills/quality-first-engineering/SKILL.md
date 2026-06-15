@@ -35,7 +35,7 @@ Fix quality issues inside the touched scope and affected integration path. If se
 
 ## Conventional Commits
 
-Use [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) — stable as of May 2026. Eleven canonical types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Subject <=72 chars. Scope optional in parentheses. Use `!` after type/scope or `BREAKING CHANGE:` footer for breaking changes.
+Use [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) - stable as of May 2026. Eleven canonical types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Subject <=72 chars. Scope optional in parentheses. Use `!` after type/scope or `BREAKING CHANGE:` footer for breaking changes.
 
 Clean history is required. Split unrelated implementation, tests, validators,
 docs/instructions, license/metadata, generated artifacts, and Serena/fullrepo
@@ -50,5 +50,5 @@ Read `references/rules-policy.md` when a task requires the full policy.
 - Hacks / temporary workarounds in touched scope (violates hard ban).
 - Swallowed errors / generic exception traps without meaningful messages.
 - Fake green checks (claiming tests passed without running them).
-- Secrets in commits/logs/docs/memories — non-negotiable.
+- Secrets in commits/logs/docs/memories - non-negotiable.
 - Speculative abstractions for one hypothetical future case.

@@ -54,7 +54,7 @@ Out of scope:
 
 - Upstream OpenCode itself. Report those to https://github.com/anomalyco/opencode/security.
 - Third-party MCP servers. Report those to their upstream project.
-- Provider model behaviour (Anthropic, OpenAI, etc.) — those are vendor-side.
+- Provider model behaviour (Anthropic, OpenAI, etc.) - those are vendor-side.
 - Operational security of operator-managed forks unless the vulnerability is reproducible against the upstream marketplace state.
 
 ## Hardening already in place

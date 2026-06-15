@@ -19,7 +19,7 @@ Verify that language servers and project prerequisites are available before rely
 6. For TypeScript and JavaScript, verify `tsconfig.json` or `jsconfig.json`.
 7. For Python, verify `pyproject.toml`, `pyrightconfig.json`, or virtual environment expectations.
 8. For Dart and Flutter, verify `pubspec.yaml`, `analysis_options.yaml`, and dependency resolution.
-9. Do not start raw `stdio` LSP sessions as a test — they hang waiting for a real LSP client.
+9. Do not start raw `stdio` LSP sessions as a test - they hang waiting for a real LSP client.
 
 ## Default LSP Availability
 

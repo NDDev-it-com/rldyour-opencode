@@ -37,10 +37,10 @@ The result was a Stop-hook loop for a genuinely synchronized repository.
 ## Considered Options
 
 1. Keep ADR-005 and special-case `rldyour-opencode` in the generic hook.
-   Reject — it preserves a project-specific exception and makes future flow
+   Reject - it preserves a project-specific exception and makes future flow
    tooling harder to reason about.
 2. Keep `fullrepo` agent-only and leave `.flow_sync_marker` as a loop guard.
-   Reject — this acknowledges the loop but does not fix the state mismatch.
+   Reject - this acknowledges the loop but does not fix the state mismatch.
 3. Publish `fullrepo` as current `HEAD` plus ignored agent-only context, while
    still excluding runtime markers and secrets. **Selected.**
 

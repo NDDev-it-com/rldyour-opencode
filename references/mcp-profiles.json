@@ -43,7 +43,7 @@
     }
   },
   "high_context": {
-    "description": "Servers known to bring large context payloads — usually because they expose paginated GitHub / Drive / corp-tool data. Including these in a skill's `requires_mcp` is allowed only with a skill-specific justification.",
+    "description": "Servers known to bring large context payloads - usually because they expose paginated GitHub / Drive / corp-tool data. Including these in a skill's `requires_mcp` is allowed only with a skill-specific justification.",
     "members": [
       "github"
     ],

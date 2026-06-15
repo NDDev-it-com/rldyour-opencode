@@ -16,7 +16,7 @@ complete portable snapshot.
 
 ## Context and Problem Statement
 
-External auditors received a `rldyour-opencode-fullrepo.zip` archive and treated it as the complete working repository. The archive omits `opencode.json`, `VERSION`, `CHANGELOG.md`, `README.md`, `.env.example`, and `.github/workflows/` because those files are excluded from the `fullrepo` orphan branch via `scripts/fullrepo_sync.sh::AGENT_ONLY_PATTERNS`. The marketplace ships two artifact classes — normal-branch runtime and agent-only `fullrepo` snapshot — but the boundary was not documented, and local validators / docs / memories did not consistently declare which class they applied to.
+External auditors received a `rldyour-opencode-fullrepo.zip` archive and treated it as the complete working repository. The archive omits `opencode.json`, `VERSION`, `CHANGELOG.md`, `README.md`, `.env.example`, and `.github/workflows/` because those files are excluded from the `fullrepo` orphan branch via `scripts/fullrepo_sync.sh::AGENT_ONLY_PATTERNS`. The marketplace ships two artifact classes - normal-branch runtime and agent-only `fullrepo` snapshot - but the boundary was not documented, and local validators / docs / memories did not consistently declare which class they applied to.
 
 The result was a structural contradiction visible to every auditor: `AGENTS.md` and `.claude/CLAUDE.md` declared `opencode.json` / `VERSION` / `CHANGELOG.md` as required source-of-truth files, while the artifact under audit (the `fullrepo` snapshot) did not contain them. Validators (`scripts/validate_config.sh`, `scripts/doctor_opencode.sh`, `scripts/tests/test_plugin_surface.py`) failed against the snapshot even when the actual code was correct.
 
@@ -29,8 +29,8 @@ The result was a structural contradiction visible to every auditor: `AGENTS.md` 
 
 ## Considered Options
 
-1. Distribute only the fullrepo snapshot. Reject — runtime verification becomes impossible without `opencode.json` and CI workflows.
-2. Distribute only the normal branch. Reject — the agent-only export pipeline is the point of `fullrepo`; removing it breaks the migration / handoff workflows documented in `docs/release-process.md`.
+1. Distribute only the fullrepo snapshot. Reject - runtime verification becomes impossible without `opencode.json` and CI workflows.
+2. Distribute only the normal branch. Reject - the agent-only export pipeline is the point of `fullrepo`; removing it breaks the migration / handoff workflows documented in `docs/release-process.md`.
 3. Distribute the normal branch as the canonical release artifact, keep `fullrepo` as an agent-only mirror, and formalise both classes in docs + validators + scripts. **Selected.**
 
 ## Decision Outcome

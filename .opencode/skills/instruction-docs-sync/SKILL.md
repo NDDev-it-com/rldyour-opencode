@@ -36,7 +36,7 @@ Do not copy chat history, future plans, speculation, secrets, tokens, cookies, o
    - OpenCode-specific skill/agent/tool routing and plugin conventions;
    - setup, validation, release, deploy, git, and `fullrepo` commands;
    - concise engineering constraints and done criteria;
-   - MCP server configuration and tool naming patterns (`<server>_<tool>` — single underscore, server name sanitised per OpenCode v1.14.48);
+   - MCP server configuration and tool naming patterns (`<server>_<tool>` - single underscore, server name sanitised per OpenCode v1.14.48);
    - permission model and per-agent overrides.
 3. Keep the file independently useful and optimized for OpenCode agents. Do not include instructions that only apply to other CLI tools unless the repository is explicitly multi-tool.
 4. Validate that all referenced paths, commands, skills, and agents actually exist.

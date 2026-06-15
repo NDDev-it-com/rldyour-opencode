@@ -14,13 +14,13 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 
 ## Release checklist
 
-1. `bash scripts/validate_config.sh` — exit 0.
-2. `uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/` — all unit tests green.
-3. `opencode debug config` — must resolve without error.
-4. `opencode debug skill | python3 -c "import json,sys;print(len(json.load(sys.stdin)))"` — equals the `.opencode/skills/` directory count.
-5. `bash scripts/check_lsps.sh` — at minimum every LSP defined in `opencode.json.lsp` must resolve to an executable.
-6. `bash scripts/check_deps_freshness.sh --check-freshness` — report all pinned MCP dependencies and registry freshness.
-7. `python3 scripts/check_action_pins.py .github/workflows --remote` — verify every GitHub Actions SHA pin matches its inline semver tag comment.
+1. `bash scripts/validate_config.sh` - exit 0.
+2. `uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/` - all unit tests green.
+3. `opencode debug config` - must resolve without error.
+4. `opencode debug skill | python3 -c "import json,sys;print(len(json.load(sys.stdin)))"` - equals the `.opencode/skills/` directory count.
+5. `bash scripts/check_lsps.sh` - at minimum every LSP defined in `opencode.json.lsp` must resolve to an executable.
+6. `bash scripts/check_deps_freshness.sh --check-freshness` - report all pinned MCP dependencies and registry freshness.
+7. `python3 scripts/check_action_pins.py .github/workflows --remote` - verify every GitHub Actions SHA pin matches its inline semver tag comment.
 8. Update `CHANGELOG.md` with a new dated section; group entries under `Added` / `Changed` / `Fixed` / `Removed` per Keep a Changelog 1.1.0.
 9. Update `VERSION` to the new SemVer.
 10. Update `README.md` if catalog counts changed (skills / commands / MCP / plugins / scripts / tests).
@@ -48,7 +48,7 @@ This force-with-lease pushes the complete portable snapshot to `origin/fullrepo`
 ## What never enters a release
 
 - Real API keys, tokens, cookies, or local credentials in any tracked file.
-- Hard-coded absolute paths under `/Users/<owner>/…` outside test fixtures.
+- Hard-coded absolute paths under `/Users/<owner>/...` outside test fixtures.
 - Runtime markers under `.serena/.*sync*`, `.serena/.flow_*`, `.serena/.dirty_stop_ack`.
 - Browser-generated artifacts (`browser/`, screenshots).
 - `.opencode/node_modules/` or any Bun runtime cache.

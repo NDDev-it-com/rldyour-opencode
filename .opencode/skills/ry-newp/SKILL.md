@@ -33,11 +33,11 @@ Produce English project documents and Russian user-facing summaries.
 
 Default docs:
 
-- **HLO**: high-level overview — one-paragraph purpose, users, value.
+- **HLO**: high-level overview - one-paragraph purpose, users, value.
 - **Requirements**: functional and non-functional, with acceptance criteria.
 - **Architecture**: layers, modules, data flow, integration points, deployment topology.
 - **ADRs**: architecture decision records for each non-obvious choice with context, decision, and consequences.
-- **Tech stack**: languages, frameworks, libraries, MCP servers, tooling — with version constraints and rationale.
+- **Tech stack**: languages, frameworks, libraries, MCP servers, tooling - with version constraints and rationale.
 - **API**: endpoints, payloads, auth, error contracts.
 - **Data**: entities, fields, relationships, indexes, migrations strategy.
 - **Infra**: hosting, CI/CD, environments, observability.

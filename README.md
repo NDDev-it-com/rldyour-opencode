@@ -17,9 +17,8 @@
 | Adapter version | 1.3.4 |
 | Runtime baseline | OpenCode 1.17.7 |
 | GitHub release tag | 1.3.4 |
-| Pinned commit | `0bd05254427a00a290eb25a01cd3f18359191c05` |
 
-Runtime baseline source: `references/opencode-baseline.json`. Pinned commit from `config/repositories.json` in the control-plane superproject.
+Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
 Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.7 (June 2026). The v1.14.48 → v1.17.7 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin-loading, skill discovery and file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
 
