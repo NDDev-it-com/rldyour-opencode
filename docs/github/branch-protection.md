@@ -2,15 +2,15 @@
 
 This document fixes the **operator-side governance contract** for the
 `NDDev-it-com/rldyour-opencode` repository. The agent does not apply these
-rules — owners do, via the GitHub web UI or `gh api`. The contract is
+rules - owners do, via the GitHub web UI or `gh api`. The contract is
 captured here so future audits and successor maintainers know what to
 restore if branch protection is ever reset.
 
 ## Protected branches
 
-- `main` — product/runtime branch; only branch from which `release.yml`
+- `main` - product/runtime branch; only branch from which `release.yml`
   fires; the source for `fullrepo` snapshots.
-- `fullrepo` — generated complete-state branch (`HEAD` + agent-only
+- `fullrepo` - generated complete-state branch (`HEAD` + agent-only
   overlay). Never accept human pull requests targeting `fullrepo`; the
   branch is `--force-with-lease`-pushed by `scripts/fullrepo_sync.sh`
   from a verified `main` snapshot.
@@ -29,7 +29,7 @@ variables owner-restricted.
 The contexts below match what GitHub emits at runtime. Audit P0-5 closed
 the previous docs/runtime drift by deriving the table from the same
 workflow files using `scripts/print_required_check_contexts.sh`. Re-run
-that script after any workflow edit and update this table verbatim — a
+that script after any workflow edit and update this table verbatim - a
 required check context that does not match a real GitHub check name
 will block all merges (the protection rule waits for a context that
 never fires) or, worse, silently let a regression through (the
@@ -94,7 +94,7 @@ restored separately if branch protection is reset.
 ## Restoring protection
 
 The required-context list below mirrors the PR-required rows above and
-expands every matrix axis explicitly — GitHub branch protection
+expands every matrix axis explicitly - GitHub branch protection
 requires the FULL context name including matrix params.
 
 ```bash

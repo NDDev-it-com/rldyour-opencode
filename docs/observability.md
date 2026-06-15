@@ -1,21 +1,21 @@
 # Observability
 
-This repository uses lightweight operational observability: deterministic logs, failure artifacts, summaries, and local diagnostic bundles. There is no daemon, no metrics export, and no external telemetry service — the marketplace is single-developer and the diagnostic surface is intentionally local-first.
+This repository uses lightweight operational observability: deterministic logs, failure artifacts, summaries, and local diagnostic bundles. There is no daemon, no metrics export, and no external telemetry service - the marketplace is single-developer and the diagnostic surface is intentionally local-first.
 
 ## What to check first
 
 When something feels wrong:
 
-- `git status -sb` — local repository state, branch, ahead/behind.
-- `git log --oneline -20` — recent change history.
-- `bash scripts/git_sync_audit.sh` — branch, upstream, dirty files, worktrees, merged-branch cleanup candidates.
-- `bash scripts/validate_config.sh` — full repository-level validator (opencode.json schema, skill/agent/command frontmatter, VERSION semver).
-- `bash scripts/fullrepo_sync.sh status-json` — complete `HEAD + agent-only` fullrepo branch sync state.
-- `bash scripts/flow_post_task_state.sh` — composite git / Serena / fullrepo / instruction-docs state in JSON.
-- `python3 scripts/smoke_mcp_capabilities.py` — verify every declared MCP server in `opencode.json` is reachable.
-- `python3 scripts/validate_instruction_docs.py` — verify `AGENTS.md` and `.claude/CLAUDE.md` are present, non-trivially large, and contain required anchor sections.
-- `opencode debug config` / `opencode debug info` / `opencode debug agent <name>` / `opencode debug skill` — live native resolution from the OpenCode CLI.
-- `gh run list --repo NDDev-it-com/rldyour-opencode --limit 10` — latest CI state.
+- `git status -sb` - local repository state, branch, ahead/behind.
+- `git log --oneline -20` - recent change history.
+- `bash scripts/git_sync_audit.sh` - branch, upstream, dirty files, worktrees, merged-branch cleanup candidates.
+- `bash scripts/validate_config.sh` - full repository-level validator (opencode.json schema, skill/agent/command frontmatter, VERSION semver).
+- `bash scripts/fullrepo_sync.sh status-json` - complete `HEAD + agent-only` fullrepo branch sync state.
+- `bash scripts/flow_post_task_state.sh` - composite git / Serena / fullrepo / instruction-docs state in JSON.
+- `python3 scripts/smoke_mcp_capabilities.py` - verify every declared MCP server in `opencode.json` is reachable.
+- `python3 scripts/validate_instruction_docs.py` - verify `AGENTS.md` and `.claude/CLAUDE.md` are present, non-trivially large, and contain required anchor sections.
+- `opencode debug config` / `opencode debug info` / `opencode debug agent <name>` / `opencode debug skill` - live native resolution from the OpenCode CLI.
+- `gh run list --repo NDDev-it-com/rldyour-opencode --limit 10` - latest CI state.
 
 ## Plugin-side observability
 
@@ -27,7 +27,7 @@ OpenCode plugins surface state through three channels:
 | App log | `client.app.log({ body: { service, level, message }})` | Server-side log file (`~/.local/share/opencode/log/*.log` on macOS/Linux) |
 | Tool metadata | `ctx.metadata({ title, metadata: { ... }})` inside a custom tool | TUI tool card; the title is shown next to the tool call |
 
-`console.log` lands only in the server log and is invisible to the user — every advisory message in this marketplace uses the three channels above. See `references/opencode-plugin-patterns.md` for the canonical patterns.
+`console.log` lands only in the server log and is invisible to the user - every advisory message in this marketplace uses the three channels above. See `references/opencode-plugin-patterns.md` for the canonical patterns.
 
 ## Diagnostic bundle
 

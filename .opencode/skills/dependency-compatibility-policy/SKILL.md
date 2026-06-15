@@ -25,7 +25,7 @@ Use current, compatible, secure, and maintainable technology choices without bli
 - **SBOM** (Software Bill of Materials): attach SPDX or CycloneDX SBOM to every release artifact. Operational, not experimental.
 - **SLSA Level 2** is the minimum for new repositories: verifiable build provenance via GitHub Actions + cosign / slsa-github-generator. Achievable in one day.
 - **Sigstore / cosign** for signing release artifacts. Verify upstream signatures when consuming critical dependencies.
-- **OWASP Top 10 2025 — A03 Software Supply Chain Failures** is a top-tier concern (jumped to #3). Top threats: dependency confusion, upstream infrastructure compromise, code signing cert theft, CI/CD exploitation, typosquatting.
+- **OWASP Top 10 2025 - A03 Software Supply Chain Failures** is a top-tier concern (jumped to #3). Top threats: dependency confusion, upstream infrastructure compromise, code signing cert theft, CI/CD exploitation, typosquatting.
 - **Lockfile discipline**: `--frozen-lockfile` / `--immutable` / `npm ci` in CI to enforce exact version matching.
 
 ## Package Manager Defaults (May 2026)
@@ -56,7 +56,7 @@ Read `references/dependency-policy.md` for detailed dependency selection and upg
 
 - Using `latest` without verification compatibility (chasing unverified versions).
 - Manually editing generated lockfile content (corrupts integrity).
-- Mixing unrelated dependency upgrades with feature work — separate commit/PR.
+- Mixing unrelated dependency upgrades with feature work - separate commit/PR.
 - Adding dependency for exact 5 lines of project-specific code when self-write is simpler.
 - Skipping SLSA Level 2 / SBOM for new releases in 2026.
 - Adopting prerelease/canary/0.x in production without explicit project acceptance.

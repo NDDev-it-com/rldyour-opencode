@@ -4,7 +4,7 @@
 > below (`claude-sonnet-4-20250514`, `claude-haiku-4-20250514`,
 > `claude-opus-4-20250514`) are historical and produce `ConfigInvalidError`
 > against OpenCode v1.14.30+. As of 0.10.1, no model IDs are hardcoded in
-> agent configs — all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
+> agent configs - all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
 > The ADR text itself is preserved unchanged. See `.serena/memories/CORE-02-PROJECT-SHAPE.md`
 > for current config facts.
 
@@ -15,8 +15,8 @@ Based on commit history analysis of both rldyour-codex (108 commits) and rldyour
 Commits modeled after: `aa53e1e` (codex bootstrap), `f43b3db` (claude bootstrap), `7950e5f` (MCP config), `18e5f63` (plugin metadata).
 
 ### Files to create:
-1. `AGENTS.md` — OpenCode-specific root instructions
-2. `opencode.json` — Master config (provider, model, MCP servers, LSP, agents, permissions, commands)
+1. `AGENTS.md` - OpenCode-specific root instructions
+2. `opencode.json` - Master config (provider, model, MCP servers, LSP, agents, permissions, commands)
 3. `.opencode/agents/flow-architecture-review.md`
 4. `.opencode/agents/flow-quality-review.md`
 5. `.opencode/agents/flow-consistency-review.md`
@@ -124,14 +124,14 @@ Commits modeled after: `018cc6e` (fullrepo agent context), `614b71e` (memory sta
 1. `.serena/project.yml`
 2. `.serena/memories/` (initial project state)
 3. `.github/workflows/validate.yml`
-4. Fullrepo sync documentation in AGENTS.md (adapted for OpenCode — no hooks, manual `/ry-sync` command)
+4. Fullrepo sync documentation in AGENTS.md (adapted for OpenCode - no hooks, manual `/ry-sync` command)
 
 ## Implementation Order (within each phase)
 
 Phase 1 is the critical path. Implement in this order:
-1. `opencode.json` (all config — this is the core)
-2. `AGENTS.md` (root instructions — this is what OpenCode reads first)
-3. `.opencode/agents/*.md` (reviewer subagents — core workflow)
+1. `opencode.json` (all config - this is the core)
+2. `AGENTS.md` (root instructions - this is what OpenCode reads first)
+3. `.opencode/agents/*.md` (reviewer subagents - core workflow)
 4. Root files (.gitignore, README, VERSION, CHANGELOG, LICENSE)
 
 Phase 2 skills can be implemented in any order since they're independent.
@@ -151,8 +151,8 @@ The 8 lifecycle hooks from Codex/Claude become:
 | UserPromptSubmit | `user_prompt_submit.sh` (Serena advisory) | AGENTS.md instruction: "When the user writes a code-related prompt in Russian, automatically use serena-code-workflow skill" |
 | PreToolUse:Bash | `prepare_auto_sync.sh` (Serena mark dirty) | AGENTS.md instruction: "After bash commands that modify files, consider serena-memory-sync" |
 | PostToolUse:Bash | `mark_sync_required.sh` + `post_tool_use_commit_advice.sh` | AGENTS.md instruction: "After meaningful changes, commit atomically with Conventional Commits" |
-| SessionStart | `session_start_context.sh` + `session_start_worktree_bootstrap.sh` | `/ry-init` command — manual bootstrap |
-| Stop | `stop_memory_sync.sh` + `stop_post_task_sync.sh` | `/ry-sync` command — manual finalization. AGENTS.md: "Before ending a session, run /ry-sync to synchronize memories, docs, git, and fullrepo" |
+| SessionStart | `session_start_context.sh` + `session_start_worktree_bootstrap.sh` | `/ry-init` command - manual bootstrap |
+| Stop | `stop_memory_sync.sh` + `stop_post_task_sync.sh` | `/ry-sync` command - manual finalization. AGENTS.md: "Before ending a session, run /ry-sync to synchronize memories, docs, git, and fullrepo" |
 
 ### Reviewer Subagents
 
@@ -197,7 +197,7 @@ In OpenCode's MCP naming: `mcp__serena__<tool_name>`
 
 ### fullrepo Branch Workflow
 
-Same concept applies — agent-only files (AGENTS.md, .serena/, .opencode/, etc.) live on a `fullrepo` branch. But instead of hooks automating restore/publish:
+Same concept applies - agent-only files (AGENTS.md, .serena/, .opencode/, etc.) live on a `fullrepo` branch. But instead of hooks automating restore/publish:
 - `/ry-init` command includes fullrepo bootstrap step
 - `/ry-sync` command includes fullrepo publish step
 - AGENTS.md documents the workflow and finish order

@@ -49,7 +49,7 @@ Read `references/reviewer-protocol.md`. These tracks are orchestrated by `ry-rev
 Each track produces findings with:
 - **Path**: exact file and line reference.
 - **Severity**: must-fix / should-fix / nit / observation.
-- **Confidence**: high / medium / low — low-confidence findings must include the evidence gap.
+- **Confidence**: high / medium / low - low-confidence findings must include the evidence gap.
 - **Description**: what is wrong and why it matters.
 - **Suggested fix**: concrete remediation or next step.
 

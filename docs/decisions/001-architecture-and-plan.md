@@ -4,7 +4,7 @@
 > below (`claude-sonnet-4-20250514`, `claude-haiku-4-20250514`,
 > `claude-opus-4-20250514`) are historical and produce `ConfigInvalidError`
 > against OpenCode v1.14.30+. As of 0.10.1, no model IDs are hardcoded in
-> agent configs — all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
+> agent configs - all agents inherit from top-level `model` (currently `opencode-go/glm-5.1`).
 > The ADR text itself is preserved unchanged. See `.serena/memories/CORE-02-PROJECT-SHAPE.md`
 > for current config facts.
 
@@ -12,12 +12,12 @@
 
 OpenCode does **NOT** have a plugin marketplace like Claude Code (`claude plugin validate/install/tag`) or Codex (`.codex-plugin/plugin.json`). OpenCode's extension system is:
 
-- **`opencode.json`** — single config file for everything (providers, models, agents, tools, permissions, commands, themes, keybinds, formatters, LSP, MCP, skills)
-- **`.opencode/`** directory — agents, skills, commands, themes, plugins (npm)
-- **NPM plugins** — can be loaded via `plugin` key in opencode.json (e.g. `"plugin": ["opencode-helicone-session"]`)
-- **No `marketplace.json`** — no manifest catalog, no `$schema` for plugin manifests, no `plugin validate/tag` CLI commands
+- **`opencode.json`** - single config file for everything (providers, models, agents, tools, permissions, commands, themes, keybinds, formatters, LSP, MCP, skills)
+- **`.opencode/`** directory - agents, skills, commands, themes, plugins (npm)
+- **NPM plugins** - can be loaded via `plugin` key in opencode.json (e.g. `"plugin": ["opencode-helicone-session"]`)
+- **No `marketplace.json`** - no manifest catalog, no `$schema` for plugin manifests, no `plugin validate/tag` CLI commands
 
-**Decision**: Instead of a marketplace, rldyour-opencode distributes as a **git repository with complete `opencode.json` config + `.opencode/` skill/agent/command definitions**. Users clone or copy into their project. This mirrors how OpenCode's own `.opencode/` convention works — skills, agents, and commands are project-local.
+**Decision**: Instead of a marketplace, rldyour-opencode distributes as a **git repository with complete `opencode.json` config + `.opencode/` skill/agent/command definitions**. Users clone or copy into their project. This mirrors how OpenCode's own `.opencode/` convention works - skills, agents, and commands are project-local.
 
 A future npm package (`opencode-ai/rldyour-opencode` or similar) could wrap the `.opencode/` directory and `opencode.json` partial as an installable plugin, but that depends on OpenCode's plugin SDK maturity and is **Phase 4**.
 
@@ -156,23 +156,23 @@ Additional prompt content (optional)
 
 ### opencode.json config
 Full schema at https://opencode.ai/config.json. Key sections:
-- `model` / `small_model` — default models
-- `provider` — API key config per provider
-- `agent` — override built-in agents or define custom ones
-- `permission` — tool access control (allow/ask/deny with glob patterns)
-- `command` — custom slash commands with template, description, agent, model
-- `mcp` — MCP server config (local command-based or remote URL-based with OAuth)
-- `lsp` — LSP server config (true for all built-in, or object for custom)
-- `formatter` — code formatter config
-- `instructions` — paths/globs to instruction files
-- `theme` / `keybinds` — TUI customization
-- `share` — sharing mode (manual/auto/disabled)
-- `snapshot` — snapshot tracking (true/false)
-- `autoupdate` — auto-update behavior
-- `shell` — shell config
-- `server` — server config for `opencode serve`
-- `plugin` — npm plugins to load
-- `experimental` — experimental features
+- `model` / `small_model` - default models
+- `provider` - API key config per provider
+- `agent` - override built-in agents or define custom ones
+- `permission` - tool access control (allow/ask/deny with glob patterns)
+- `command` - custom slash commands with template, description, agent, model
+- `mcp` - MCP server config (local command-based or remote URL-based with OAuth)
+- `lsp` - LSP server config (true for all built-in, or object for custom)
+- `formatter` - code formatter config
+- `instructions` - paths/globs to instruction files
+- `theme` / `keybinds` - TUI customization
+- `share` - sharing mode (manual/auto/disabled)
+- `snapshot` - snapshot tracking (true/false)
+- `autoupdate` - auto-update behavior
+- `shell` - shell config
+- `server` - server config for `opencode serve`
+- `plugin` - npm plugins to load
+- `experimental` - experimental features
 
 ### Custom commands (.opencode/commands/*.md)
 ```markdown
@@ -194,9 +194,9 @@ Focus on the failing tests and suggest fixes.
 Based on Codex commit `aa53e1e bootstrap rldyour codex marketplace` and Claude commit `f43b3db init: bootstrap rldyour-claude marketplace`.
 
 Files:
-- `AGENTS.md` — OpenCode-specific root instructions
-- `opencode.json` — Master config with model, provider, MCP servers, LSP, agents, permissions, commands
-- `.opencode/agents/` — Subagent definitions (7 reviewers + memory-sync + explore)
+- `AGENTS.md` - OpenCode-specific root instructions
+- `opencode.json` - Master config with model, provider, MCP servers, LSP, agents, permissions, commands
+- `.opencode/agents/` - Subagent definitions (7 reviewers + memory-sync + explore)
 - `.gitignore`
 - `README.md`, `VERSION`, `CHANGELOG.md`, `LICENSE`
 
@@ -208,16 +208,16 @@ All 32 SKILL.md files adapted to OpenCode format (simpler frontmatter, tool rout
 ### Phase 3: Commands, References, Scripts
 Based on Codex commits for flow commands, validation scripts, bootstrap.
 
-- `.opencode/commands/` — 6 slash commands
-- `references/` — Reference docs
-- `scripts/` — Validation and bootstrap scripts adapted for OpenCode CLI
+- `.opencode/commands/` - 6 slash commands
+- `references/` - Reference docs
+- `scripts/` - Validation and bootstrap scripts adapted for OpenCode CLI
 
 ### Phase 4: Git, Serena, CI/CD
 Based on both repos' fullrepo workflow, git hooks, and CI.
 
-- `.serena/` — Project state
-- `.github/workflows/` — CI validation
-- Fullrepo sync adapted for OpenCode (no hooks — instead, `/ry-sync` command)
+- `.serena/` - Project state
+- `.github/workflows/` - CI validation
+- Fullrepo sync adapted for OpenCode (no hooks - instead, `/ry-sync` command)
 
 ---
 
@@ -225,10 +225,10 @@ Based on both repos' fullrepo workflow, git hooks, and CI.
 
 | Feature | Codex | Claude Code | OpenCode |
 |---|---|---|---|
-| Hook lifecycle | Codex hooks (4 events) | CC hooks (30 events) | **NO hooks** — use AGENTS.md instructions + commands |
-| SERENA sync enforcement | Stop hook blocks exit | Stop hook blocks exit | **Manual** — `/ry-sync` command + AGENTS.md instruction |
-| Marketplace | `.agents/plugins/marketplace.json` | `.claude-plugin/marketplace.json` | **None** — `opencode.json` + `.opencode/` |
-| Plugin manifest | `.codex-plugin/plugin.json` | `.claude-plugin/plugin.json` | **None** — config in `opencode.json` |
+| Hook lifecycle | Codex hooks (4 events) | CC hooks (30 events) | **NO hooks** - use AGENTS.md instructions + commands |
+| SERENA sync enforcement | Stop hook blocks exit | Stop hook blocks exit | **Manual** - `/ry-sync` command + AGENTS.md instruction |
+| Marketplace | `.agents/plugins/marketplace.json` | `.claude-plugin/marketplace.json` | **None** - `opencode.json` + `.opencode/` |
+| Plugin manifest | `.codex-plugin/plugin.json` | `.claude-plugin/plugin.json` | **None** - config in `opencode.json` |
 | Skills routing | OpenAI YAML + SKILL.md | CC SKILL.md with `allowed-tools` | OpenCode SKILL.md (name + description only) |
 | Agent spec | OpenAI YAML | CC agent .md with frontmatter | OpenCode agent .md with frontmatter |
 | MCP config | `.mcp.json` per plugin | `.mcp.json` per plugin | `opencode.json` → `mcp` section |

@@ -106,17 +106,17 @@ return {
 
 Five tools registered, all wrapping existing diagnostic scripts so the LLM can drive them directly without a bash round-trip:
 
-- `rldyour_validate_config` — runs `scripts/validate_config.sh`.
-- `rldyour_check_deps` — runs `scripts/check_deps_freshness.sh --json`.
-- `rldyour_lsp_health` — runs `scripts/check_lsps.sh`.
-- `rldyour_git_audit` — runs `scripts/git_sync_audit.sh`.
-- `rldyour_fullrepo_status` — runs `scripts/fullrepo_sync.sh status-json`.
+- `rldyour_validate_config` - runs `scripts/validate_config.sh`.
+- `rldyour_check_deps` - runs `scripts/check_deps_freshness.sh --json`.
+- `rldyour_lsp_health` - runs `scripts/check_lsps.sh`.
+- `rldyour_git_audit` - runs `scripts/git_sync_audit.sh`.
+- `rldyour_fullrepo_status` - runs `scripts/fullrepo_sync.sh status-json`.
 
 Each tool returns the script's combined stdout/stderr and stamps `ctx.metadata({ title, metadata: { exitCode } })` so the TUI shows pass/fail at a glance.
 
 ### Slash-command audit (`.opencode/plugins/ry-command-audit.ts`)
 
-`command.execute.before` appends one line per slash command invocation to `.serena/.command_audit.log` (runtime marker — never committed). Args are sanitized for credential-shaped patterns before logging. Log rotates with reset when it crosses 256 KiB.
+`command.execute.before` appends one line per slash command invocation to `.serena/.command_audit.log` (runtime marker - never committed). Args are sanitized for credential-shaped patterns before logging. Log rotates with reset when it crosses 256 KiB.
 
 ### Tool routing nudges (`.opencode/plugins/ry-tool-hints.ts`)
 
@@ -130,7 +130,7 @@ HINTS keys use the OpenCode `<server>_<tool>` tool-ID format (single underscore;
 
 ### Dynamic system prompt context (`.opencode/plugins/ry-system-context.ts`)
 
-`experimental.chat.system.transform` injects a one-line runtime stamp into every system prompt: `[rldyour runtime] date=YYYY-MM-DD branch=... head=<short> worktree=clean|dirty(N files)`. Probes git via `Bun.spawn` with silent fallback ("unknown" when git unavailable). Branch and HEAD flow through a per-directory TTL cache (3 s; audit P1-6 + integration-review F-3 + reviewer wave closures) so an in-session `git checkout|switch|rebase` invalidates the stamp within one turn while still suppressing two of the three subprocess spawns per turn. `git status --porcelain` is the only turn-volatile probe and spawns every call. Both `branch` and `headShort` flow through a `sanitizeRuntimeStamp` allowlist `[A-Za-z0-9._/-]` with a `SAFE_STAMP_MAX_LEN` cap before reaching the system prompt — defeats indirect prompt injection through crafted branch names (reviewer wave 2026-05-18 security F-4 closure). Grounds the LLM in "now" facts that the static AGENTS.md cannot carry.
+`experimental.chat.system.transform` injects a one-line runtime stamp into every system prompt: `[rldyour runtime] date=YYYY-MM-DD branch=... head=<short> worktree=clean|dirty(N files)`. Probes git via `Bun.spawn` with silent fallback ("unknown" when git unavailable). Branch and HEAD flow through a per-directory TTL cache (3 s; audit P1-6 + integration-review F-3 + reviewer wave closures) so an in-session `git checkout|switch|rebase` invalidates the stamp within one turn while still suppressing two of the three subprocess spawns per turn. `git status --porcelain` is the only turn-volatile probe and spawns every call. Both `branch` and `headShort` flow through a `sanitizeRuntimeStamp` allowlist `[A-Za-z0-9._/-]` with a `SAFE_STAMP_MAX_LEN` cap before reaching the system prompt - defeats indirect prompt injection through crafted branch names (reviewer wave 2026-05-18 security F-4 closure). Grounds the LLM in "now" facts that the static AGENTS.md cannot carry.
 
 ### Compaction autocontinue suppression (`.opencode/plugins/ry-bootstrap.ts`)
 
@@ -154,7 +154,7 @@ async function toast(variant: "info" | "warning" | "error", message: string) {
 }
 ```
 
-Both helpers are best-effort — a transient client error never blocks the underlying tool execution. The `service` field per `client.app.log` matches the plugin file stem (`ry-shell-strategy`, `ry-flow-hooks`, etc.) for grep-friendly filtering. Toast `variant` set as `"warning"` for advisory, `"error"` for blocks; `"info"` only for low-frequency banners (idle reminder, post-commit `/ry-sync` nudge). Console.log is reserved for unit-test fixtures or temporary debugging — production plugins must not use it.
+Both helpers are best-effort - a transient client error never blocks the underlying tool execution. The `service` field per `client.app.log` matches the plugin file stem (`ry-shell-strategy`, `ry-flow-hooks`, etc.) for grep-friendly filtering. Toast `variant` set as `"warning"` for advisory, `"error"` for blocks; `"info"` only for low-frequency banners (idle reminder, post-commit `/ry-sync` nudge). Console.log is reserved for unit-test fixtures or temporary debugging - production plugins must not use it.
 
 ### Session bootstrap context (`.opencode/plugins/ry-bootstrap.ts`)
 
@@ -178,11 +178,11 @@ Both helpers are best-effort — a transient client error never blocks the under
 
 ## What we do not use
 
-- **`auth` / `provider`** — Anthropic provider auto-loads via `opencode auth`. No need to register custom providers.
-- **`chat.message` / `chat.params` / `chat.headers`** — current agent frontmatter already sets temperature/steps per agent; the pipeline hooks would be useful only if we needed dynamic per-message logic.
-- **`experimental.chat.messages.transform`** — full message-history rewriting is not currently needed.
-- **`experimental.text.complete`** — no post-processing of LLM output needed.
-- **`experimental_workspace`** — single local workspace; no remote / distributed setup.
+- **`auth` / `provider`** - Anthropic provider auto-loads via `opencode auth`. No need to register custom providers.
+- **`chat.message` / `chat.params` / `chat.headers`** - current agent frontmatter already sets temperature/steps per agent; the pipeline hooks would be useful only if we needed dynamic per-message logic.
+- **`experimental.chat.messages.transform`** - full message-history rewriting is not currently needed.
+- **`experimental.text.complete`** - no post-processing of LLM output needed.
+- **`experimental_workspace`** - single local workspace; no remote / distributed setup.
 
 These are documented here as known surfaces in case future requirements warrant adopting them.
 
@@ -190,14 +190,14 @@ These are documented here as known surfaces in case future requirements warrant 
 
 Plugin code is not the only extension point. The OpenCode CLI exposes scriptable surfaces consumed in `docs/release-process.md`, `docs/dependency-updates.md`, `docs/rollback-restore.md`, and our reviewer/post-task-sync workflows:
 
-- `opencode debug config | agent <name> | skill | info | startup | paths` — authoritative resolved state.
-- `opencode models <provider>` — list valid model IDs for a provider.
-- `opencode run "..."` — non-interactive prompt execution (useful for CI smoke tests of skills).
-- `opencode export <sessionID>` / `opencode import <file>` — session portability.
-- `opencode stats` — token/cost analytics for release-time review.
-- `opencode session` — list / delete stored sessions.
-- `opencode github` / `opencode pr <number>` — GitHub agent and PR-branch workflow.
-- `opencode serve` / `opencode web` / `opencode acp` — headless server modes for distributed deployments.
-- `opencode plugin <module>` — install plugin and update config (alias `opencode plug`).
+- `opencode debug config | agent <name> | skill | info | startup | paths` - authoritative resolved state.
+- `opencode models <provider>` - list valid model IDs for a provider.
+- `opencode run "..."` - non-interactive prompt execution (useful for CI smoke tests of skills).
+- `opencode export <sessionID>` / `opencode import <file>` - session portability.
+- `opencode stats` - token/cost analytics for release-time review.
+- `opencode session` - list / delete stored sessions.
+- `opencode github` / `opencode pr <number>` - GitHub agent and PR-branch workflow.
+- `opencode serve` / `opencode web` / `opencode acp` - headless server modes for distributed deployments.
+- `opencode plugin <module>` - install plugin and update config (alias `opencode plug`).
 
-None of these are wired into automation yet — they are available primitives.
+None of these are wired into automation yet - they are available primitives.

@@ -62,7 +62,7 @@ npm install -g pyright              # alternative to pipx install pyright
 
 ## OpenCode LSP Registration
 
-OpenCode has 30+ built-in LSP servers that auto-start when file extensions are detected. Enable in `opencode.json` with `"lsp": true`. The user must still install the LSP binaries locally — OpenCode only registers the server; if the binary is not on PATH, registration silently no-ops for that language.
+OpenCode has 30+ built-in LSP servers that auto-start when file extensions are detected. Enable in `opencode.json` with `"lsp": true`. The user must still install the LSP binaries locally - OpenCode only registers the server; if the binary is not on PATH, registration silently no-ops for that language.
 
 ## Known Limitations
 

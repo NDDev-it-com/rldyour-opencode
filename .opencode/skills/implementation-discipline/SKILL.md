@@ -38,6 +38,6 @@ Read `references/rules-policy.md` for the full implementation discipline checkli
 - Dump unrelated implementation, docs, validator, license/metadata, generated,
   and Serena/fullrepo sync changes into one commit.
 - Premature abstraction for single speculative future case.
-- Skip integration tracing — forget about clients, schemas, generated types.
+- Skip integration tracing - forget about clients, schemas, generated types.
 - Comments explaining WHAT (names should do that), not WHY.
 - Leave dead code / stale flags / outdated tests in touched scope.

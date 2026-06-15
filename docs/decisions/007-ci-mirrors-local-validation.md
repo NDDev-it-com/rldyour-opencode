@@ -9,7 +9,7 @@
 
 Before 0.11.0 the marketplace had two CI workflows (`validate.yml`, `dependency-check.yml`). The audit identified governance / supply-chain / typecheck gaps that require additional CI surfaces, and the existing workflows had drift hazards: pre-0.11.0 there was no shell-strict-mode lint in CI, no plugin typecheck, no instruction-docs validation, no CodeQL, no gitleaks, no dependency-review, no SBOM, and no release workflow.
 
-A second concern emerged from the audit: when CI logic diverges from local scripts, the marketplace ends up with two implementations of "valid" — one in workflow YAML and one in local bash. That doubles maintenance and creates drift opportunities (the local script can pass while CI fails, or vice versa).
+A second concern emerged from the audit: when CI logic diverges from local scripts, the marketplace ends up with two implementations of "valid" - one in workflow YAML and one in local bash. That doubles maintenance and creates drift opportunities (the local script can pass while CI fails, or vice versa).
 
 ## Decision Drivers
 
@@ -23,8 +23,8 @@ A second concern emerged from the audit: when CI logic diverges from local scrip
 
 ## Considered Options
 
-1. Local-only validation. Reject — manual gate doesn't scale and doesn't block bad PRs.
-2. CI-only validation with custom YAML logic. Reject — doubles the validation surface; local + CI drift becomes a maintenance burden.
+1. Local-only validation. Reject - manual gate doesn't scale and doesn't block bad PRs.
+2. CI-only validation with custom YAML logic. Reject - doubles the validation surface; local + CI drift becomes a maintenance burden.
 3. Local scripts as source of truth; CI workflows as thin wrappers that invoke them with appropriate matrix / permissions / timeouts. **Selected.**
 
 ## Decision Outcome
