@@ -15,13 +15,13 @@
 | Field | Value |
 |---|---|
 | Adapter version | 1.3.4 |
-| Runtime baseline | OpenCode 1.17.6 |
+| Runtime baseline | OpenCode 1.17.7 |
 | GitHub release tag | 1.3.4 |
 | Pinned commit | `0bd05254427a00a290eb25a01cd3f18359191c05` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Pinned commit from `config/repositories.json` in the control-plane superproject.
 
-Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.6 (June 2026). The v1.14.48 → v1.17.6 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin-loading, skill discovery and file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
+Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.7 (June 2026). The v1.14.48 → v1.17.7 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin-loading, skill discovery and file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes.
 
 ## What This Repository Provides
 
@@ -40,7 +40,7 @@ OpenCode's native config surfaces that this adapter populates:
   - `commands/*.md` - 11 slash commands
   - `plugins/*.ts` - 10 Bun-runtime TypeScript local plugins
   - `package.json` - `@opencode-ai/plugin` pin for local Bun dependency resolution
-- **Permission keys (canonical v1.17.6)**: `read`, `edit`, `bash`, `task`, `external_directory`, `doom_loop` - used in `opencode.json` `permission.*` fields.
+- **Permission keys (canonical v1.17.7)**: `read`, `edit`, `bash`, `task`, `external_directory`, `doom_loop` - used in `opencode.json` `permission.*` fields.
 - **MCP JSON**: declared under `mcp` in `opencode.json`; local servers use `bunx` (npm) or `uvx` (Python) or `dart` (Dart SDK) launchers - never `npx`.
 
 Source-only artifacts (scripts, tests, CI workflows, reference docs, ADRs) are not loaded by OpenCode at runtime; they exist for validation and release hygiene only.
@@ -193,7 +193,7 @@ In external or colleague-owned repositories, `.rldyour/project-policy.json` may 
 
 ## Security Boundary
 
-Owner full-auto posture is intentional and explicitly acknowledged. The primary `build` and `plan` agents use OpenCode's canonical v1.17.6 permission keys with `"allow"` for `read`, `edit`, `bash`, `task`, `external_directory`, and `doom_loop`. This is not a sandbox - it is a trusted owner workstation posture designed for maximum autonomy.
+Owner full-auto posture is intentional and explicitly acknowledged. The primary `build` and `plan` agents use OpenCode's canonical v1.17.7 permission keys with `"allow"` for `read`, `edit`, `bash`, `task`, `external_directory`, and `doom_loop`. This is not a sandbox - it is a trusted owner workstation posture designed for maximum autonomy.
 
 The `oc` launcher (from `scripts/install_yolo_launchers.sh --apply`) injects an allow-all `OPENCODE_CONFIG_CONTENT` environment override and sets `OPENCODE_DISABLE_CLAUDE_CODE=1`, mirroring the same no-prompt posture at the OS launcher level.
 
