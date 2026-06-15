@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Refresh OpenCode runtime baseline to 1.17.7 (npm latest; runtime/MCP reliability fixes; config schema and canonical permission key set byte-identical to 1.17.6, verified by schema diff)
 
 ## [1.3.4] - 2026-06-14
 

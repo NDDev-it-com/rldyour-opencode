@@ -207,7 +207,7 @@ def test_collect_diagnostics_creates_bundle(tmp_path: Path) -> None:
     opencode_stub = stub_bin / "opencode"
     opencode_stub.write_text(
         "#!/usr/bin/env bash\n"
-        "if [ \"${1:-}\" = \"--version\" ]; then echo '1.17.6'; exit 0; fi\n"
+        "if [ \"${1:-}\" = \"--version\" ]; then echo '1.17.7'; exit 0; fi\n"
         "echo '{\"stub\":\"opencode\"}'\n",
         encoding="utf-8",
     )
