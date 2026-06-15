@@ -48,8 +48,6 @@ CANONICAL_PERMISSION_KEYS: frozenset[str] = frozenset(
         "question",
         "webfetch",
         "websearch",
-        "repo_clone",
-        "repo_overview",
         "lsp",
         "doom_loop",
         "skill",

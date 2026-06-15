@@ -54,8 +54,6 @@ def test_contract_requires_owner_full_auto_standard_permissions() -> None:
         "question": "allow",
         "webfetch": "allow",
         "websearch": "allow",
-        "repo_clone": "allow",
-        "repo_overview": "allow",
         "lsp": "allow",
         "doom_loop": "allow",
         "skill": "allow",

@@ -285,16 +285,16 @@ def test_command_missing_description(tmp_path: Path) -> None:
 
 
 def test_canonical_permission_keys_has_expected_size() -> None:
-    """v1.17.6 canonical set has 17 keys (verified via built-in customize-opencode skill)."""
-    assert len(vh.CANONICAL_PERMISSION_KEYS) == 17
+    """v1.17.6 canonical set has 15 keys (verified via built-in customize-opencode skill)."""
+    assert len(vh.CANONICAL_PERMISSION_KEYS) == 15
 
 
-def test_canonical_permission_keys_includes_v1_15_3_set() -> None:
+def test_canonical_permission_keys_includes_v1_17_6_set() -> None:
     """Mirror the canonical set from `opencode debug skill` built-in customize-opencode."""
     expected = {
         "read", "edit", "glob", "grep", "list", "bash", "task",
         "external_directory", "todowrite", "question", "webfetch", "websearch",
-        "repo_clone", "repo_overview", "lsp", "doom_loop", "skill",
+        "lsp", "doom_loop", "skill",
     }
     assert vh.CANONICAL_PERMISSION_KEYS == expected
 
