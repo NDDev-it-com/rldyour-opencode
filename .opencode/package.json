@@ -6,7 +6,7 @@
   "type": "module",
   "dependencies": {
     "@opencode-ai/plugin": "1.17.6",
-    "@opencode-ai/sdk": "1.17.6"
+    "@opencode-ai/sdk": "1.17.7"
   },
   "license": "AGPL-3.0-or-later",
   "author": {
