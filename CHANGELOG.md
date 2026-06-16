@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.5.2] - 2026-06-16
+
+### Fixed
+
+- patch: advance past system-instruction tracking (.gemini/, AGENTS.md) and empty-tree fullrepo fix Preserve documented `opencode-ai` `1.17.7`, `@opencode-ai/plugin` `1.17.7`, and `@opencode-ai/sdk` `1.17.7` baseline evidence.
+
 ## [1.5.1] - 2026-06-15
 
 ### Changed
