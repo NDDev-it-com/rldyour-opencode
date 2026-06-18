@@ -105,7 +105,7 @@ OpenCode agents are not cmux orchestrators. cmux orchestrator mode exists only
 as one visible cmux terminal controlling visible worker terminals.
 
 In standard mode, no software orchestrator exists. The owner operates directly
-through OpenCode, Claude Code, Codex, or Gemini CLI. In cmux orchestrator mode,
+through OpenCode, Claude Code, Codex, or Antigravity CLI. In cmux orchestrator mode,
 OpenCode can run as a visible worker terminal, but it must not spawn hidden
 background orchestrators, daemon supervisors, or unbounded worker jobs.
 
