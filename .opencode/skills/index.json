@@ -78,7 +78,10 @@
       "name": "cmux-orchestrator",
       "path": ".opencode/skills/cmux-orchestrator/SKILL.md",
       "domain": "orchestrator",
-      "triggers": [],
+      "triggers": [
+        "cmux v3 head",
+        "visible-terminal orchestration"
+      ],
       "requires_mcp": [],
       "network": false
     },
@@ -86,7 +89,9 @@
       "name": "cmux-worker",
       "path": ".opencode/skills/cmux-worker/SKILL.md",
       "domain": "orchestrator",
-      "triggers": [],
+      "triggers": [
+        "cmux v3 worker"
+      ],
       "requires_mcp": [],
       "network": false
     },
