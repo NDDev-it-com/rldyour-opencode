@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.6.0] - 2026-06-24
+
+### Changed
+
+- cmux protocol v3 projections and latest MCP runtime pins (chrome-devtools-mcp 1.4.0, context7 3.2.2) Preserve documented `opencode-ai` `1.17.7`, `@opencode-ai/plugin` `1.17.7`, and `@opencode-ai/sdk` `1.17.7` baseline evidence.
+
 ## [1.5.2] - 2026-06-16
 
 ### Fixed
