@@ -79,10 +79,8 @@
       "path": ".opencode/skills/cmux-orchestrator/SKILL.md",
       "domain": "orchestrator",
       "triggers": [
-        "cmux orchestrator",
-        "multi-agent terminal workflow",
-        "delegate workers",
-        "collect worker reports"
+        "cmux v3 head",
+        "visible-terminal orchestration"
       ],
       "requires_mcp": [],
       "network": false
@@ -92,9 +90,7 @@
       "path": ".opencode/skills/cmux-worker/SKILL.md",
       "domain": "orchestrator",
       "triggers": [
-        "cmux worker role",
-        "scoped worker task",
-        "worker JSON report"
+        "cmux v3 worker"
       ],
       "requires_mcp": [],
       "network": false
