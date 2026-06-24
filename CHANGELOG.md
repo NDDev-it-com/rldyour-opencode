@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Refresh OpenCode runtime baseline to `1.17.9` (npm latest; runtime fixes). Pin `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` to `1.17.9`; vendor `references/opencode-config.schema.v1.17.9.json` from the live `https://opencode.ai/config.json` channel (byte-identical to the prior `v1.17.7` snapshot, verified by SHA-256 `57c02429`).
 
 ## [1.6.0] - 2026-06-24
 

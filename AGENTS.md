@@ -18,20 +18,23 @@ tuple.
 
 - Repository: `NDDev-it-com/rldyour-opencode`
 - Branch: `main`
-- Product version: `1.5.1`
-- Current HEAD: `ba8d8eefea4e15223ad73a925d800f4bf9feab0b`
-- Runtime baseline: OpenCode `1.17.7`
 
-The durable source of truth is the current code/config/tests/git state:
+The durable source of truth is the current code/config/tests/git state, not a
+value copied into this overlay:
 
 - `opencode.json`
 - `.opencode/**`
-- `references/**`
+- `references/**` — `references/opencode-baseline.json` is the single pin for the
+  OpenCode runtime/plugin/SDK/schema baseline (`opencode-ai`,
+  `@opencode-ai/plugin`, and `@opencode-ai/sdk`).
 - `scripts/**`
 - `tests/**`
-- root `config/repositories.json`
+- root `config/repositories.json` — owns the adapter product version
+  (`product_version`) and the control-plane pinned commit (`expected_head`).
 
-This overlay is derived context only.
+Do not duplicate the product version, pinned commit, or runtime version as
+standalone literals in this file; read them from the files above so they cannot
+drift. This overlay is derived context only.
 
 ## Domain Boundaries
 
@@ -65,24 +68,23 @@ they make a boundary explicit.
 
 ## System Install Contract
 
-`scripts/install_system_opencode.sh` installs source config from normal branch
-and copies this file only when the `fullrepo` overlay is restored locally. If
-this file is absent in a source-only checkout, the installer must continue with
-an explicit optional-overlay warning.
+`scripts/install_system_opencode.sh` installs source config from the normal
+branch and copies this file directly, because `AGENTS.md` is tracked on `main`
+and is present on a fresh `git clone` without any `fullrepo` restore step.
 
 The installer-required normal source paths are:
 
 - `opencode.json`
 - `.opencode/`
-
-The optional agent-only source path is:
-
 - `AGENTS.md`
 
-`AGENTS.md` must be restored and published through `fullrepo`; it must not be
-made a normal-branch source file only to satisfy system installation. A
-source-only checkout must still install the OpenCode runtime config and report
-that the agent overlay is unavailable.
+`AGENTS.md` is a tracked-on-main system instruction file, not an agent-only
+overlay: it is in the root `validate_fullrepo_sync.py` system-file allowlist and
+stays on normal `main` history. Only the `.serena/` agent context
+(`.serena/memories/`, `.serena/reviews/`, `.serena/plans/`, `.serena/research/`,
+and the other `.serena/` workflow directories) is restored and published through
+`fullrepo`. The installer still tolerates a malformed checkout missing this file
+by emitting an explicit warning, but a normal clone always carries it.
 
 The system convergence path is owned by root `/ry-repair`:
 
@@ -152,32 +154,35 @@ browser control provider.
 
 ## Release And Fullrepo Policy
 
-OpenCode adapter releases are numeric-tagged. Current exact tag support is
-`1.3.4`; older tags are historical unless the root tuple explicitly pins them.
+OpenCode adapter releases are numeric-tagged. The current exact tag is `1.6.0`
+(the active `product_version` in root `config/repositories.json`); older tags are
+historical unless the root tuple explicitly pins them.
 
 Before the root control plane advances the OpenCode gitlink:
 
 1. Commit OpenCode-owned changes in this repository.
 2. Tag the adapter release when product-version surfaces change.
 3. Push `main` and the numeric tag.
-4. Publish `fullrepo` after agent-only overlays change.
+4. Publish `fullrepo` after the `.serena/` agent context changes.
 5. Update the root `config/repositories.json` expected head and version.
 6. Run root tuple, contract, instruction parity, fullrepo, and release gates.
 
-This file is part of the fullrepo overlay. Update it when OpenCode current
-version, pinned commit, install contract, runtime baseline, browser routing,
-permissions, or agent-only workflow rules change.
+This file is tracked on `main` (not part of the `fullrepo` overlay). Update it
+when the OpenCode install contract, runtime baseline, browser routing,
+permissions, or durable workflow rules change. Read the product version, pinned
+commit, and runtime version from their source files rather than restating them
+here.
 
 ## Validation Commands
 
 Run these checks after changing OpenCode-owned source:
 
 ```bash
+bash scripts/validate_config.sh
 python3 scripts/validate_contract.py
 python3 scripts/validate_opencode_baseline.py
-python3 scripts/validate_opencode_permissions.py
-python3 scripts/validate_opencode_skill_index.py
-python3 scripts/validate_opencode_command_index.py
-python3 scripts/validate_serena_memory_schema.py
-python3 scripts/validate_serena_memory_semantics.py
+python3 scripts/validate_opencode_schema.py
+python3 scripts/check_baseline_consistency.py
+python3 scripts/validate_instruction_docs.py
+python3 scripts/validate_mcp_profiles.py
 ```
