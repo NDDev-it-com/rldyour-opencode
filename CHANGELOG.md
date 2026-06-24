@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [1.6.1] - 2026-06-25
+
 ### Changed
 
+- Refresh CLI runtime baselines to latest (Claude Code 2.1.190, Codex 0.142.0, OpenCode 1.17.9, Antigravity CLI 1.0.11, MiMoCode 0.1.3); resolve adapter instruction-doc and surface-adoption drift.
 - Refresh OpenCode runtime baseline to `1.17.9` (npm latest; runtime fixes). Pin `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` to `1.17.9`; vendor `references/opencode-config.schema.v1.17.9.json` from the live `https://opencode.ai/config.json` channel (byte-identical to the prior `v1.17.7` snapshot, verified by SHA-256 `57c02429`).
 
 ## [1.6.0] - 2026-06-24
