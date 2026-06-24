@@ -24,12 +24,12 @@ value copied into this overlay:
 
 - `opencode.json`
 - `.opencode/**`
-- `references/**` — `references/opencode-baseline.json` is the single pin for the
+- `references/**` - `references/opencode-baseline.json` is the single pin for the
   OpenCode runtime/plugin/SDK/schema baseline (`opencode-ai`,
   `@opencode-ai/plugin`, and `@opencode-ai/sdk`).
 - `scripts/**`
 - `tests/**`
-- root `config/repositories.json` — owns the adapter product version
+- root `config/repositories.json` - owns the adapter product version
   (`product_version`) and the control-plane pinned commit (`expected_head`).
 
 Do not duplicate the product version, pinned commit, or runtime version as
@@ -154,7 +154,7 @@ browser control provider.
 
 ## Release And Fullrepo Policy
 
-OpenCode adapter releases are numeric-tagged. The current exact tag is `1.6.0`
+OpenCode adapter releases are numeric-tagged. The current exact tag is `1.6.1`
 (the active `product_version` in root `config/repositories.json`); older tags are
 historical unless the root tuple explicitly pins them.
 
