@@ -1,7 +1,7 @@
 <!-- Memory Metadata
-Last updated: 2026-06-16
-Last verified: 2026-06-16
-Last commit: 875c7f2b49d60bad5d70694329f59f3705f617e7 chore(release): opencode 1.5.2 (other)
+Last updated: 2026-06-26
+Last verified: 2026-06-26
+Last commit: fc52b89e8af2adb4c8f1c33102dec760eff14d04 refactor(policy): track opencode agent context on main
 Scope: OpenCode adapter implementation surface
 Area: OPENCODE
 -->
@@ -16,15 +16,15 @@ OpenCode adapter implementation surface
 - `path:references/rldyour-contract.json`
 
 ## Last verified
-- date: 2026-06-16
-- commit: ``
-- checked by: Codex ry-start memory taxonomy sync
+- date: 2026-06-26
+- commit: `fc52b89e8af2adb4c8f1c33102dec760eff14d04`
+- checked by: opencode 1.7.0 tracked-context migration
 
 ## Facts
 - OpenCode memories describe opencode.json, local plugins, commands, skills, agents, permissions, MCP, and LSP.
 
 ## Evidence
-- `commit:`
+- `commit:fc52b89e8af2adb4c8f1c33102dec760eff14d04`
 - `path:opencode.json`
 - `path:references/rldyour-contract.json`
 

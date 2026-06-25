@@ -1,7 +1,7 @@
 <!-- Memory Metadata
-Last updated: 2026-06-16
-Last verified: 2026-06-16
-Last commit: 875c7f2b49d60bad5d70694329f59f3705f617e7 chore(release): opencode 1.5.2 (other)
+Last updated: 2026-06-26
+Last verified: 2026-06-26
+Last commit: fc52b89e8af2adb4c8f1c33102dec760eff14d04 refactor(policy): track opencode agent context on main
 Scope: verified current technical debt
 Area: TECHDEBT
 -->
@@ -16,15 +16,15 @@ verified current technical debt
 - `path:CHANGELOG.md`
 
 ## Last verified
-- date: 2026-06-16
-- commit: ``
-- checked by: Codex ry-start memory taxonomy sync
+- date: 2026-06-26
+- commit: `fc52b89e8af2adb4c8f1c33102dec760eff14d04`
+- checked by: opencode 1.7.0 tracked-context migration
 
 ## Facts
 - Technical debt memories record verified open debt only when it has code/config evidence.
 
 ## Evidence
-- `commit:`
+- `commit:fc52b89e8af2adb4c8f1c33102dec760eff14d04`
 - `path:README.md`
 - `path:CHANGELOG.md`
 

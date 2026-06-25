@@ -1,7 +1,7 @@
 <!-- Memory Metadata
 Last updated: 2026-06-26
 Last verified: 2026-06-26
-Last commit: 11c2d87ecc805517653ff4b61870cac3dfca4618 fix(docs): use ASCII dashes and refresh current tag in AGENTS.md
+Last commit: fc52b89e8af2adb4c8f1c33102dec760eff14d04 refactor(policy): track opencode agent context on main
 Scope: release readiness, versioning, and artifact hygiene
 Area: RELEASE
 -->
@@ -17,16 +17,16 @@ release readiness, versioning, and artifact hygiene
 - `path:.github/workflows/release.yml`
 
 ## Last verified
-- date: 2026-06-16
-- commit: `875c7f2b49d60bad5d70694329f59f3705f617e7`
-- checked by: Codex ry-start memory taxonomy sync
+- date: 2026-06-26
+- commit: `fc52b89e8af2adb4c8f1c33102dec760eff14d04`
+- checked by: opencode 1.7.0 tracked-context migration
 
 ## Facts
 - Current rldyour-opencode adapter VERSION is `1.7.0`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
 - Release memories record numeric versioning, tags, CI gates, and clean artifact hygiene.
 
 ## Evidence
-- `commit:875c7f2b49d60bad5d70694329f59f3705f617e7`
+- `commit:fc52b89e8af2adb4c8f1c33102dec760eff14d04`
 - `path:VERSION`
 - `path:CHANGELOG.md`
 - `path:.github/workflows/release.yml`
