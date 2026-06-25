@@ -10,8 +10,7 @@ When something feels wrong:
 - `git log --oneline -20` - recent change history.
 - `bash scripts/git_sync_audit.sh` - branch, upstream, dirty files, worktrees, merged-branch cleanup candidates.
 - `bash scripts/validate_config.sh` - full repository-level validator (opencode.json schema, skill/agent/command frontmatter, VERSION semver).
-- `bash scripts/fullrepo_sync.sh status-json` - complete `HEAD + agent-only` fullrepo branch sync state.
-- `bash scripts/flow_post_task_state.sh` - composite git / Serena / fullrepo / instruction-docs state in JSON.
+- `bash scripts/flow_post_task_state.sh` - composite git / Serena / tracked-context / instruction-docs state in JSON.
 - `python3 scripts/smoke_mcp_capabilities.py` - verify every declared MCP server in `opencode.json` is reachable.
 - `python3 scripts/validate_instruction_docs.py` - verify `AGENTS.md` and `.claude/CLAUDE.md` are present, non-trivially large, and contain required anchor sections.
 - `opencode debug config` / `opencode debug info` / `opencode debug agent <name>` / `opencode debug skill` - live native resolution from the OpenCode CLI.
@@ -48,7 +47,6 @@ The script writes a timestamped directory under `diagnostics/` (git-ignored). Ty
 | `deps-pins.json` | `bash scripts/check_deps_freshness.sh --json` |
 | `action-pins.txt` | `python3 scripts/check_action_pins.py .github/workflows` |
 | `flow-state.json` | `bash scripts/flow_post_task_state.sh` |
-| `fullrepo-status.json` | `bash scripts/fullrepo_sync.sh status-json` |
 | `git-audit.txt` | `bash scripts/git_sync_audit.sh` |
 | `mcp-smoke.json` | `python3 scripts/smoke_mcp_capabilities.py --json` |
 | `opencode-info.txt`, `opencode-config.txt` | `opencode debug info / config` (skipped if CLI absent) |
@@ -70,10 +68,10 @@ The bundle never contains `.env*`, credentials, or anything from `~/.ssh` / `~/.
 
 1. Read the failing GitHub Actions job summary.
 2. Pull the diagnostic bundle: `bash scripts/collect_diagnostics.sh --include-doctor`.
-3. Inspect `validate.log`, `opencode-config.txt`, `mcp-smoke.json`, `flow-state.json`, `fullrepo-status.json`.
+3. Inspect `validate.log`, `opencode-config.txt`, `mcp-smoke.json`, and `flow-state.json`.
 4. If MCP-related: check `mcp-smoke.json` for non-`alive` servers; rerun the local launcher manually.
 5. If LSP-related: check `lsp-health.txt`; reinstall via `bash scripts/install_lsps.sh`.
-6. If git-state-related: check `git-status.txt` + `fullrepo-status.json`; use `bash scripts/fullrepo_sync.sh bootstrap-init` to restore agent-only context.
+6. If git-state-related: check `git-status.txt`; durable AI context is tracked on `main`, while runtime-local Serena state remains ignored.
 7. Reproduce locally with the exact command that failed.
 
 ## Logging rules

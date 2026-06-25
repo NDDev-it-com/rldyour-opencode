@@ -6,7 +6,7 @@ Thanks for taking the time to contribute to the rldyour AI CLI configuration for
 
 - Code of Conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 - Security disclosure: [SECURITY.md](./SECURITY.md)
-- Cross-tool root instructions: [AGENTS.md](./AGENTS.md) (agent-only, published to `fullrepo`)
+- Cross-tool root instructions: [AGENTS.md](./AGENTS.md)
 - Architecture decisions: [docs/decisions/](./docs/decisions/)
 - Release process: [docs/release-process.md](./docs/release-process.md)
 - Observability triage: [docs/observability.md](./docs/observability.md)
@@ -14,14 +14,12 @@ Thanks for taking the time to contribute to the rldyour AI CLI configuration for
 
 ## Repository layout
 
-The marketplace splits into two artifact classes:
+The marketplace tracks runtime artifacts and durable agent context on `main`:
 
 | Class | What lives there | Branch |
 |---|---|---|
 | Normal-branch runtime | `opencode.json`, `README.md`, `VERSION`, `CHANGELOG.md`, `.env.example`, `scripts/`, `docs/`, `references/`, `.github/`, `.opencode/{agents,skills,commands,plugins}/` | `main` |
-| Agent-only context | `AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, `.serena/project.yml` | `fullrepo` (orphan) |
-
-The `fullrepo` branch is managed via `scripts/fullrepo_sync.sh`. Do not commit agent-only paths to `main` - they are excluded via `.git/info/exclude`.
+| Durable agent context | `AGENTS.md`, `.serena/memories/*`, `.serena/project.yml`, `.serena/plans/`, `.serena/research/`, `.serena/newproj/`, `.serena/deploy/` | `main` |
 
 ## Local development setup
 
@@ -33,9 +31,7 @@ cd rldyour-opencode
 # Install plugin SDK dependencies (used by typecheck workflow)
 cd .opencode && bun install --frozen-lockfile && cd ..
 
-# Optionally bootstrap agent-only context from fullrepo
 bash scripts/bootstrap_opencode.sh
-bash scripts/fullrepo_sync.sh restore
 ```
 
 ## Validation contract
@@ -56,7 +52,7 @@ When `opencode` CLI is on PATH, `validate_config.sh` also exercises the live `op
 ## Commit, branch, and PR conventions
 
 - **Conventional Commits 1.0.0** for every commit. Format: `<type>(<scope>): <description>` with type from `feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert`.
-- **Atomic commits**: one logical change per commit. Split unrelated implementation, tests/validators, docs/instructions, license/metadata, generated artifacts, and Serena/fullrepo sync when they are independently reviewable. Never `--amend` an already-pushed commit; ship a follow-up commit instead.
+- **Atomic commits**: one logical change per commit. Split unrelated implementation, tests/validators, docs/instructions, license/metadata, generated artifacts, and Serena memory updates when they are independently reviewable. Never `--amend` an already-pushed commit; ship a follow-up commit instead.
 - **Commit subject ≤72 characters**; longer detail in the body.
 - **Branch naming**: `feat/<topic>`, `fix/<topic>`, `chore/<topic>`. Solo-maintainer commits on `main` are acceptable for small atomic changes; multi-step features should use a feature branch and a single PR.
 - **PR description** must include: scope, validation evidence (which gates ran green), risk assessment, ADR link if architectural.

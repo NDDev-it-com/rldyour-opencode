@@ -157,12 +157,12 @@ def _count_files(rel_dir: str, pattern: str) -> int:
 def check_skills() -> dict[str, Any]:
     started = time.monotonic_ns()
     skills_dir = REPO_ROOT / ".opencode" / "skills"
-    # Quality-review F-5: a partial fullrepo restore or a fresh archive
+    # Quality-review F-5: a partial context restore or a fresh archive
     # can land without `.opencode/skills` at all. Guard the iterdir so the
     # doctor reports a clean skip instead of crashing on FileNotFoundError.
     if not skills_dir.exists():
         return _result("skills.index", "skip", started, [
-            ".opencode/skills directory absent (fullrepo not bootstrapped)",
+            ".opencode/skills directory absent",
         ])
     count = sum(1 for p in skills_dir.iterdir() if p.is_dir() and (p / "SKILL.md").exists())
     index = skills_dir / "index.json"
@@ -243,7 +243,7 @@ def check_serena() -> dict[str, Any]:
     started = time.monotonic_ns()
     serena = REPO_ROOT / ".serena"
     if not serena.exists():
-        return _result("serena.layout", "skip", started, ["no .serena directory (restored from fullrepo on demand)"])
+        return _result("serena.layout", "skip", started, ["no .serena directory"])
     project = serena / "project.yml"
     memories_dir = serena / "memories"
     details: list[str] = []

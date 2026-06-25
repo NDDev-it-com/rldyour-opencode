@@ -17,15 +17,18 @@ When a local edit broke `opencode debug config`:
 
 Never `git reset --hard` on `main` to undo a bad change - use `git revert` so the history records the rollback.
 
-## Restoring agent-only files
+## Restoring tracked agent context
 
-If `.serena/`, `.claude/`, `AGENTS.md`, or another ignored agent-only path is missing locally:
+If `.serena/`, `AGENTS.md`, or another tracked context path is missing locally:
 
 ```bash
-bash scripts/fullrepo_sync.sh bootstrap-init
+git restore --source=HEAD -- AGENTS.md .serena
 ```
 
-`bootstrap-init` installs the `.git/info/exclude` rldyour block and restores the agent-only paths from `origin/fullrepo`. The `fullrepo` branch itself is a complete `HEAD + agent-only` snapshot, but restore intentionally copies back only the ignored project knowledge paths so the normal branch checkout stays authoritative for runtime files. If `origin/fullrepo` does not exist yet, run `bash scripts/fullrepo_sync.sh publish` from a known-good clone first.
+Tracked context is normal source; restore it from `HEAD`, a prior tag, or a
+follow-up revert like any other repository file. Do not restore runtime-local
+cache, review scratch files, diagnostics, markers, tokens, cookies, or
+credentials.
 
 ## Restoring a published release
 
@@ -42,7 +45,8 @@ Never amend or force-push an existing release tag. Make a new patch release inst
 
 If `.serena/memories/` is corrupted, partially deleted, or contains stale claims that fail to verify against current code:
 
-1. Run `bash scripts/fullrepo_sync.sh restore` to pull the last published memory snapshot from `origin/fullrepo`.
+1. Restore the last known-good `.serena/memories/` tree from `HEAD`, a prior
+   tag, or a revert commit.
 2. Re-run the `serena-memory-sync` skill (or `@flow-memory-sync` subagent) to refresh memories against the current HEAD.
 3. Commit the refresh as `chore(serena): sync project knowledge after <HEAD-SHA>`.
 

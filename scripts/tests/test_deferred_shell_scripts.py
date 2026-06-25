@@ -335,7 +335,7 @@ def test_flow_post_task_state_is_valid_json(tmp_path: Path) -> None:
     result = _run_script(script, [], cwd=tmp_path, timeout=DEFAULT_TIMEOUT)
     assert result.returncode == 0
     payload = json.loads(result.stdout)
-    assert set(payload.keys()) >= {"git", "fullrepo", "serena", "instruction_docs", "sync_needed"}
+    assert set(payload.keys()) >= {"git", "serena", "instruction_docs", "sync_needed"}
     assert isinstance(payload["git"]["dirty"], bool)
     assert payload["serena"]["memory_count"] == 1
 

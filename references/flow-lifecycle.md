@@ -23,7 +23,7 @@ Core order:
 
 1. Git sync audit: dirty state, current branch, upstream ahead/behind, worktrees, local/remote branches.
 2. If uncommitted, unmerged, or stale merged branch/worktree state exists, deeply review it. If correct and consistent, synchronize it into `main`, merge safe branches, push, and remove merged worktrees/branches. If risky, ask the user with concrete options.
-3. Resolve project policy before treating `AGENTS.md`, `.serena/*`, `.opencode/*`, or similar files as missing. Restore agent-only files from an existing `fullrepo` only when policy allows it. Creating a missing `fullrepo` branch requires `fullrepo.create_if_missing=true` or explicit current user instruction.
+3. Resolve project policy before treating `AGENTS.md`, `.serena/*`, `.opencode/*`, or similar files as missing. Read tracked agent context directly from the working tree and report missing required context explicitly.
 4. Serena readiness: `check_onboarding_performed`, onboarding if needed, `list_memories`, relevant `read_memory`.
 5. Scope detection: project, module, sphere, or feature. For a sphere such as backend, inspect the whole sphere and its integration points.
 6. Semantic map: `get_symbols_overview`, targeted `find_symbol`, `find_referencing_symbols`, `search_for_pattern` only when needed.
@@ -52,7 +52,7 @@ Core order:
 10. Run quality gates and fix all issues in touched scope plus integration path.
 11. Run reviewer workflow only when the user explicitly asks for review, audit, security review, rules review, or `ry-review`. Use parallel subagents (`@flow-*-review`) only for that explicit review path.
 12. Run browser/security/design/LSP workflows when triggered by the change type.
-13. Synchronize Serena memories, agent-only files, AGENTS.md, git, GitHub, `fullrepo`, and worktree cleanup through post-task sync. For public repositories, verify GitHub Actions for the final pushed HEAD and trigger existing dispatch-only readiness/release workflows when required by the public CI/CD policy.
+13. Synchronize Serena memories, agent-only files, AGENTS.md, git, GitHub, and worktree cleanup through post-task sync. For public repositories, verify GitHub Actions for the final pushed HEAD and trigger existing dispatch-only readiness/release workflows when required by the public CI/CD policy.
 
 ## ry-newp
 

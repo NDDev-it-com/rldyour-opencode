@@ -5,7 +5,7 @@
 This is the OpenCode adapter instruction overlay for `rldyour-opencode`.
 It is a system file tracked on `main` so that `install_system_opencode.sh`
 copies it to the OpenCode config root on a fresh `git clone`, without
-relying on the `fullrepo` overlay restore step.
+relying on an overlay restore step.
 
 Canonical public description: rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review.
 
@@ -70,7 +70,7 @@ they make a boundary explicit.
 
 `scripts/install_system_opencode.sh` installs source config from the normal
 branch and copies this file directly, because `AGENTS.md` is tracked on `main`
-and is present on a fresh `git clone` without any `fullrepo` restore step.
+and is present on a fresh `git clone`.
 
 The installer-required normal source paths are:
 
@@ -78,18 +78,17 @@ The installer-required normal source paths are:
 - `.opencode/`
 - `AGENTS.md`
 
-`AGENTS.md` is a tracked-on-main system instruction file, not an agent-only
-overlay: it is in the root `validate_fullrepo_sync.py` system-file allowlist and
-stays on normal `main` history. Only the `.serena/` agent context
-(`.serena/memories/`, `.serena/reviews/`, `.serena/plans/`, `.serena/research/`,
-and the other `.serena/` workflow directories) is restored and published through
-`fullrepo`. The installer still tolerates a malformed checkout missing this file
-by emitting an explicit warning, but a normal clone always carries it.
+`AGENTS.md` is a tracked-on-main system instruction file. Durable `.serena/`
+agent context (`.serena/project.yml`, `.serena/memories/`, `.serena/plans/`,
+`.serena/research/`, `.serena/newproj/`, and `.serena/deploy/`) is also normal
+source. Runtime-local cache, reviews, diagnostics, markers, local env files,
+browser artifacts, tokens, cookies, and credentials stay ignored. The installer
+still tolerates a malformed checkout missing this file by emitting an explicit
+warning, but a normal clone always carries it.
 
 The system convergence path is owned by root `/ry-repair`:
 
 - preflight source paths before long installer phases;
-- restore `fullrepo` overlays when policy allows it;
 - run OpenCode installer and doctor scripts with explicit timeouts;
 - validate installed surfaces through positive inventories;
 - validate every discovered `opencode` binary on `PATH` against the runtime
@@ -111,8 +110,8 @@ through OpenCode, Claude Code, Codex, or Antigravity CLI. In cmux orchestrator m
 OpenCode can run as a visible worker terminal, but it must not spawn hidden
 background orchestrators, daemon supervisors, or unbounded worker jobs.
 
-OpenCode reviewer agents may analyze and report. They must not push, publish
-fullrepo, delete branches, run system installs, or mutate global policy unless
+OpenCode reviewer agents may analyze and report. They must not push, delete
+branches, run system installs, or mutate global policy unless
 the visible orchestrator explicitly delegates that exact action and project
 policy permits it.
 
@@ -152,9 +151,9 @@ Browser provider roles are fixed:
 Do not reclassify Webwright as MCP and do not silently introduce a second
 browser control provider.
 
-## Release And Fullrepo Policy
+## Release And Tracked Context Policy
 
-OpenCode adapter releases are numeric-tagged. The current exact tag is `1.6.1`
+OpenCode adapter releases are numeric-tagged. The current exact tag is `1.7.0`
 (the active `product_version` in root `config/repositories.json`); older tags are
 historical unless the root tuple explicitly pins them.
 
@@ -163,11 +162,12 @@ Before the root control plane advances the OpenCode gitlink:
 1. Commit OpenCode-owned changes in this repository.
 2. Tag the adapter release when product-version surfaces change.
 3. Push `main` and the numeric tag.
-4. Publish `fullrepo` after the `.serena/` agent context changes.
+4. Ensure durable `.serena/` context is tracked on `main` and runtime-local
+   state is ignored.
 5. Update the root `config/repositories.json` expected head and version.
-6. Run root tuple, contract, instruction parity, fullrepo, and release gates.
+6. Run root tuple, contract, instruction parity, repository-context, and release gates.
 
-This file is tracked on `main` (not part of the `fullrepo` overlay). Update it
+This file is tracked on `main`. Update it
 when the OpenCode install contract, runtime baseline, browser routing,
 permissions, or durable workflow rules change. Read the product version, pinned
 commit, and runtime version from their source files rather than restating them

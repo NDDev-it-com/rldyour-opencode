@@ -136,7 +136,7 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
         "description": (
             "Диагностические custom tools с timeout и output budget. EN: "
             "registers rldyour_validate_config, _check_deps, _lsp_health, "
-            "_git_audit, and _fullrepo_status wrappers around diagnostic scripts."
+            "_git_audit, and _context_status wrappers around diagnostic scripts."
         ),
         "category": "tool-registration",
         "writes_files": False,
@@ -146,7 +146,7 @@ PLUGIN_METADATA: dict[str, dict[str, Any]] = {
             "rldyour_check_deps",
             "rldyour_lsp_health",
             "rldyour_git_audit",
-            "rldyour_fullrepo_status",
+            "rldyour_context_status",
         ],
     },
 }

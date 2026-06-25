@@ -34,28 +34,6 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           fetch-depth: 0
-      - name: Prepare agent-only validation context
-        shell: bash
-        run: |
-          # Release runs the same pytest corpus as validate.yml. Some tests
-          # assert cross-layer contracts in AGENTS.md / .claude, while normal
-          # branches keep those files on origin/fullrepo. Restore only the
-          # instruction docs and exclude marker; do not bootstrap fullrepo over
-          # the release checkout because that could mask the tagged tree under
-          # validation.
-          # Audit P1-5: restore is a FALLBACK, not an overwrite — a tag built
-          # from a branch that already contains AGENTS.md / .claude/CLAUDE.md
-          # must keep its own copy so the release validates the tagged
-          # contents, not the published fullrepo snapshot.
-          set -euo pipefail
-          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo || true
-          bash scripts/fullrepo_sync.sh install-exclude
-          for path in AGENTS.md .claude/CLAUDE.md; do
-            if [ ! -f "${path}" ] && git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
-              mkdir -p "$(dirname "${path}")"
-              git show "origin/fullrepo:${path}" > "${path}"
-            fi
-          done
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:

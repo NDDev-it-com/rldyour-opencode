@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-06-26
+
+### Changed
+
+- Retire the `fullrepo` overlay model. Durable AI context (`AGENTS.md`, `.opencode/`, `.serena/project.yml`, and `.serena/memories/`) is now tracked on `main`; runtime-local Serena state remains ignored.
+- Remove fullrepo restore/publish scripts, CI bootstrap steps, branch-protection metadata, flow policy keys, and post-task blockers.
+- Replace the OpenCode diagnostic custom tool with `rldyour_context_status`, which reports tracked-context/git/Serena state without relying on a secondary branch.
+- Preserve documented `opencode-ai` `1.17.9`, `@opencode-ai/plugin` `1.17.9`, and `@opencode-ai/sdk` `1.17.9` runtime baseline evidence; runtime upgrades are intentionally separate from this architecture migration.
+
 
 ## [1.6.1] - 2026-06-25
 

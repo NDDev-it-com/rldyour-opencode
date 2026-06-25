@@ -30,7 +30,7 @@ RUNTIME_IGNORED = {
     ".serena/project.local.yml",
 }
 DOC_FILES = ("AGENTS.md", ".claude/CLAUDE.md", "CLAUDE.md")
-PROTECTED_BRANCHES = {"main", "master", "dev", "develop", "development", "staging", "production", "prod", "fullrepo"}
+PROTECTED_BRANCHES = {"main", "master", "dev", "develop", "development", "staging", "production", "prod"}
 WORKFLOW_BRANCH_PREFIXES = ("ai/", "opencode/", "ry-", "rldyour/")
 
 
@@ -235,65 +235,27 @@ def _branch_cleanup_state(current_branch: str, policy: dict[str, Any]) -> dict[s
     }
 
 
-def _fullrepo_state() -> dict[str, Any]:
-    script = SCRIPT_DIR / "fullrepo_sync.sh"
-    if not script.is_file():
-        return {}
-    try:
-        proc = subprocess.run(
-            ["bash", str(script), "status-json"],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=_subprocess_timeout(),
-        )
-    except subprocess.TimeoutExpired:
-        return {}
-    if proc.returncode != 0 or not proc.stdout.strip():
-        return {}
-    try:
-        payload = json.loads(proc.stdout)
-    except json.JSONDecodeError:
-        return {}
-    return payload if isinstance(payload, dict) else {}
-
-
-def _instruction_docs_state(root: Path, dirty_files: list[str], policy: dict[str, Any], fullrepo_state: dict[str, Any]) -> dict[str, Any]:
+def _instruction_docs_state(root: Path, dirty_files: list[str], policy: dict[str, Any]) -> dict[str, Any]:
     effective = _effective_policy(policy)
-    fullrepo_policy = effective.get("fullrepo") if isinstance(effective.get("fullrepo"), dict) else {}
     normal_policy = (
         effective.get("normal_branch_policy") if isinstance(effective.get("normal_branch_policy"), dict) else {}
     )
     instruction_policy = (
         effective.get("instruction_docs") if isinstance(effective.get("instruction_docs"), dict) else {}
     )
-    instruction_docs_mode = str(instruction_policy.get("mode", "auto"))
-    normal_instruction_mode = str(normal_policy.get("instruction_docs", "auto"))
-    if instruction_docs_mode == "auto" and normal_instruction_mode != "auto":
+    instruction_docs_mode = str(instruction_policy.get("mode", "tracked-normal-branch"))
+    normal_instruction_mode = str(normal_policy.get("instruction_docs", "tracked-normal-branch"))
+    if instruction_docs_mode not in {"tracked-normal-branch", "disabled"}:
         instruction_docs_mode = normal_instruction_mode
-    fullrepo_mode = str(fullrepo_policy.get("mode", "auto"))
-    if instruction_docs_mode in {"disabled", "tracked-normal-branch"} or fullrepo_mode == "disabled":
-        fullrepo_managed = False
-    elif instruction_docs_mode == "fullrepo-managed" or fullrepo_mode == "required":
-        fullrepo_managed = True
-    else:
-        fullrepo_managed = bool(
-            fullrepo_state.get("fullrepo_remote")
-            or fullrepo_state.get("fullrepo_local")
-            or fullrepo_state.get("exclude_installed")
-        )
     present_docs = [path for path in DOC_FILES[:2] if (root / path).is_file()]
-    missing_docs = [path for path in DOC_FILES[:2] if fullrepo_managed and not (root / path).is_file()]
+    missing_docs = [path for path in DOC_FILES[:2] if not (root / path).is_file()]
     dirty_instruction_docs = [path for path in dirty_files if path in DOC_FILES]
     review_reasons: list[str] = []
-    if missing_docs:
-        review_reasons.append("required agent instruction docs are missing")
     if dirty_instruction_docs:
         review_reasons.append("instruction docs have uncommitted changes")
     if instruction_docs_mode == "disabled":
         review_reasons = []
     return {
-        "fullrepo_managed": fullrepo_managed,
         "instruction_docs_mode": instruction_docs_mode,
         "policy_source": policy.get("source"),
         "policy_source_kind": policy.get("source_kind"),
@@ -302,7 +264,7 @@ def _instruction_docs_state(root: Path, dirty_files: list[str], policy: dict[str
         "missing_docs": missing_docs,
         "dirty_instruction_docs": dirty_instruction_docs,
         "review_reasons": review_reasons,
-        "needs_instruction_docs_review": bool(fullrepo_managed and review_reasons),
+        "needs_instruction_docs_review": bool(review_reasons),
     }
 
 
@@ -321,10 +283,8 @@ def state() -> dict[str, Any]:
     root = Path(_stdout("rev-parse", "--show-toplevel") or ".").resolve()
     project_policy = load_policy(root)
     effective = _effective_policy(project_policy)
-    fullrepo_policy = effective.get("fullrepo") if isinstance(effective.get("fullrepo"), dict) else {}
     stop_policy = effective.get("stop_hook") if isinstance(effective.get("stop_hook"), dict) else {}
     serena_policy = effective.get("serena") if isinstance(effective.get("serena"), dict) else {}
-    fullrepo_mode = str(fullrepo_policy.get("mode", "auto"))
     runtime_execution = _runtime_execution(effective)
     execution_mode = str(runtime_execution["execution_mode"])
     agent_role = str(runtime_execution["agent_role"])
@@ -335,34 +295,8 @@ def state() -> dict[str, Any]:
     dirty_files = _porcelain_paths()
     ahead, behind, upstream = _ahead_behind()
     serena_current, serena_state = _serena_state(root)
-    fullrepo_state = _fullrepo_state()
-    instruction_docs_state = _instruction_docs_state(root, dirty_files, project_policy, fullrepo_state)
+    instruction_docs_state = _instruction_docs_state(root, dirty_files, project_policy)
     branch_cleanup_state = _branch_cleanup_state(branch, project_policy)
-
-    has_existing_fullrepo_context = bool(
-        fullrepo_state.get("fullrepo_remote")
-        or fullrepo_state.get("fullrepo_local")
-        or fullrepo_state.get("exclude_installed")
-        or fullrepo_state.get("local_fullrepo_sha")
-        or fullrepo_state.get("remote_fullrepo_sha")
-    )
-    fullrepo_mismatch = bool(
-        fullrepo_state
-        and (
-            fullrepo_state.get("remote_fullrepo_matches_worktree") is False
-            or fullrepo_state.get("local_fullrepo_matches_worktree") is False
-        )
-    )
-    remote_missing_attention = bool(fullrepo_mode == "required" and not fullrepo_state.get("fullrepo_remote", False))
-    fullrepo_attention_candidate = bool(fullrepo_mismatch or remote_missing_attention)
-    fullrepo_blocks_stop = bool(stop_policy.get("block_on_fullrepo", True)) and bool(
-        fullrepo_policy.get("block_stop", True)
-    )
-    fullrepo_needs_attention = False
-    if fullrepo_mode == "required":
-        fullrepo_needs_attention = fullrepo_attention_candidate and fullrepo_blocks_stop
-    elif fullrepo_mode == "auto":
-        fullrepo_needs_attention = bool(has_existing_fullrepo_context and fullrepo_attention_candidate and fullrepo_blocks_stop)
 
     blocking_reasons: list[str] = []
     advisory_reasons: list[str] = []
@@ -378,8 +312,6 @@ def state() -> dict[str, Any]:
             advisory_reasons.append("worker-serena-stale-report")
         if ahead or behind:
             advisory_reasons.append("worker-branch-drift-report")
-        if fullrepo_attention_candidate:
-            advisory_reasons.append("worker-fullrepo-report")
         if bool(branch_cleanup_state.get("needs_cleanup")):
             advisory_reasons.append("worker-branch-cleanup-report")
         if bool(instruction_docs_state.get("needs_instruction_docs_review")):
@@ -391,10 +323,6 @@ def state() -> dict[str, Any]:
             blocking_reasons.append("dirty-worktree")
         if (ahead or behind) and bool(stop_policy.get("block_on_ahead_behind", True)):
             blocking_reasons.append("branch-ahead-behind")
-        if fullrepo_needs_attention:
-            blocking_reasons.append("fullrepo-sync-required")
-        elif fullrepo_attention_candidate and fullrepo_mode in {"auto", "advisory"}:
-            advisory_reasons.append("fullrepo-sync-advisory")
         branch_cleanup_blocks_stop = bool(stop_policy.get("block_on_branch_cleanup", False)) or bool(
             branch_cleanup_state.get("block_stop")
         )
@@ -444,10 +372,8 @@ def state() -> dict[str, Any]:
             "warnings": project_policy.get("warnings", []),
             "effective": effective,
         },
-        "fullrepo_state": fullrepo_state,
         "instruction_docs_state": instruction_docs_state,
         "branch_cleanup_state": branch_cleanup_state,
-        "fullrepo_needs_attention": fullrepo_needs_attention,
         "blocking_reasons": blocking_reasons,
         "advisory_reasons": advisory_reasons,
         "needs_flow_sync": needs_flow_sync,
@@ -461,7 +387,6 @@ def state() -> dict[str, Any]:
             "ahead": ahead,
             "behind": behind,
         },
-        "fullrepo": {"exists": bool(fullrepo_state.get("fullrepo_remote") or fullrepo_state.get("fullrepo_local"))},
         "serena": serena_state,
         "instruction_docs": {"agents_md": (root / "AGENTS.md").is_file()},
     }

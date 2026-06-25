@@ -19,7 +19,7 @@ For rldyour AI CLI configuration repositories, `/ry-repair` also verifies determ
   (`git pull --ff-only`, `git submodule update --init --recursive`), then
   `python3 scripts/ry_repair_sync.py --check` and `--apply --install-system`.
   In consumer mode do NOT author changes into the repository: no commits, no
-  doc/contract/memory edits, no fullrepo publication. If fast-forward fails or
+  doc/contract/memory edits. If fast-forward fails or
   validators reveal repository drift, report it and switch to authoring repair
   only on explicit owner instruction.
 
@@ -30,7 +30,7 @@ For rldyour AI CLI configuration repositories, `/ry-repair` also verifies determ
 3. Inspect Serena memories, plans, and research archives for stale facts, unsupported claims, missing taxonomy, duplicated rules, or contradictions with current code.
 4. Inspect GitHub issues, pull requests, and recent history through MCP or CLI when available. Verify every issue against current code before treating it as a fact.
 5. Inspect MCP/LSP/tooling config, plugin hook lifecycles, commands/skills/agents, CI gates, release manifests, dependency baselines, and docs source-of-truth declarations.
-6. When the root control plane is present, run `python3 scripts/ry_repair_sync.py --plan --target "$PWD"` and use `--check` before claiming local repo, system AI CLI config, Serena memory, or GitHub/fullrepo sync. For OS/mode work, pass explicit flags: `--os macos|linux|wsl|windows`, `--mode standard|orchestrator`, and `--cmux` only for macOS orchestrator mode.
+6. When the root control plane is present, run `python3 scripts/ry_repair_sync.py --plan --target "$PWD"` and use `--check` before claiming local repo, system AI CLI config, Serena memory, or GitHub sync. For OS/mode work, pass explicit flags: `--os macos|linux|wsl|windows`, `--mode standard|orchestrator`, and `--cmux` only for macOS orchestrator mode.
 7. Treat approved active inventories as system-wide: installed Claude/Codex/OpenCode configs, active agent/tool surfaces, CI workflows, runtime pins, docs, and release gates must match current MCP/provider policies. Do not keep permanent tool-specific absence gates for removed components.
 8. Detect semantic entropy: duplicated docs, stale pins, conflicting instructions, dead config, unclear source-of-truth, missing ADR/CONTEXT/FUTURE facts, broken validators, adapter parity drift, and natural-language policy overrides that are not materialized in project policy JSON.
 9. Produce a repair plan that separates:
@@ -47,7 +47,7 @@ For rldyour AI CLI configuration repositories, `/ry-repair` also verifies determ
 - Do not edit ADR meaning, business logic, functional behavior, pricing, deployment targets, security posture, or data contracts without owner approval.
 - Hooks and plugins stay bounded and deterministic. They may mark state; `ry-repair` performs the repair.
 - Do not hide unresolved drift behind green summaries. Every blocked check names the blocker and next proof command.
-- Do not report local repo, system config, Serena memory, or GitHub parity without evidence from `ry_repair_sync.py`, installed-config validators, current git state, and fullrepo/GitHub checks where applicable.
+- Do not report local repo, system config, Serena memory, or GitHub parity without evidence from `ry_repair_sync.py`, installed-config validators, current git state, and GitHub checks where applicable.
 
 ## Output
 
@@ -58,4 +58,4 @@ Report in Russian:
 - Technical repairs applied.
 - Decision-class items left for owner approval.
 - Exact validation commands and results.
-- Docs/memory/fullrepo/git synchronization status.
+- Docs/memory/git synchronization status.

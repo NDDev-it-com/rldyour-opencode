@@ -110,7 +110,7 @@ Five tools registered, all wrapping existing diagnostic scripts so the LLM can d
 - `rldyour_check_deps` - runs `scripts/check_deps_freshness.sh --json`.
 - `rldyour_lsp_health` - runs `scripts/check_lsps.sh`.
 - `rldyour_git_audit` - runs `scripts/git_sync_audit.sh`.
-- `rldyour_fullrepo_status` - runs `scripts/fullrepo_sync.sh status-json`.
+- `rldyour_context_status` - runs `scripts/flow_post_task_state.sh`.
 
 Each tool returns the script's combined stdout/stderr and stamps `ctx.metadata({ title, metadata: { exitCode } })` so the TUI shows pass/fail at a glance.
 

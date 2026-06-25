@@ -1,0 +1,70 @@
+<!-- Memory Metadata
+Last updated: 2026-06-26
+Last verified: 2026-06-26
+Last commit: 11c2d87ecc805517653ff4b61870cac3dfca4618 fix(docs): use ASCII dashes and refresh current tag in AGENTS.md
+Scope: release readiness, versioning, and artifact hygiene
+Area: RELEASE
+-->
+
+# Release Validation
+
+## Scope
+release readiness, versioning, and artifact hygiene
+
+## Current source of truth
+- `path:VERSION`
+- `path:CHANGELOG.md`
+- `path:.github/workflows/release.yml`
+
+## Last verified
+- date: 2026-06-16
+- commit: `875c7f2b49d60bad5d70694329f59f3705f617e7`
+- checked by: Codex ry-start memory taxonomy sync
+
+## Facts
+- Current rldyour-opencode adapter VERSION is `1.7.0`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
+- Release memories record numeric versioning, tags, CI gates, and clean artifact hygiene.
+
+## Evidence
+- `commit:875c7f2b49d60bad5d70694329f59f3705f617e7`
+- `path:VERSION`
+- `path:CHANGELOG.md`
+- `path:.github/workflows/release.yml`
+
+## Known pitfalls
+- Treat this memory as derived context. Current code, configuration, runtime output, and GitHub state override stale memory text.
+
+## Update policy
+Update after verified changes to the referenced source-of-truth files.
+
+## Delete / merge policy
+- Delete or merge only when the referenced source-of-truth files no longer support this memory and the replacement memory preserves the durable facts.
+
+## Applies to
+- The scope declared in this memory and the source-of-truth paths listed below.
+
+## Source of truth
+- The `Current source of truth` section above, plus current code, configuration, tests, git state, and live GitHub state where the memory explicitly references live release or repository surfaces.
+
+## Invariants
+- Code, configuration, tests, validators, git state, and live GitHub state override this memory when they disagree.
+
+## Current State
+- See `Facts` for current durable facts. Do not treat `Historical evidence`, old commit notes, or previous release entries as current state.
+
+## Do Not Infer
+- Do not infer runtime versions, product versions, commits, permissions, release state, security posture, or tool behavior from this memory without checking the source of truth.
+
+## Update Triggers
+- Update after verified changes to the source-of-truth files, runtime baselines, release tuple, validation gates, live release state, or durable agent workflow contracts.
+
+## Validation Commands
+- `python3 scripts/validate_serena_memory_schema.py --scope all --strict-mode strict-all`
+- `python3 scripts/validate_serena_memory_semantics.py --scope all --strict-current-facts`
+- `python3 scripts/validate_memory_freshness.py --scope all`
+
+## Repair Procedure
+- Re-read source-of-truth files, update only verified current facts, move stale facts to historical evidence, then rerun the validation commands.
+
+## Current module tuple
+- OpenCode: `modules/rldyour-opencode`, product version `1.7.0`.

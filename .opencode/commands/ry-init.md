@@ -1,12 +1,12 @@
 ---
-description: "Инициализация scoped read-only контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context."
+description: "Инициализация scoped read-only контекста проекта: Serena discovery + tracked context review + verified context pack. Initialize scoped project context."
 agent: build
 ---
 
 Initialize the current project scope. Run the full init workflow:
 
 1. Git sync audit: dirty state, current branch, upstream ahead/behind, worktrees, local/remote branches.
-2. Bootstrap agent-only context before treating instruction docs or Serena files as missing.
+2. Inspect durable AI context as normal tracked source; do not restore it from another branch.
 3. Serena readiness: check onboarding, list memories, read relevant memories.
 4. Scope detection: classify as project, sphere, module, or feature. If ambiguous, ask the user in Russian with 2-3 concrete options.
 5. Semantic map: use Serena-first for supported code (get_symbols_overview, targeted find_symbol, find_referencing_symbols, search_for_pattern). Fall back to rg/file reads for manifests, Markdown, config, shell scripts, or unsupported languages.

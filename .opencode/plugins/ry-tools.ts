@@ -2,7 +2,7 @@
  * Multi-domain diagnostic aggregator.
  *
  * Tools registered here span multiple domains from AGENTS.md § Domain
- * Boundaries — Flow (validate_config, git_audit, fullrepo_status),
+ * Boundaries - Flow (validate_config, git_audit, context_status),
  * LSP (lsp_health), Dependency (check_deps). Bundling is intentional:
  * the plugin only *exposes* diagnostic scripts; the scripts themselves
  * stay within their respective domains. New tools added here MUST:
@@ -96,7 +96,7 @@ const TOOL_BUDGETS = {
   checkDeps: { timeoutMs: 30_000, maxOutputBytes: 64_000 },
   lspHealth: { timeoutMs: 20_000, maxOutputBytes: 128_000 },
   gitAudit: { timeoutMs: 15_000, maxOutputBytes: 64_000 },
-  fullrepoStatus: { timeoutMs: 15_000, maxOutputBytes: 64_000 },
+  contextStatus: { timeoutMs: 15_000, maxOutputBytes: 64_000 },
 } as const
 
 function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
@@ -187,20 +187,20 @@ function buildTools(getCwd: () => string): Record<string, ToolDefinition> {
       },
     }),
 
-    rldyour_fullrepo_status: tool({
+    rldyour_context_status: tool({
       description:
-        "Проверяет fullrepo state через `bash scripts/fullrepo_sync.sh status-json`. EN: returns JSON for agent-only branch, dirty/ahead/behind state, fullrepo existence, and Serena memory count before /ry-sync.",
+        "Проверяет repository context через `bash scripts/flow_post_task_state.sh`. EN: returns JSON for dirty/ahead/behind state, tracked Serena memory count, instruction docs, and branch cleanup before /ry-sync.",
       args: {},
       async execute(_args, ctx) {
         const cwd = ctx.directory || getCwd()
-        const budget = TOOL_BUDGETS.fullrepoStatus
-        const result = await runScript(cwd, ["bash", "scripts/fullrepo_sync.sh", "status-json"], budget)
+        const budget = TOOL_BUDGETS.contextStatus
+        const result = await runScript(cwd, ["bash", "scripts/flow_post_task_state.sh"], budget)
         if (result.timedOut) {
-          ctx.metadata({ title: "fullrepo TIMEOUT", metadata: { timeoutMs: budget.timeoutMs } })
-          return formatTimeoutResult("fullrepo_sync.sh status-json", budget.timeoutMs)
+          ctx.metadata({ title: "context TIMEOUT", metadata: { timeoutMs: budget.timeoutMs } })
+          return formatTimeoutResult("flow_post_task_state.sh", budget.timeoutMs)
         }
         ctx.metadata({
-          title: "fullrepo status",
+          title: "context status",
           metadata: { exitCode: result.exitCode, truncated: result.truncated },
         })
         return result.stdout || result.stderr

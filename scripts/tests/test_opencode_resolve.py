@@ -73,14 +73,19 @@ EXPECTED_PLUGINS = (
     "ry-system-context.ts",
 )
 
+OPENCODE_DEBUG_TIMEOUT_SECONDS = 180
+
 
 def _run_opencode(*args: str) -> subprocess.CompletedProcess[str]:
+    # `opencode debug config` is a live Bun/CLI resolution smoke. It can be
+    # slow in full-suite runs on macOS when pytest capture and Bun cache work
+    # happen concurrently, even though the command itself resolves correctly.
     proc = subprocess.run(
         ["opencode", *args],
         cwd=str(PROJECT_ROOT),
         capture_output=True,
         text=False,
-        timeout=60,
+        timeout=OPENCODE_DEBUG_TIMEOUT_SECONDS,
         env={
             **os.environ,
             "NO_COLOR": "1",

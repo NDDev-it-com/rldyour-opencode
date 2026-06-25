@@ -98,7 +98,7 @@ export const RyCommandAudit: Plugin = async ({ client, directory }) => {
         // code couldn't handle.
         //
         // (1) Missing `.serena/` directory. On a freshly cloned repo where
-        //     the agent-only files have not been restored from `fullrepo`
+        //     the agent-only files have not been restored from `tracked context`
         //     yet, the parent directory does not exist and Bun.write would
         //     silently fail. `ensureDir` runs `mkdir -p` which is
         //     idempotent and cheap.

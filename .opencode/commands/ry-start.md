@@ -17,7 +17,7 @@ Implement a task through the full quality workflow:
 10. Run quality gates and fix all issues in touched scope plus integration path.
 11. Run explicit review workflow only when the user asks for review, audit, security review, rules review, or ry-review. Normal ry-start implementation must skip reviewer fan-out to save tokens.
 12. Run browser/security/design/LSP workflows when triggered by the change type.
-13. Synchronize Serena memories, AGENTS.md, instruction docs, git, and fullrepo through /ry-sync.
+13. Synchronize Serena memories, AGENTS.md, instruction docs, git, through /ry-sync.
 
 ## CI/CD and Git Mutation Gate
 

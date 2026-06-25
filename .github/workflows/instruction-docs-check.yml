@@ -49,11 +49,11 @@ jobs:
         with:
           python-version: "3.13"
       - name: Validate instruction docs
-        # AGENTS.md and .claude/CLAUDE.md live on the `fullrepo` orphan branch
+        # AGENTS.md and .claude/CLAUDE.md live on the `tracked context` orphan branch
         # in the agent-only artifact path. PR runs against the normal branch
         # do not see them; the script tolerates absent files gracefully. The
         # cron run scheduled in validate.yml uses the same script but reads
-        # the fullrepo snapshot via a separate checkout step (deferred to
+        # the tracked context snapshot via a separate checkout step (deferred to
         # future automation).
         run: |
           if [ -f AGENTS.md ] && [ -f .claude/CLAUDE.md ]; then

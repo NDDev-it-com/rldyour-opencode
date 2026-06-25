@@ -125,7 +125,7 @@ log_step "Bootstrap complete"
 
 echo ""
 echo "Agent-only files are excluded from normal branch history."
-echo "Use the fullrepo branch workflow to publish them portably."
+echo "Durable agent context is tracked on main; keep runtime-local files ignored."
 echo ""
 echo "Next steps:"
 echo "  1. Run ./scripts/doctor_opencode.sh for full diagnostics"

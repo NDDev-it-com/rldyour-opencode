@@ -21,13 +21,13 @@ Keep durable project instructions useful for future sessions without turning the
 - Repository docs, instructions, ADRs, memories, plans, comments, and commits are English. User-facing conversation with the user is Russian.
 - Do not store secrets, personal tokens, local-only credentials, private cookies, or chat transcripts in docs.
 
-## Agent-Only Files And Fullrepo
+## Agent-Only Files And tracked context
 
 In normal product repositories, instruction files (`AGENTS.md`, `.claude/CLAUDE.md`, `REVIEW.md`) are agent-only context. They should be:
 
-- Restored locally from `fullrepo` branch via the project sync script.
-- Ignored through `.git/info/exclude` (`fullrepo` block installed automatically).
-- Published to `fullrepo` branch via sync workflow.
+- Restored locally from `tracked context` branch via the project sync script.
+- Ignored through `.git/info/exclude` (`tracked context` block installed automatically).
+- Published to `tracked context` branch via sync workflow.
 - Never committed to normal product branches (`main`, feature branches).
 
 Repositories that are themselves agent tooling may intentionally track selected instruction templates as product files.
@@ -38,7 +38,7 @@ Read `references/project-instructions-and-adrs.md` before creating or updating d
 
 - Reduce `.claude/CLAUDE.md` to a thin `@AGENTS.md` import (violates project rule).
 - Create root `CLAUDE.md` for new projects (`.claude/CLAUDE.md` is the preferred path).
-- Commit `AGENTS.md`/`CLAUDE.md`/`REVIEW.md` into normal product branches (use fullrepo).
+- Commit `AGENTS.md`/`CLAUDE.md`/`REVIEW.md` into normal product branches (use tracked context).
 - Store secrets / tokens / chat history in instruction docs.
 - Skip ADR for irreversible decisions (architecture, framework, DB choice).
 - Update instruction docs for mechanical formatting changes (only durable facts).

@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "1.7.0",
   "generated_by": "scripts/generate_plugins_index.py",
   "count": 10,
   "plugins": [
@@ -117,7 +117,7 @@
       "name": "ry-tools",
       "path": ".opencode/plugins/ry-tools.ts",
       "category": "tool-registration",
-      "description": "Диагностические custom tools с timeout и output budget. EN: registers rldyour_validate_config, _check_deps, _lsp_health, _git_audit, and _fullrepo_status wrappers around diagnostic scripts.",
+      "description": "Диагностические custom tools с timeout и output budget. EN: registers rldyour_validate_config, _check_deps, _lsp_health, _git_audit, and _context_status wrappers around diagnostic scripts.",
       "hooks": [
         "tool"
       ],
@@ -128,7 +128,7 @@
         "rldyour_check_deps",
         "rldyour_lsp_health",
         "rldyour_git_audit",
-        "rldyour_fullrepo_status"
+        "rldyour_context_status"
       ]
     }
   ]

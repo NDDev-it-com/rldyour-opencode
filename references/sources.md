@@ -24,6 +24,6 @@ Engineering conclusions:
 - Subagents are useful for parallel reviews, but prompts must be self-contained and bounded.
 - `AGENTS.md` is the concise root project-instruction file (cross-tool standard, see https://agents.md/) while `opencode.json` is the OpenCode-native configuration file. Keep both independently useful.
 - `.git/info/exclude` is local exclude state, so it is appropriate for per-repository agent-only files that should exist locally but not in normal branch history.
-- Use `--force-with-lease` for generated `fullrepo` snapshots so unexpected remote updates are not overwritten silently.
+- Use ordinary protected-branch review, fast-forward pushes, and release tags for tracked context changes.
 - Reviewer subagents (`.opencode/agents/*.md`) with `mode: subagent` and `hidden: true` are the canonical pattern for orchestrated-only review tracks.
 - Quality and correctness are higher priority than speed.

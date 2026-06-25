@@ -63,7 +63,7 @@ COMMAND_METADATA: dict[str, dict[str, Any]] = {
     },
     "ry-sync": {
         "domain": "flow",
-        "triggers": ["finalize task", "post-task sync", "publish fullrepo"],
+        "triggers": ["finalize task", "post-task sync", "tracked context"],
     },
     "ry-design": {
         "domain": "design",
