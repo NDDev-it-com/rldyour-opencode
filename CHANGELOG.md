@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.3] - 2026-06-26
+
+### Fixed
+
+- Align README memory heading with the shared tracked-context adapter template. Runtime baseline remains OpenCode/plugin/SDK `1.17.9`.
+
 ## [1.7.2] - 2026-06-26
 
 ### Fixed

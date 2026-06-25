@@ -14,9 +14,9 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.7.2` |
+| Adapter version | `1.7.3` |
 | Runtime baseline | OpenCode 1.17.9 |
-| GitHub release tag | `1.7.2` |
+| GitHub release tag | `1.7.3` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
@@ -180,7 +180,7 @@ Three browser providers are active, each with a distinct role:
 
 The `/ry-design` command routes through Figma MCP (design context and asset download), shadcn/ui MCP (registry access), and Chrome DevTools MCP (validation). DeepWiki, Context7, and Grep MCP support research and documentation retrieval during design and exploration tasks.
 
-## Memory Model
+## Repository Context / Serena Memory
 
 Normal `main` history carries product artifacts and durable agent context:
 `opencode.json`, `.opencode/`, `AGENTS.md`, `.serena/project.yml`,
