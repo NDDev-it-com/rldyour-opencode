@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.2] - 2026-06-26
+
+### Fixed
+
+- Document that the generated cmux projection patch preserves `opencode-ai` `1.17.9`, `@opencode-ai/plugin` `1.17.9`, and `@opencode-ai/sdk` `1.17.9` runtime baseline evidence.
+
 ## [1.7.1] - 2026-06-26
 
 ### Fixed
