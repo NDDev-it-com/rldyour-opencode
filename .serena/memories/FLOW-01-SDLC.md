@@ -17,7 +17,7 @@ rldyour SDLC command lifecycle
 ## Last verified
 - date: 2026-06-26
 - commit: `d93a558050d54a80e578035d0e1627385ec7c1e4`
-- checked by: opencode 1.7.2 tracked-context migration
+- checked by: opencode 1.7.3 tracked-context migration
 
 ## Facts
 - Flow memories record ry-init, ry-start, ry-newp, ry-review, ry-repair, ry-deploy, and ry-sync behavior.

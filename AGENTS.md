@@ -153,7 +153,7 @@ browser control provider.
 
 ## Release And Tracked Context Policy
 
-OpenCode adapter releases are numeric-tagged. The current exact tag is `1.7.2`
+OpenCode adapter releases are numeric-tagged. The current exact tag is `1.7.3`
 (the active `product_version` in root `config/repositories.json`); older tags are
 historical unless the root tuple explicitly pins them.
 
