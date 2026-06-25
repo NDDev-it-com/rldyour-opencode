@@ -1,7 +1,7 @@
 <!-- Memory Metadata
 Last updated: 2026-06-26
 Last verified: 2026-06-26
-Last commit: fc52b89e8af2adb4c8f1c33102dec760eff14d04 refactor(policy): track opencode agent context on main
+Last commit: d93a558050d54a80e578035d0e1627385ec7c1e4 test(runtime): stabilize opencode debug resolve smoke
 Scope: quality-first engineering rules
 Area: RULES
 -->
@@ -17,14 +17,14 @@ quality-first engineering rules
 
 ## Last verified
 - date: 2026-06-26
-- commit: `fc52b89e8af2adb4c8f1c33102dec760eff14d04`
+- commit: `d93a558050d54a80e578035d0e1627385ec7c1e4`
 - checked by: opencode 1.7.0 tracked-context migration
 
 ## Facts
 - Rules memories record non-negotiable quality, architecture, dependency, and verification discipline.
 
 ## Evidence
-- `commit:fc52b89e8af2adb4c8f1c33102dec760eff14d04`
+- `commit:d93a558050d54a80e578035d0e1627385ec7c1e4`
 - `path:.opencode/skills/quality-first-engineering`
 - `path:README.md`
 

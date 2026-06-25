@@ -1,7 +1,7 @@
 <!-- Memory Metadata
 Last updated: 2026-06-26
 Last verified: 2026-06-26
-Last commit: fc52b89e8af2adb4c8f1c33102dec760eff14d04 refactor(policy): track opencode agent context on main
+Last commit: d93a558050d54a80e578035d0e1627385ec7c1e4 test(runtime): stabilize opencode debug resolve smoke
 Scope: rldyour SDLC command lifecycle
 Area: FLOW
 -->
@@ -16,14 +16,14 @@ rldyour SDLC command lifecycle
 
 ## Last verified
 - date: 2026-06-26
-- commit: `fc52b89e8af2adb4c8f1c33102dec760eff14d04`
+- commit: `d93a558050d54a80e578035d0e1627385ec7c1e4`
 - checked by: opencode 1.7.0 tracked-context migration
 
 ## Facts
 - Flow memories record ry-init, ry-start, ry-newp, ry-review, ry-repair, ry-deploy, and ry-sync behavior.
 
 ## Evidence
-- `commit:fc52b89e8af2adb4c8f1c33102dec760eff14d04`
+- `commit:d93a558050d54a80e578035d0e1627385ec7c1e4`
 - `path:.opencode/commands/ry-start.md`
 
 ## Known pitfalls
