@@ -19,10 +19,10 @@ release readiness, versioning, and artifact hygiene
 ## Last verified
 - date: 2026-06-26
 - commit: `d93a558050d54a80e578035d0e1627385ec7c1e4`
-- checked by: opencode 1.7.0 tracked-context migration
+- checked by: opencode 1.7.1 tracked-context migration
 
 ## Facts
-- Current rldyour-opencode adapter VERSION is `1.7.0`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
+- Current rldyour-opencode adapter VERSION is `1.7.1`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
 - Release memories record numeric versioning, tags, CI gates, and clean artifact hygiene.
 
 ## Evidence
@@ -67,4 +67,4 @@ Update after verified changes to the referenced source-of-truth files.
 - Re-read source-of-truth files, update only verified current facts, move stale facts to historical evidence, then rerun the validation commands.
 
 ## Current module tuple
-- OpenCode: `modules/rldyour-opencode`, product version `1.7.0`.
+- OpenCode: `modules/rldyour-opencode`, product version `1.7.1`.

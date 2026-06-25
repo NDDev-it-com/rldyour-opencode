@@ -18,7 +18,7 @@ canonical implementation and naming patterns
 ## Last verified
 - date: 2026-06-26
 - commit: `d93a558050d54a80e578035d0e1627385ec7c1e4`
-- checked by: opencode 1.7.0 tracked-context migration
+- checked by: opencode 1.7.1 tracked-context migration
 
 ## Facts
 - Pattern memories record canonical naming, routing, versioning, and implementation patterns.

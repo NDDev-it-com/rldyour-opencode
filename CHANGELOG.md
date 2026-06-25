@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.1] - 2026-06-26
+
+### Fixed
+
+- Sync generated cmux worker/orchestrator skill projections with the tracked-context branch model.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
