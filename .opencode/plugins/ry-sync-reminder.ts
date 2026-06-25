@@ -9,7 +9,7 @@ export const RySyncReminder: Plugin = async ({ client }) => {
       if (event.type !== "session.idle") return
 
       const message =
-        "Session is idle — run /ry-sync to refresh Serena memories, docs, git state, and fullrepo before ending."
+        "Session is idle - run /ry-sync to refresh Serena memories, docs, and git state before ending."
 
       try {
         await client.tui.showToast({ body: { variant: "info", message, duration: 8000 } })

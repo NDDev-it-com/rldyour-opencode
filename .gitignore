@@ -31,10 +31,11 @@ node_modules/
 # OpenCode plugin dependencies
 .opencode/node_modules/
 
-# Serena runtime markers (must never be committed or published to fullrepo).
-# Matches the local-only set in scripts/fullrepo_sync.sh RUNTIME_EXCLUDE_PATTERNS
-# so normal-branch git and fullrepo publish stay aligned.
+# Serena runtime-local state. Durable `.serena/project.yml` and
+# `.serena/memories/` are tracked on main.
 .serena/cache/
+.serena/reviews/
+.serena/diagnostics/
 .serena/project.local.yml
 .serena/.gitignore
 .serena/.flow_*
@@ -69,10 +70,4 @@ diagnostics/
 # OpenCode local config (user-specific)
 .opencode/local.json
 
-# AI workflow directories (managed via fullrepo branch)
-.claude/
-.cursor/
-.windsurf/
-.roo/
-.aider*
-.agents/
+# AI workflow directories are normal tracked source when present.

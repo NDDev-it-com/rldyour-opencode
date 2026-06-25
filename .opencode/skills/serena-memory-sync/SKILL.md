@@ -31,7 +31,7 @@ Do not create memory noise for trivial formatting, purely mechanical edits, curr
 - `.serena/plans/`: non-trivial implementation plans that are worth preserving across sessions.
 - `.serena/research/`: complex or long research results with source links and implementation impact.
 
-In normal product repositories, these knowledge files are agent-only context. They are restored from and published to `fullrepo`, then ignored through `.git/info/exclude` instead of being committed to `main`. Repositories that are themselves agent tooling may intentionally track selected `.serena` knowledge files when they are part of the product source of truth.
+In normal product repositories, these knowledge files are agent-only context. They are restored from and published to `tracked context`, then ignored through `.git/info/exclude` instead of being committed to `main`. Repositories that are themselves agent tooling may intentionally track selected `.serena` knowledge files when they are part of the product source of truth.
 
 Local/runtime files must not be committed or published: `.serena/cache/`, `.serena/.gitignore`, `.serena/project.local.yml`, `.serena/.sync_marker`, `.serena/.serena_sync_state.json`, `.serena/.auto_sync_head`, `.serena/.active_workflow_intent.json`, `.serena/.dirty_stop_ack`.
 
@@ -145,7 +145,7 @@ Do not write:
 5. Save non-trivial plans to `.serena/plans/` only when they will help future sessions continue work.
 6. Save long research summaries to `.serena/research/` only when the research was complex, source-backed, and likely reusable.
 7. Keep exact paths, symbol names, commands, contracts, invariants, verification checks, and behavior. Avoid generic advice.
-8. In repositories where `.serena` knowledge is tracked, commit knowledge-only changes. In fullrepo-managed repositories, acknowledge current memories and clear runtime sync markers; publish to `fullrepo` as part of sync workflow.
+8. In repositories where `.serena` knowledge is tracked, commit knowledge-only changes. In tracked context-managed repositories, acknowledge current memories and clear runtime sync markers; publish to `tracked context` as part of sync workflow.
 
 ## Quality Rules
 
@@ -166,4 +166,4 @@ Report:
 - `New memories`: new files, if any.
 - `Plans/research archived`: files written, if any.
 - `Unresolved gaps`: anything that could not be verified from code.
-- `Sync status`: whether memory changes were committed or acknowledged for fullrepo publish.
+- `Sync status`: whether memory changes were committed or acknowledged for tracked context publish.

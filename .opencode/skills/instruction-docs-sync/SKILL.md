@@ -9,13 +9,13 @@ description: "Синхронизация AGENTS.md и .claude/CLAUDE.md из п�
 
 Keep project instruction files current after meaningful work without creating a second source of truth or violating the effective project policy for agent files.
 
-This skill runs after Serena memory sync and before quality checks, commits, GitHub sync, and `fullrepo` publish.
+This skill runs after Serena memory sync and before quality checks, commits, GitHub sync, and tracked context commit.
 
 ## Required Files
 
 - `AGENTS.md`: OpenCode-native project instructions. Source of truth for any AI agent working in the repository.
 
-By default this file is agent-only in rldyour-managed product repositories: keep it local, ignore it through `.git/info/exclude`, and publish it through `fullrepo`. If project policy sets `instruction_docs.mode=tracked-normal-branch` or `normal_branch_policy.agent_files=allowed`, treat it as a normal tracked project file.
+By default this file is agent-only in rldyour-managed product repositories: keep it local, ignore it through `.git/info/exclude`, and publish it through `tracked context`. If project policy sets `instruction_docs.mode=tracked-normal-branch` or `normal_branch_policy.agent_files=allowed`, treat it as a normal tracked project file.
 
 ## Source Of Truth
 
@@ -34,13 +34,13 @@ Do not copy chat history, future plans, speculation, secrets, tokens, cookies, o
 2. Update `AGENTS.md` for OpenCode:
    - repository purpose and source-of-truth paths;
    - OpenCode-specific skill/agent/tool routing and plugin conventions;
-   - setup, validation, release, deploy, git, and `fullrepo` commands;
+   - setup, validation, release, deploy, git, and `tracked context` commands;
    - concise engineering constraints and done criteria;
    - MCP server configuration and tool naming patterns (`<server>_<tool>` - single underscore, server name sanitised per OpenCode v1.14.48);
    - permission model and per-agent overrides.
 3. Keep the file independently useful and optimized for OpenCode agents. Do not include instructions that only apply to other CLI tools unless the repository is explicitly multi-tool.
 4. Validate that all referenced paths, commands, skills, and agents actually exist.
-5. Let `flow-post-task-sync` commit tracked instruction files or publish agent-only instruction files through `fullrepo` according to effective project policy.
+5. Let `flow-post-task-sync` commit tracked instruction files or publish agent-only instruction files through `tracked context` according to effective project policy.
 
 ## Freshness Rules
 
@@ -48,7 +48,7 @@ Review and update `AGENTS.md` when any meaningful task changes durable facts:
 
 - Setup, install, bootstrap, doctor, validation, smoke, deploy, or release commands.
 - Project architecture, module boundaries, generated artifacts, quality gates, or security policy.
-- Skills, agents, commands, MCP definitions, LSP workflow, browser/design/security workflows, or git/fullrepo behavior.
+- Skills, agents, commands, MCP definitions, LSP workflow, browser/design/security workflows, or git/repository context behavior.
 - Repository-specific conventions that future OpenCode sessions must know before editing.
 - Permission changes, new agents, or modified tool routing.
 
@@ -75,7 +75,7 @@ Before finalizing an `AGENTS.md` update:
 
 Report:
 
-- `Instruction docs state`: required files present/missing, durable-change candidates, fullrepo policy.
+- `Instruction docs state`: required files present/missing, durable-change candidates policy.
 - `Updated docs`: which instruction files changed and why.
 - `Validation`: checklist result.
-- `Fullrepo`: whether updated agent-only docs still need `fullrepo` publish.
+- `tracked context`: whether updated agent-only docs still need tracked context commit.

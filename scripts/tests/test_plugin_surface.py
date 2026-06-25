@@ -35,7 +35,7 @@ EXPECTED_RY_TOOL_IDS = {
     "rldyour_check_deps",
     "rldyour_lsp_health",
     "rldyour_git_audit",
-    "rldyour_fullrepo_status",
+    "rldyour_context_status",
 }
 
 

@@ -9,11 +9,8 @@ restore if branch protection is ever reset.
 ## Protected branches
 
 - `main` - product/runtime branch; only branch from which `release.yml`
-  fires; the source for `fullrepo` snapshots.
-- `fullrepo` - generated complete-state branch (`HEAD` + agent-only
-  overlay). Never accept human pull requests targeting `fullrepo`; the
-  branch is `--force-with-lease`-pushed by `scripts/fullrepo_sync.sh`
-  from a verified `main` snapshot.
+  fires. Durable AI context is tracked on `main` with the rest of the
+  source tree.
 
 ## Public repository CI/CD
 
@@ -81,10 +78,8 @@ restored separately if branch protection is reset.
 - **Conversation resolution**: required before merge.
 - **Restrict pushes**: only repository administrators may push directly to
   `main`; everyone else opens a PR.
-- **Allow force pushes**: disabled for `main` and `fullrepo`. `fullrepo` is
-  force-pushed by the maintainer via `scripts/fullrepo_sync.sh publish`
-  using `--force-with-lease`; this is performed locally, not via PR.
-- **Allow deletions**: disabled for `main` and `fullrepo`.
+- **Allow force pushes**: disabled for `main`.
+- **Allow deletions**: disabled for `main`.
 - **Required pull request reviews**: 1 reviewer for single-developer
   ownership (`@rldyourmnd`) with codeowner enforcement via `.github/CODEOWNERS`.
 - **Dismiss stale reviews when new commits are pushed**: enabled.

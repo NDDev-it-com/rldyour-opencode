@@ -1,5 +1,5 @@
 ---
-description: "Синхронизация Serena memories, AGENTS.md/CLAUDE.md, git и fullrepo после meaningful работы. Synchronize memories, docs, git state and fullrepo branch."
+description: "Синхронизация Serena memories, AGENTS.md, .opencode и git после meaningful работы. Synchronize memories, docs, and git state."
 agent: build
 ---
 
@@ -10,7 +10,7 @@ Synchronize project state after meaningful work:
 3. Quality checks and manual evidence third: run applicable lint, typecheck, and test commands for the touched scope.
 4. Atomic commits fourth: commit source changes by logical feature/fix/refactor units. Commit Serena/docs sync separately when it improves history clarity. Use Conventional Commits.
 5. GitHub sync fifth: push to upstream when configured. If upstream is missing, ask before setting it.
-6. Fullrepo branch sync sixth: ensure agent-only files (AGENTS.md, .serena/*, .opencode/ agents/skills/commands) are published to the fullrepo branch and excluded from normal branch history via .git/info/exclude.
+6. Repository context check sixth: ensure durable agent context (`AGENTS.md`, `.serena/memories/`, `.serena/project.yml`, `.opencode/`) is tracked on `main` and runtime-local state stays ignored.
 7. Branch/worktree cleanup last: remove merged worktrees and branches only after verifying they are merged into main and pushed if needed.
 
 Never commit secrets, runtime markers, browser artifacts, local env files, or accidental generated junk.

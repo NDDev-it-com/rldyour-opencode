@@ -8,7 +8,6 @@ import subprocess
 REPO_ROOT = Path(__file__).resolve().parents[2]
 POLICY = REPO_ROOT / "scripts" / "project_flow_policy.py"
 STATE = REPO_ROOT / "scripts" / "flow_post_task_state.py"
-FULLREPO = REPO_ROOT / "scripts" / "fullrepo_sync.sh"
 
 
 def git(cwd: Path, *args: str) -> str:
@@ -37,7 +36,8 @@ def test_policy_defaults_are_advisory_and_protect_dev(tmp_path: Path) -> None:
 
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert payload["effective"]["fullrepo"]["mode"] == "auto"
+    assert payload["effective"]["normal_branch_policy"]["agent_files"] == "allowed"
+    assert payload["effective"]["serena"]["memory_storage"] == "normal-branch"
     assert payload["effective"]["branch_cleanup"]["mode"] == "advisory"
     assert "dev" in payload["effective"]["branch_cleanup"]["protected_branches"]
     assert payload["effective"]["execution"]["mode"] == "standard"
@@ -71,32 +71,12 @@ def test_execution_and_cmux_policy_are_loaded(tmp_path: Path) -> None:
     assert payload["effective"]["cmux"]["enabled"] is True
 
 
-def test_disabled_fullrepo_status_and_publish_refusal(tmp_path: Path) -> None:
-    init_repo(tmp_path)
-    write_policy(tmp_path, {"schema_version": 1, "fullrepo": {"mode": "disabled"}})
-    git(tmp_path, "add", ".rldyour/project-policy.json")
-    git(tmp_path, "commit", "-m", "policy")
-    (tmp_path / "AGENTS.md").write_text("agent docs\n", encoding="utf-8")
-
-    status = subprocess.run(["bash", str(FULLREPO), "status-json"], cwd=tmp_path, text=True, capture_output=True)
-    publish = subprocess.run(["bash", str(FULLREPO), "publish"], cwd=tmp_path, text=True, capture_output=True)
-
-    assert status.returncode == 0, status.stderr
-    payload = json.loads(status.stdout)
-    assert payload["mode"] == "disabled"
-    assert payload["fullrepo_needs_attention"] is False
-    assert payload["worktree_agent_paths"] == []
-    assert publish.returncode == 1
-    assert "fullrepo disabled by project policy" in publish.stderr
-
-
 def test_tracked_ai_docs_policy_does_not_require_sync(tmp_path: Path) -> None:
     init_repo(tmp_path)
     write_policy(
         tmp_path,
         {
             "schema_version": 1,
-            "fullrepo": {"mode": "disabled"},
             "normal_branch_policy": {
                 "agent_files": "allowed",
                 "ai_marker_additions": "allowed",
@@ -104,7 +84,7 @@ def test_tracked_ai_docs_policy_does_not_require_sync(tmp_path: Path) -> None:
             },
             "instruction_docs": {"mode": "tracked-normal-branch"},
             "branch_cleanup": {"mode": "advisory", "protected_branches": ["main", "dev"]},
-            "stop_hook": {"block_on_fullrepo": False, "block_on_branch_cleanup": False},
+            "stop_hook": {"block_on_branch_cleanup": False},
         },
     )
     (tmp_path / "AGENTS.md").write_text("agent docs\n", encoding="utf-8")
@@ -120,7 +100,6 @@ def test_tracked_ai_docs_policy_does_not_require_sync(tmp_path: Path) -> None:
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["project_policy"]["source"] == ".rldyour/project-policy.json"
-    assert payload["fullrepo_needs_attention"] is False
     assert payload["blocking_reasons"] == []
     assert payload["needs_flow_sync"] is False
 
@@ -142,7 +121,6 @@ def test_orchestrator_worker_reports_without_global_sync(tmp_path: Path) -> None
     assert payload["execution"]["agent_role"] == "worker"
     assert payload["execution"]["worker_id"] == "worker-opencode-test"
     assert "worker-report-required" in payload["blocking_reasons"]
-    assert "fullrepo-sync-required" not in payload["blocking_reasons"]
     assert "branch-cleanup-required" not in payload["blocking_reasons"]
 
 

@@ -147,7 +147,7 @@ When writing or editing a memory:
 
 This is an OpenCode configuration marketplace (`rldyour-opencode`). Specifics that affect your work:
 
-- Memory location: `.serena/memories/` (project-level, agent-only on `fullrepo` branch).
+- Memory location: `.serena/memories/` (project-level, agent-only on `tracked context` branch).
 - Two active project memories normally exist: `project_marketplace_state.md` (current state) and verified canon memory. New memories require a strong durability case.
 - After your work, the `ry-sync` command workflow takes over and runs the git pipeline + publish automatically.
 

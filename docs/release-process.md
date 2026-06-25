@@ -28,15 +28,14 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 12. `git tag X.Y.Z` (annotated, signed if configured).
 13. Push `main` and tags; public repositories use automatic CI/CD by default. Verify the GitHub Actions runs for the pushed HEAD/tag, including `.github/workflows/validate.yml` (which runs both `validate_config.sh` and `pytest scripts/tests/`). If a required release/readiness workflow did not run because it is dispatch-only, scheduled, or release-only, trigger that existing workflow with `gh workflow run` and wait for it.
 
-## Publishing fullrepo context
+## Tracked agent context
 
-After the release commit lands on `main`, run:
-
-```bash
-bash scripts/fullrepo_sync.sh publish
-```
-
-This force-with-lease pushes the complete portable snapshot to `origin/fullrepo`: the current `HEAD` tree plus ignored agent-only context (`AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*`, etc.). Runtime markers (`.serena/cache/`, `.serena/.flow_*`, `.opencode/node_modules/`, etc.) are stripped and publication aborts if a secret-looking value is detected.
+Durable agent context (`AGENTS.md`, `.serena/project.yml`,
+`.serena/memories/*`, `.serena/plans/`, `.serena/research/`,
+`.serena/newproj/`, and `.serena/deploy/`) is committed on `main` with the
+source change that makes its facts true. Runtime markers, cache, review scratch
+files, diagnostics, local env files, browser artifacts, tokens, cookies, and
+credentials must remain ignored.
 
 ## Hotfix branch (when `main` is locked)
 

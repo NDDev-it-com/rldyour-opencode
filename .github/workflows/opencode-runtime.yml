@@ -57,24 +57,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
-      - name: Prepare agent-only validation context
-        run: |
-          # Audit P1-5: restore is a FALLBACK, not an overwrite. A push that
-          # already carries AGENTS.md / .claude/CLAUDE.md must keep its own
-          # copy so the runtime resolver sees the same instruction docs the
-          # operator authored.
-          set -euo pipefail
-          git fetch --no-tags --depth=1 origin fullrepo || true
-          bash scripts/fullrepo_sync.sh install-exclude
-          if git rev-parse --verify origin/fullrepo >/dev/null 2>&1; then
-            for path in AGENTS.md .claude/CLAUDE.md; do
-              if [ ! -f "${path}" ] && git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
-                mkdir -p "$(dirname "${path}")"
-                git show "origin/fullrepo:${path}" > "${path}"
-              fi
-            done
-          fi
-
       - name: Set up Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
         with:

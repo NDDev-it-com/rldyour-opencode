@@ -97,7 +97,6 @@ run_cmd deps-pins.json        bash scripts/check_deps_freshness.sh --json
 run_cmd action-pins.txt       python3 scripts/check_action_pins.py .github/workflows
 run_cmd flow-state.json       bash scripts/flow_post_task_state.sh
 run_cmd git-audit.txt         bash scripts/git_sync_audit.sh
-run_cmd fullrepo-status.json  bash scripts/fullrepo_sync.sh status-json
 run_cmd mcp-smoke.json        python3 scripts/smoke_mcp_capabilities.py --mode static --json
 
 if [ "${INCLUDE_LIVE_MCP}" -eq 1 ]; then

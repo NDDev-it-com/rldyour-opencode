@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "1.7.0",
   "generated_by": "scripts/generate_commands_index.py",
   "count": 11,
   "commands": [
@@ -46,7 +46,7 @@
     {
       "name": "ry-init",
       "path": ".opencode/commands/ry-init.md",
-      "description": "Инициализация scoped read-only контекста проекта: Serena discovery + fullrepo bootstrap + verified context pack. Initialize scoped project context.",
+      "description": "Инициализация scoped read-only контекста проекта: Serena discovery + tracked context review + verified context pack. Initialize scoped project context.",
       "agent": "build",
       "subtask": false,
       "domain": "flow",
@@ -141,14 +141,14 @@
     {
       "name": "ry-sync",
       "path": ".opencode/commands/ry-sync.md",
-      "description": "Синхронизация Serena memories, AGENTS.md/CLAUDE.md, git и fullrepo после meaningful работы. Synchronize memories, docs, git state and fullrepo branch.",
+      "description": "Синхронизация Serena memories, AGENTS.md, .opencode и git после meaningful работы. Synchronize memories, docs, and git state.",
       "agent": "build",
       "subtask": false,
       "domain": "flow",
       "triggers": [
         "finalize task",
         "post-task sync",
-        "publish fullrepo"
+        "tracked context"
       ]
     }
   ]

@@ -9,7 +9,7 @@ Post-task sync is the last phase of meaningful work. It prevents forgotten chang
 3. Quality checks and manual evidence third.
 4. Atomic commits fourth.
 5. GitHub sync fifth.
-6. Fullrepo branch sync sixth.
+6. Repository context check sixth.
 7. Merged branch/worktree cleanup last.
 
 For public repositories, GitHub sync includes verifying the GitHub Actions runs
@@ -26,7 +26,7 @@ OpenCode loads instruction docs at session start. Treat this context as an input
 
 Serena MCP owns `.serena/memories`, `.serena/plans`, and `.serena/research`. The sync workflow waits until Serena state is current, then runs memory synchronization through `@flow-memory-sync`.
 
-In fullrepo-managed projects, Serena knowledge is not committed to normal branches. The fullrepo publish step handles the complete snapshot.
+Serena knowledge is tracked on main when it is durable; runtime-local state stays ignored.
 
 ## AGENTS.md And OpenCode Configuration
 
@@ -36,27 +36,11 @@ OpenCode reads project configuration from `opencode.json` and agent/skill/comman
 
 Both AGENTS.md and opencode.json must contain verified facts, not chat history or speculative plans.
 
-For default rldyour-managed projects, root `AGENTS.md`, `.serena/`, `.opencode/` agents/skills/commands, and similar AI workflow files are agent-only files excluded from normal branch history through `.git/info/exclude` and published to the `fullrepo` branch. Project policy may explicitly allow tracked instruction/AI files in normal branches.
+Durable AI workflow files such as `AGENTS.md`, `.serena/memories/`, `.serena/project.yml`, and `.opencode/` are tracked on main. Runtime-local cache, diagnostics, review scratch files, markers, local env files, browser artifacts, and secrets stay ignored.
 
-## Fullrepo Branch
+## Repository Context
 
-`fullrepo` is the portable complete-state branch. It lets a new machine initialize with the same agent-only project context while keeping `main` and feature branches free of AI workflow files.
-
-Post-task flow:
-
-1. Commit and push normal source/test/docs/config changes to the current upstream branch.
-2. Ensure `.git/info/exclude` has the rldyour fullrepo block.
-3. Publish agent-only files to the `fullrepo` branch after the normal branch is at its final `HEAD` only when policy requires or allows fullrepo.
-4. Verify branch refs before final delivery.
-
-Initialization flow:
-
-1. Before relying on missing agent-only context, check `origin/fullrepo`.
-2. If `origin/fullrepo` exists, restore its agent-only files and install excludes.
-3. If `origin/fullrepo` does not exist, do not create it unless `fullrepo.create_if_missing=true` or the current user instruction explicitly allows creation.
-4. If the current branch tracks agent-only files, remove them from the index only when policy says they should be fullrepo-managed.
-
-`fullrepo` uses safe force updates because it is a generated snapshot branch. Use `--force-with-lease`, not a blind `--force`, so an unexpected remote update cannot be silently overwritten.
+Durable repository context is part of the normal tracked tree. Use ordinary git review, commits, tags, releases, and reverts for context changes.
 
 ## Commit Rules
 
@@ -69,5 +53,5 @@ Initialization flow:
 ## Cleanup Rules
 
 - Remove merged worktrees and branches only after verifying they are merged into `main` and pushed if needed.
-- Delete remote branches after merge only when policy allows it, the branch was created for this workflow, and no open PR depends on it. Protected branches such as `main`, `dev`, and `fullrepo` are never cleanup candidates.
+- Delete remote branches after merge only when policy allows it, the branch was created for this workflow, and no open PR depends on it. Protected branches such as `main` are never cleanup candidates.
 - Ask the user if branch ownership, merge status, or remote state is unclear.

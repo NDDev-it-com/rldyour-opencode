@@ -34,27 +34,6 @@ jobs:
       # bumping the major version; verify via `gh api repos/actions/<name>/git/refs/tags/<tag>`.
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-      - name: Prepare agent-only validation context
-        shell: bash
-        run: |
-          # Unit tests validate cross-layer contracts that reference AGENTS.md,
-          # while normal branches keep agent-only files on origin/fullrepo.
-          # Restore only instruction docs needed by tests; do not run
-          # bootstrap-init here because it would replace scripts/.opencode
-          # from fullrepo and could mask the exact PR/main files under test.
-          # Audit P1-5: restore is a FALLBACK, not an overwrite — a PR with a
-          # branch-local AGENTS.md or .claude/CLAUDE.md must keep its own
-          # copy so the workflow validates the PR contents, not the stale
-          # fullrepo snapshot.
-          set -euo pipefail
-          git fetch --no-tags origin +refs/heads/fullrepo:refs/remotes/origin/fullrepo || true
-          bash scripts/fullrepo_sync.sh install-exclude
-          for path in AGENTS.md .claude/CLAUDE.md; do
-            if [ ! -f "${path}" ] && git show "origin/fullrepo:${path}" >/dev/null 2>&1; then
-              mkdir -p "$(dirname "${path}")"
-              git show "origin/fullrepo:${path}" > "${path}"
-            fi
-          done
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:

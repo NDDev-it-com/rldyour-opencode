@@ -173,7 +173,7 @@ for src_rel, dst_rel in source_paths:
     dst = target / dst_rel
     if not src.exists():
         if src_rel in optional_source_paths:
-            actions.append(f"skip optional missing {src_rel}; restore fullrepo to install this agent-only file")
+            actions.append(f"skip optional missing {src_rel}; durable AI context is tracked on main when present")
             continue
         raise SystemExit(f"missing source path: {src}")
     if dst.resolve() == src.resolve():

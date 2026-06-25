@@ -16,7 +16,7 @@ Make every change precise, synchronized, maintainable, and consistent with the s
 - Preserve existing public contracts unless the task explicitly requires a breaking change.
 - Keep changes atomic and readable. Separate mechanical refactors from behavior changes.
 - Keep git history logical: separate implementation, tests/validators,
-  docs/instructions, license/metadata, generated artifacts, and Serena/fullrepo
+  docs/instructions, license/metadata, generated artifacts, and Serena memory
   sync when they are independently reviewable.
 - Prefer clear names over comments. Use comments only for why, constraints, non-obvious algorithms, or external contract reasons.
 - Remove obsolete code, stale branches, stale docs, dead feature flags, and outdated tests when they are in scope.
@@ -36,7 +36,7 @@ Read `references/rules-policy.md` for the full implementation discipline checkli
 - Edit without understanding existing implementation (use Serena first).
 - Mix mechanical refactors with behavior changes in one commit.
 - Dump unrelated implementation, docs, validator, license/metadata, generated,
-  and Serena/fullrepo sync changes into one commit.
+  and Serena memory sync changes into one commit.
 - Premature abstraction for single speculative future case.
 - Skip integration tracing - forget about clients, schemas, generated types.
 - Comments explaining WHAT (names should do that), not WHY.

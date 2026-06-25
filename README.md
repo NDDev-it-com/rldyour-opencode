@@ -14,9 +14,9 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.6.1` |
+| Adapter version | `1.7.0` |
 | Runtime baseline | OpenCode 1.17.9 |
-| GitHub release tag | `1.6.1` |
+| GitHub release tag | `1.7.0` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
@@ -32,7 +32,7 @@ OpenCode's native config surfaces that this adapter populates:
 
 - **Master config**: `opencode.json` (JSON or JSONC) - model, MCP, LSP, agents, watchers, compaction, permission rules.
 - **Release-safe overlay**: `opencode.release-safe.json` - conservative static read-deny patterns for `.env`, private keys, tokens, and shell/edit ask posture for public OSS examples.
-- **Agent-only context**: `AGENTS.md` (cross-tool root instructions), `.claude/CLAUDE.md` (Claude Code project memory - agent-only, not on `main`).
+- **Durable AI context**: `AGENTS.md`, `.opencode/`, `.serena/project.yml`, and `.serena/memories/` are tracked on `main`. Runtime-local Serena state remains ignored.
 - **`.opencode/` directory layout**:
   - `agents/*.md` - 9 subagents (6 reviewer tracks, memory-sync, ry-explore, customize-opencode)
   - `skills/<name>/SKILL.md` - 38 skills across 10 domains
@@ -121,7 +121,7 @@ bash scripts/doctor_opencode.sh
 | `/ry-repair` | `build` | Repair stale docs, memories, contracts, hooks, MCP/LSP config, CI, and AI-tool context |
 | `/ry-newp` | `build` | Plan a new project (skeptical questions, research, ADRs, architecture docs) |
 | `/ry-deploy` | `build` | Deploy with sync, log checks, fix-forward |
-| `/ry-sync` | `build` | Synchronize memories, docs, git, and fullrepo |
+| `/ry-sync` | `build` | Synchronize memories, docs, git, and tracked context |
 | `/ry-design` | `build` | End-to-end design: Figma → tokens → FSD → shadcn/ui → browser validation |
 | `/ry-explore` | `ry-explore` (subtask) | Deep multi-source research via Context7 / DeepWiki / Grep / web |
 | `/ry-sec-review` | `plan` | Defensive Mythos-style security review |
@@ -180,15 +180,18 @@ Three browser providers are active, each with a distinct role:
 
 The `/ry-design` command routes through Figma MCP (design context and asset download), shadcn/ui MCP (registry access), and Chrome DevTools MCP (validation). DeepWiki, Context7, and Grep MCP support research and documentation retrieval during design and exploration tasks.
 
-## Memory / Fullrepo Model
+## Memory Model
 
-Normal `main` history carries only product artifacts: `opencode.json`, `.opencode/`, scripts, tests, CI workflows, docs, and reference files.
+Normal `main` history carries product artifacts and durable agent context:
+`opencode.json`, `.opencode/`, `AGENTS.md`, `.serena/project.yml`,
+`.serena/memories/*.md`, scripts, tests, CI workflows, docs, and reference
+files.
 
-Agent-only files - `AGENTS.md`, `.claude/CLAUDE.md`, `.serena/memories/*.md`, `.serena/project.yml`, `.serena/newproj/` - are overlaid onto the current `HEAD` tree and published via the generated `fullrepo` branch managed by `scripts/fullrepo_sync.sh`. Normal `main` history does not carry these files.
-
-Serena memories live under `.serena/memories/` using the `AREA-NN-SLUG.md` taxonomy (6 verified knowledge files at HEAD). The freshness contract: memories are updated only from verified current code, git diffs, and tests - never from speculation, plans, or chat history. Run the `flow-memory-sync` subagent (or `/ry-sync`) after committed task waves to keep memories current.
-
-In external or colleague-owned repositories, `.rldyour/project-policy.json` may disable fullrepo, allow instruction docs on normal branches, and disable branch-cleanup blockers. The default rldyour-owned policy applies here.
+Serena memories live under `.serena/memories/` using the `AREA-NN-SLUG.md`
+taxonomy. The freshness contract: memories are updated only from verified
+current code, git diffs, and tests - never from speculation, plans, or chat
+history. Runtime-local cache, reviews, diagnostics, markers, local env files,
+browser artifacts, tokens, cookies, and credentials stay ignored.
 
 ## Security Boundary
 

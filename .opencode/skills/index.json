@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "1.7.0",
   "generated_by": "scripts/generate_skills_index.py",
   "count": 38,
   "skills": [
@@ -175,7 +175,6 @@
         "finalize task",
         "post-task sync",
         "memory sync",
-        "sync to fullrepo",
         "finalize before delivery"
       ],
       "requires_mcp": [],
@@ -391,8 +390,7 @@
         "project onboarding",
         "context pack",
         "study repo",
-        "learn project",
-        "fullrepo bootstrap"
+        "learn project"
       ],
       "requires_mcp": [
         "serena"
