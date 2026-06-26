@@ -50,6 +50,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.7.8] - 2026-06-27
+
+### Fixed
+
+- Refresh OpenCode Serena release memory. Preserve documented `opencode-ai` `1.17.11`, `@opencode-ai/plugin` `1.17.11`, and `@opencode-ai/sdk` `1.17.11` baseline evidence.
+
 ## [1.7.0] - 2026-06-26
 
 ### Changed
