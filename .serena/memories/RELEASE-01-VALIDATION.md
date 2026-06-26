@@ -1,7 +1,7 @@
 <!-- Memory Metadata
-Last updated: 2026-06-26
-Last verified: 2026-06-26
-Last commit: d93a558050d54a80e578035d0e1627385ec7c1e4 test(runtime): stabilize opencode debug resolve smoke
+Last updated: 2026-06-27
+Last verified: 2026-06-27
+Last commit: d2a059918bdaa9b3497eac57889655c2ccfb59a3 chore(release): rldyour-opencode 1.7.7
 Scope: release readiness, versioning, and artifact hygiene
 Area: RELEASE
 -->
@@ -17,16 +17,16 @@ release readiness, versioning, and artifact hygiene
 - `path:.github/workflows/release.yml`
 
 ## Last verified
-- date: 2026-06-26
-- commit: `d93a558050d54a80e578035d0e1627385ec7c1e4`
-- checked by: opencode 1.7.6 tracked-context migration
+- date: 2026-06-27
+- commit: `d2a059918bdaa9b3497eac57889655c2ccfb59a3`
+- checked by: opencode 1.7.8 tracked-context runtime validation
 
 ## Facts
-- Current rldyour-opencode adapter VERSION is `1.7.6`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
+- Current rldyour-opencode adapter VERSION is `1.7.8`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
 - Release memories record numeric versioning, tags, CI gates, and clean artifact hygiene.
 
 ## Evidence
-- `commit:d93a558050d54a80e578035d0e1627385ec7c1e4`
+- `commit:d2a059918bdaa9b3497eac57889655c2ccfb59a3`
 - `path:VERSION`
 - `path:CHANGELOG.md`
 - `path:.github/workflows/release.yml`
@@ -67,4 +67,4 @@ Update after verified changes to the referenced source-of-truth files.
 - Re-read source-of-truth files, update only verified current facts, move stale facts to historical evidence, then rerun the validation commands.
 
 ## Current module tuple
-- OpenCode: `modules/rldyour-opencode`, product version `1.7.6`.
+- OpenCode: `modules/rldyour-opencode`, product version `1.7.8`.
