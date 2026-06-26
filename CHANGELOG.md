@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.7] - 2026-06-27
+
+### Fixed
+
+- Document that the shadcn MCP runtime refresh preserves `opencode-ai` `1.17.11`, `@opencode-ai/plugin` `1.17.11`, and `@opencode-ai/sdk` `1.17.11` runtime baseline evidence.
+
 ## [1.7.6] - 2026-06-27
 
 ### Changed
