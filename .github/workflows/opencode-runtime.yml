@@ -65,7 +65,7 @@ jobs:
       - name: Install pinned OpenCode CLI
         run: |
           set -euo pipefail
-          bun install -g opencode-ai@1.17.9
+          bun install -g opencode-ai@1.17.11
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
 
       - name: opencode --version
