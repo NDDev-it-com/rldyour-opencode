@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.5] - 2026-06-26
+
+### Changed
+
+- Sync Serena release memories after runtime and MCP refresh. Preserve documented `opencode-ai` `1.17.11`, `@opencode-ai/plugin` `1.17.11`, and `@opencode-ai/sdk` `1.17.11` baseline evidence.
+
 ## [1.7.4] - 2026-06-26
 
 ### Changed
