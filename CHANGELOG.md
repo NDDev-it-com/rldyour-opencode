@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.9] - 2026-06-29
+
+### Fixed
+
+- Harden Ruff and Pyright baseline across adapter configs while preserving documented `opencode-ai` `1.17.11`, `@opencode-ai/plugin` `1.17.11`, and `@opencode-ai/sdk` `1.17.11` baseline evidence.
+
 ## [1.7.7] - 2026-06-27
 
 ### Fixed
@@ -48,7 +54,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
 
 ## [1.7.8] - 2026-06-27
 

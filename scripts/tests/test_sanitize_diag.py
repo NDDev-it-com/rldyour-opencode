@@ -16,10 +16,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 # sys.path setup happens in conftest.py at session start.
 import _sanitize_diag as sd  # noqa: E402
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 SANITIZE_PY = PROJECT_ROOT / "scripts" / "_sanitize_diag.py"

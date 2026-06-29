@@ -20,10 +20,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import pytest
-
 # sys.path setup via conftest.py
 import _validate_helpers as vh
+import pytest
 
 SKILLS_DIR = Path(__file__).resolve().parent.parent.parent / ".opencode" / "skills"
 

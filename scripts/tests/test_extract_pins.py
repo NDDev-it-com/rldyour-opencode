@@ -9,10 +9,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 # sys.path setup via conftest.py
 import _extract_pins as ep
+import pytest
 
 
 def _write(tmp_path: Path, payload: dict) -> Path:

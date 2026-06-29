@@ -15,7 +15,6 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from project_flow_policy import load_policy  # noqa: E402
 
-
 RUNTIME_IGNORED = {
     ".serena/.sync_marker",
     ".serena/.serena_sync_state.json",
@@ -149,11 +148,17 @@ def _path_matches_scope(path: str, scopes: list[str]) -> bool:
     return False
 
 
-def _policy_list(section: dict[str, Any], key: str, fallback: tuple[str, ...]) -> tuple[str, ...]:
+def _policy_list(section: dict[str, Any] | None, key: str, fallback: tuple[str, ...]) -> tuple[str, ...]:
+    if not isinstance(section, dict):
+        return fallback
     value = section.get(key)
     if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
         return fallback
     return tuple(value)
+
+
+def _dict_section(value: object) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
 
 
 def _local_merged_branches(base: str, current_branch: str, protected_branches: set[str]) -> list[str]:
@@ -186,11 +191,11 @@ def _workflow_branch(branch: str, prefixes: tuple[str, ...]) -> bool:
 
 def _branch_cleanup_state(current_branch: str, policy: dict[str, Any]) -> dict[str, Any]:
     effective = _effective_policy(policy)
-    branches_policy = effective.get("branches") if isinstance(effective.get("branches"), dict) else {}
-    cleanup_policy = effective.get("branch_cleanup") if isinstance(effective.get("branch_cleanup"), dict) else {}
+    branches_policy = _dict_section(effective.get("branches"))
+    cleanup_policy = _dict_section(effective.get("branch_cleanup"))
     protected_branches = set(PROTECTED_BRANCHES)
-    protected_branches.update(branches_policy.get("protected_branches", []) if isinstance(branches_policy, dict) else [])
-    protected_branches.update(cleanup_policy.get("protected_branches", []) if isinstance(cleanup_policy, dict) else [])
+    protected_branches.update(branches_policy.get("protected_branches", []))
+    protected_branches.update(cleanup_policy.get("protected_branches", []))
     workflow_prefixes = _policy_list(cleanup_policy, "workflow_branch_prefixes", WORKFLOW_BRANCH_PREFIXES)
     blocking_prefixes = _policy_list(cleanup_policy, "blocking_prefixes", workflow_prefixes)
     cleanup_mode = str(cleanup_policy.get("mode", "advisory"))
@@ -237,12 +242,8 @@ def _branch_cleanup_state(current_branch: str, policy: dict[str, Any]) -> dict[s
 
 def _instruction_docs_state(root: Path, dirty_files: list[str], policy: dict[str, Any]) -> dict[str, Any]:
     effective = _effective_policy(policy)
-    normal_policy = (
-        effective.get("normal_branch_policy") if isinstance(effective.get("normal_branch_policy"), dict) else {}
-    )
-    instruction_policy = (
-        effective.get("instruction_docs") if isinstance(effective.get("instruction_docs"), dict) else {}
-    )
+    normal_policy = _dict_section(effective.get("normal_branch_policy"))
+    instruction_policy = _dict_section(effective.get("instruction_docs"))
     instruction_docs_mode = str(instruction_policy.get("mode", "tracked-normal-branch"))
     normal_instruction_mode = str(normal_policy.get("instruction_docs", "tracked-normal-branch"))
     if instruction_docs_mode not in {"tracked-normal-branch", "disabled"}:
@@ -283,8 +284,8 @@ def state() -> dict[str, Any]:
     root = Path(_stdout("rev-parse", "--show-toplevel") or ".").resolve()
     project_policy = load_policy(root)
     effective = _effective_policy(project_policy)
-    stop_policy = effective.get("stop_hook") if isinstance(effective.get("stop_hook"), dict) else {}
-    serena_policy = effective.get("serena") if isinstance(effective.get("serena"), dict) else {}
+    stop_policy = _dict_section(effective.get("stop_hook"))
+    serena_policy = _dict_section(effective.get("serena"))
     runtime_execution = _runtime_execution(effective)
     execution_mode = str(runtime_execution["execution_mode"])
     agent_role = str(runtime_execution["agent_role"])

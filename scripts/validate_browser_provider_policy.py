@@ -5,7 +5,6 @@ import argparse
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN = (
     "@playwright/" + "mcp",
@@ -63,9 +62,9 @@ def validate() -> None:
     mcp = config.get("mcp") or {}
     require("playwright" not in mcp, "playwright must not be an active MCP server")
     chrome = mcp.get("chrome-devtools") or {}
-    require(chrome, "chrome-devtools MCP server is required")
+    require(bool(chrome), "chrome-devtools MCP server is required")
     command = [str(item) for item in chrome.get("command") or []]
-    require(SAFE_CHROME_ARGS <= set(command), "chrome-devtools MCP args must keep safe defaults")
+    require(set(command) >= SAFE_CHROME_ARGS, "chrome-devtools MCP args must keep safe defaults")
 
     for skill in REQUIRED_SKILLS:
         path = ROOT / ".opencode/skills" / skill / "SKILL.md"
