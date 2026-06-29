@@ -11,10 +11,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 # sys.path setup happens in conftest.py at session start.
 import _check_freshness as cf  # noqa: E402
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 WRAPPER_SH = PROJECT_ROOT / "scripts" / "check_deps_freshness.sh"

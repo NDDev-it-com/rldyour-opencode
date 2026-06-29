@@ -10,11 +10,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 # sys.path setup happens in conftest.py at session start.
 import _validate_helpers as vh
-
+import pytest
 
 # ---------- opencode.json shape ----------
 
@@ -296,7 +294,7 @@ def test_canonical_permission_keys_includes_v1_17_6_set() -> None:
         "external_directory", "todowrite", "question", "webfetch", "websearch",
         "lsp", "doom_loop", "skill",
     }
-    assert vh.CANONICAL_PERMISSION_KEYS == expected
+    assert expected == vh.CANONICAL_PERMISSION_KEYS
 
 
 def test_canonical_permission_keys_excludes_codesearch() -> None:
