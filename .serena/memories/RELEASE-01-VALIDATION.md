@@ -1,6 +1,6 @@
 <!-- Memory Metadata
-Last updated: 2026-07-01
-Last verified: 2026-07-01
+Last updated: 2026-06-30
+Last verified: 2026-06-30
 Last commit: f95f005275557e1f9d13718fd4ec8be27bd59c07 chore(release): opencode 1.7.10
 Scope: release readiness, versioning, and artifact hygiene
 Area: RELEASE
@@ -17,7 +17,7 @@ release readiness, versioning, and artifact hygiene
 - `path:.github/workflows/release.yml`
 
 ## Last verified
-- date: 2026-07-01
+- date: 2026-06-30
 - commit: `f95f005275557e1f9d13718fd4ec8be27bd59c07`
 - checked by: OpenCode 1.17.12 runtime baseline release sync
 
