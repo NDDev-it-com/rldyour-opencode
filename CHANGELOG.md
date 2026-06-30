@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+
+## [1.7.10] - 2026-07-01
+
+### Changed
+
+- Refresh Claude Code 2.1.197, OpenCode 1.17.12, and Playwright CLI 0.1.15 baselines.
+- Refresh OpenCode runtime, plugin, SDK, and schema baseline evidence to `1.17.12`.
+
 ## [1.7.9] - 2026-06-29
 
 ### Fixed
