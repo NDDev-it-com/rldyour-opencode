@@ -4,32 +4,32 @@ Verified: 2026-06-26
 
 Source of truth:
 - Runtime baseline: `references/opencode-baseline.json`
-- Vendored schema: `references/opencode-config.schema.v1.17.11.json`
-- Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.17.11`
+- Vendored schema: `references/opencode-config.schema.v1.17.12.json`
+- Official docs and release notes: `https://opencode.ai/docs/config` and `https://github.com/anomalyco/opencode/releases/tag/v1.17.12`
 
-## Current adopted surface: 1.17.11
+## Current adopted surface: 1.17.12
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
-| OpenCode runtime/schema/package baseline | 1.17.11 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` are pinned to `1.17.11`; npm package metadata is the authoritative latest channel, GitHub Releases are informational, and the vendored config schema is `references/opencode-config.schema.v1.17.11.json` fetched from the live `https://opencode.ai/config.json`. The `1.17.11` config schema is byte-identical to the previously vendored `v1.17.7` snapshot (SHA-256 `57c02429`); the filename tracks the current runtime baseline. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
-| Top-level `references` config key | 1.17.0-1.17.11 | Future | The schema adds `references` ("Named git or local directory references", git/local sub-types); 1.17.1 adds per-reference usage descriptions and `@`-autocomplete hiding, and 1.17.7-1.17.11 keep the surface current while fixing desktop/runtime issues. The adapter does not currently need named reference entries; adopt when an owner workflow requires shared reference directories. | `scripts/validate_opencode_schema.py` |
+| OpenCode runtime/schema/package baseline | 1.17.12 | Adopted | `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` are pinned to `1.17.12`; npm package metadata is the authoritative latest channel, GitHub Releases are informational, and the vendored config schema is `references/opencode-config.schema.v1.17.12.json` fetched from the live `https://opencode.ai/config.json`. The `1.17.12` config schema is byte-identical to the previously vendored `v1.17.7` snapshot (SHA-256 `57c02429`); the filename tracks the current runtime baseline. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| Top-level `references` config key | 1.17.0-1.17.12 | Future | The schema adds `references` ("Named git or local directory references", git/local sub-types); 1.17.1 adds per-reference usage descriptions and `@`-autocomplete hiding, and 1.17.7-1.17.12 keep the surface current while fixing desktop/runtime issues. The adapter does not currently need named reference entries; adopt when an owner workflow requires shared reference directories. | `scripts/validate_opencode_schema.py` |
 | `fff`-backed file search and `X-Session-Id` proxy headers | 1.17.0 | Operational | Faster project file search and sticky-routing session headers are runtime behavior; no config migration is required. | installed-runtime smoke |
-| MCP reliability fixes and remote config auth recovery | 1.17.0-1.17.11 | Adopted | MCP tool calls receive abort signals, catalogs paginate, servers respect advertised capabilities and configured timeouts for prompt/resource requests, client-setup failures fail cleanly, and 1.17.2 recovers from expired remote config auth by prompting login. Treat as runtime correctness; `opencode.json` MCP definitions stay unchanged. | `scripts/validate_mcp_profiles.py`; `scripts/smoke_mcp_capabilities.py` |
-| Claude Fable reasoning support | 1.17.0-1.17.11 | Operational | Runtime adds Claude Fable reasoning handling and fixes Anthropic fallback responses; provider/model selection stays owner policy in `opencode.json`. | installed-runtime smoke |
+| MCP reliability fixes and remote config auth recovery | 1.17.0-1.17.12 | Adopted | MCP tool calls receive abort signals, catalogs paginate, servers respect advertised capabilities and configured timeouts for prompt/resource requests, client-setup failures fail cleanly, and 1.17.2 recovers from expired remote config auth by prompting login. Treat as runtime correctness; `opencode.json` MCP definitions stay unchanged. | `scripts/validate_mcp_profiles.py`; `scripts/smoke_mcp_capabilities.py` |
+| Claude Fable reasoning support | 1.17.0-1.17.12 | Operational | Runtime adds Claude Fable reasoning handling and fixes Anthropic fallback responses; provider/model selection stays owner policy in `opencode.json`. | installed-runtime smoke |
 | Subagent permission restoration | 1.17.2 | Adopted | Runtime lets subagents use their configured permissions again. This preserves the adapter's explicit primary/subagent permission profiles; it does not weaken reviewer subagent read-only policy. | `scripts/validate_config.sh`; root `scripts/validate_opencode_permission_profiles.py` |
-| TUI footer/status-line content customization | not available in 1.17.11 stable config | Future | The stable `opencode.json`/`tui.json` surface still exposes no footer or status-line content keys in `1.17.11`. The experimental `@opencode-ai/plugin` TUI slot API (`app_bottom`, `home_footer`, `sidebar_footer` slots) has existed unchanged since `1.16.2` and remains experimental; the built-in session footer is not plugin-customizable through it. The owner status-line requirement stays covered by Claude Code `statusLine` and Codex `[tui].status_line`; adopt here when a stable surface lands. | `scripts/validate_opencode_schema.py`; installed-runtime smoke |
+| TUI footer/status-line content customization | not available in 1.17.12 stable config | Future | The stable `opencode.json`/`tui.json` surface still exposes no footer or status-line content keys in `1.17.12`. The experimental `@opencode-ai/plugin` TUI slot API (`app_bottom`, `home_footer`, `sidebar_footer` slots) has existed unchanged since `1.16.2` and remains experimental; the built-in session footer is not plugin-customizable through it. The owner status-line requirement stays covered by Claude Code `statusLine` and Codex `[tui].status_line`; adopt here when a stable surface lands. | `scripts/validate_opencode_schema.py`; installed-runtime smoke |
 
 ## Historical baseline notes: 1.17.7
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
-| OpenCode runtime/schema/package baseline | 1.17.7 | Adopted | Historical package/schema baseline superseded by the current `1.17.11` row. The `v1.17.7` config schema snapshot is byte-identical to the current `v1.17.11` snapshot (SHA-256 `57c02429`). | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| OpenCode runtime/schema/package baseline | 1.17.7 | Adopted | Historical package/schema baseline superseded by the current `1.17.12` row. The `v1.17.7` config schema snapshot is byte-identical to the current `v1.17.12` snapshot (SHA-256 `57c02429`). | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
 
 ## Historical baseline notes: 1.17.1
 
 | Surface | Introduced | Decision | Implementation | Validator |
 | --- | --- | --- | --- | --- |
-| OpenCode runtime/schema/package baseline | 1.17.1 | Adopted | Historical package/schema baseline superseded by the current `1.17.11` row. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
+| OpenCode runtime/schema/package baseline | 1.17.1 | Adopted | Historical package/schema baseline superseded by the current `1.17.12` row. | `scripts/check_baseline_consistency.py`; `scripts/validate_opencode_schema.py` |
 
 ## Historical baseline notes: 1.16.2
 
