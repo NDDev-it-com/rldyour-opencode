@@ -175,12 +175,12 @@ _BASELINE_OK = {
     "bun_runtime": {"version": "1.3.14"},
     "python_runtime": {"version": "3.13"},
     "test_dependencies": {
-        "pytest": "9.0.3",
+        "pytest": "9.1.1",
         "pyyaml": "6.0.3",
         "jsonschema": "4.26.0",
-        "ruff": "0.15.13",
+        "ruff": "0.15.20",
     },
-    "security_tooling": {"gitleaks": "8.30.1", "codeql_action": "v4.36.0"},
+    "security_tooling": {"gitleaks": "8.30.1", "codeql_action": "v4.36.3"},
 }
 
 
@@ -496,7 +496,7 @@ def test_drift_detected_when_referencing_pin_disagrees(tmp_path: Path) -> None:
             ),
             # Trailing referencing pin drift (Quality-review F-1).
             ".github/workflows/validate.yml": (
-                'pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" '
+                'pip install --upgrade pip "pytest==9.1.1" "PyYAML==6.0.3" '
                 '"jsonschema==4.26.0" "referencing==0.30.0"\n'
             ),
         },

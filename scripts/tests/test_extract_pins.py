@@ -45,10 +45,10 @@ def test_bunx_scoped_npm_pin(tmp_path: Path) -> None:
 def test_bunx_unscoped_npm_pin(tmp_path: Path) -> None:
     cfg = _write(tmp_path, {
         "model": "x",
-        "mcp": {"bar": {"type": "local", "command": ["bunx", "shadcn@4.12.0", "mcp"]}},
+        "mcp": {"bar": {"type": "local", "command": ["bunx", "shadcn@4.13.0", "mcp"]}},
     })
     pins = ep.extract_pins(cfg)
-    assert pins == [{"kind": "npm", "server": "bar", "name": "shadcn", "version": "4.12.0"}]
+    assert pins == [{"kind": "npm", "server": "bar", "name": "shadcn", "version": "4.13.0"}]
 
 
 def test_uvx_pypi_pin(tmp_path: Path) -> None:

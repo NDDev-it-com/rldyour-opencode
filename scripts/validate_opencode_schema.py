@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SCHEMA = REPO_ROOT / "references" / "opencode-config.schema.v1.17.12.json"
+DEFAULT_SCHEMA = REPO_ROOT / "references" / "opencode-config.schema.v1.17.13.json"
 DEFAULT_CONFIG = REPO_ROOT / "opencode.json"
 # Every external $ref the vendored OpenCode schema points at MUST have a
 # matching local snapshot in this map. The validator builds a Registry
