@@ -19,7 +19,7 @@ release readiness, versioning, and artifact hygiene
 ## Last verified
 - date: 2026-06-30
 - commit: `f95f005275557e1f9d13718fd4ec8be27bd59c07`
-- checked by: OpenCode 1.17.12 runtime baseline release sync
+- checked by: OpenCode 1.17.13 runtime baseline release sync
 
 ## Facts
 - Current rldyour-opencode adapter VERSION is `1.7.10`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
