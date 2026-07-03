@@ -31,11 +31,11 @@ jobs:
       attestations: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
           python-version: "3.13"
       - name: Set up Bun
@@ -48,7 +48,7 @@ jobs:
       - name: Install pytest + PyYAML + jsonschema + referencing (pinned)
         # `referencing` pinned explicitly per integration-review F-1 so the
         # release gate cannot silently lose this transitive dependency.
-        run: python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0" "referencing==0.36.2"
+        run: python3 -m pip install --upgrade pip "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "referencing==0.37.0"
       - name: Validate config + baseline + schema + profiles + indices + tests
         # Release gate mirrors validate.yml ordering so a green release
         # implies the same offline-safe gate set. New entries since v0.12.1:
@@ -142,12 +142,12 @@ jobs:
           retention-days: 30
       - name: Attest release evidence bundle
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26  # v4.1.0
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
         with:
           subject-path: release-evidence.tgz
       - name: Attest generated SBOM
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26  # v4.1.0
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
         with:
           subject-path: sbom.json
       - name: Create release tag (workflow_dispatch only)

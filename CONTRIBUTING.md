@@ -40,11 +40,11 @@ Before opening a PR, every change MUST pass these local gates. They mirror the C
 
 ```bash
 bash scripts/validate_config.sh                                          # opencode.json + frontmatter (strict YAML) + VERSION + action pins
-uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/  # 500 passed + 1 skipped across 23 suites
+uvx --from "pytest==9.1.1" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.37.0" pytest scripts/tests/  # 500 passed + 1 skipped across 23 suites
 bash scripts/check_deps_freshness.sh --check-freshness                   # pin report + registry freshness
 python3 scripts/check_action_pins.py .github/workflows --remote          # SHA/comment integrity for actions
 bunx --bun tsc --noEmit -p .opencode/tsconfig.json                       # plugin typecheck
-uvx --from "ruff==0.15.13" ruff check scripts                            # python lint
+uvx --from "ruff==0.15.20" ruff check scripts                            # python lint
 ```
 
 When `opencode` CLI is on PATH, `validate_config.sh` also exercises the live `opencode debug config | skill | agent build` resolution smoke. CI runs the same scripts on Ubuntu and macOS matrices.
