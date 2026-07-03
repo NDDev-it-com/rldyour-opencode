@@ -3,12 +3,18 @@
 ## [Unreleased]
 
 
+## [1.7.11] - 2026-07-03
+
+### Fixed
+
+- Refresh runtime and dependency baselines. Preserve documented `opencode-ai` `1.17.13`, `@opencode-ai/plugin` `1.17.13`, and `@opencode-ai/sdk` `1.17.13` baseline evidence.
+
 ## [1.7.10] - 2026-07-01
 
 ### Changed
 
-- Refresh Claude Code 2.1.197, OpenCode 1.17.12, and Playwright CLI 0.1.15 baselines.
-- Refresh OpenCode runtime, plugin, SDK, and schema baseline evidence to `1.17.12`.
+- Refresh Claude Code 2.1.199, OpenCode 1.17.13, and Playwright CLI 0.1.15 baselines.
+- Refresh OpenCode runtime, plugin, SDK, and schema baseline evidence to `1.17.13`.
 
 ## [1.7.9] - 2026-06-29
 
