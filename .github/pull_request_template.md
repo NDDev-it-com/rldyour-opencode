@@ -20,7 +20,7 @@
 All gates relevant to the touched surface must run green locally. Tick what you ran:
 
 - [ ] `bash scripts/validate_config.sh` - opencode.json + frontmatter + VERSION
-- [ ] `uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" pytest scripts/tests/` - full suite
+- [ ] `uvx --from "pytest==9.1.1" --with "pyyaml==6.0.3" pytest scripts/tests/` - full suite
 - [ ] `bash scripts/check_deps_freshness.sh` - pin report
 - [ ] `bash scripts/check_deps_freshness.sh --check-freshness` - network freshness (if dependency change)
 - [ ] `python3 scripts/check_action_pins.py .github/workflows --remote` - GitHub Actions SHA/comment integrity (if workflow action pins changed)
