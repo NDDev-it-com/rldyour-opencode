@@ -197,7 +197,7 @@
       "type": "local",
       "command": [
         "bunx",
-        "chrome-devtools-mcp@1.4.0",
+        "chrome-devtools-mcp@1.5.0",
         "--headless",
         "--isolated",
         "--no-usage-statistics",
@@ -231,7 +231,7 @@
       "type": "local",
       "command": [
         "bunx",
-        "shadcn@4.12.0",
+        "shadcn@4.13.0",
         "mcp"
       ],
       "enabled": true,

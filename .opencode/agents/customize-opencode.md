@@ -143,7 +143,7 @@ After every edit to `opencode.json`, verify:
 
 1. Edit the relevant `permission` object (global or per-agent).
 2. Values must be `"allow"`, `"ask"`, `"deny"`, or an object with glob patterns (e.g., `bash: { "git diff": "allow", "*": "ask" }`).
-3. The OpenCode v1.17.12 canonical permission key set is: `read, edit, glob, grep, list, bash, task, external_directory, todowrite, question, webfetch, websearch, lsp, doom_loop, skill`. Note: `codesearch`, `repo_clone`, and `repo_overview` are not in the v1.16+ schema (verified against the built-in customize-opencode skill and `references/opencode-config.schema.v1.17.12.json`) - do not reintroduce them. The keys `todowrite, question, webfetch, websearch, doom_loop` accept only a flat action (no per-pattern object).
+3. The OpenCode v1.17.13 canonical permission key set is: `read, edit, glob, grep, list, bash, task, external_directory, todowrite, question, webfetch, websearch, lsp, doom_loop, skill`. Note: `codesearch`, `repo_clone`, and `repo_overview` are not in the v1.16+ schema (verified against the built-in customize-opencode skill and `references/opencode-config.schema.v1.17.13.json`) - do not reintroduce them. The keys `todowrite, question, webfetch, websearch, doom_loop` accept only a flat action (no per-pattern object).
 4. Unknown keys are silently accepted by the runtime today (issue [sst/opencode#15507](https://github.com/sst/opencode/issues/15507)). `scripts/_validate_helpers.py::CANONICAL_PERMISSION_KEYS` is the project's defense against PascalCase typos and stale keys; rejecting them at validation time is required.
 5. Within a per-tool object, **insertion order matters** - OpenCode evaluates the LAST matching rule. Place broad rules first and narrow rules last.
 
