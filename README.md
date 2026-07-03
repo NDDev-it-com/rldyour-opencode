@@ -14,13 +14,13 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.7.10` |
-| Runtime baseline | OpenCode 1.17.12 |
-| GitHub release tag | `1.7.10` |
+| Adapter version | `1.7.11` |
+| Runtime baseline | OpenCode 1.17.13 |
+| GitHub release tag | `1.7.11` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
-Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.12 (June 2026). The v1.14.48 → v1.17.12 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin-loading, skill discovery and file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes. The `1.17.12` config schema is byte-identical to the `v1.17.7` snapshot (SHA-256 `57c02429`).
+Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.13 (June 2026). The v1.14.48 → v1.17.13 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin-loading, skill discovery and file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes. The `1.17.13` config schema is byte-identical to the `v1.17.7` snapshot (SHA-256 `57c02429`).
 
 ## What This Repository Provides
 
@@ -39,7 +39,7 @@ OpenCode's native config surfaces that this adapter populates:
   - `commands/*.md` - 11 slash commands
   - `plugins/*.ts` - 10 Bun-runtime TypeScript local plugins
   - `package.json` - `@opencode-ai/plugin` pin for local Bun dependency resolution
-- **Permission keys (canonical v1.17.12)**: `read`, `edit`, `bash`, `task`, `external_directory`, `doom_loop` - used in `opencode.json` `permission.*` fields.
+- **Permission keys (canonical v1.17.13)**: `read`, `edit`, `bash`, `task`, `external_directory`, `doom_loop` - used in `opencode.json` `permission.*` fields.
 - **MCP JSON**: declared under `mcp` in `opencode.json`; local servers use `bunx` (npm) or `uvx` (Python) or `dart` (Dart SDK) launchers - never `npx`.
 
 Source-only artifacts (scripts, tests, CI workflows, reference docs, ADRs) are not loaded by OpenCode at runtime; they exist for validation and release hygiene only.
@@ -135,8 +135,8 @@ Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `u
 |---|---|---|---|
 | serena | local (uvx) | 1.5.3 | Semantic code navigation, analysis, editing |
 | sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
-| chrome-devtools | local (bunx) | 1.2.0 | Chrome DevTools diagnostics |
-| shadcn | local (bunx) | 4.11.0 | shadcn/ui registry access |
+| chrome-devtools | local (bunx) | 1.5.0 | Chrome DevTools diagnostics |
+| shadcn | local (bunx) | 4.13.0 | shadcn/ui registry access |
 | dart-flutter | local (dart) | - | Dart/Flutter project support |
 | context7 | remote | - | Current library documentation |
 | deepwiki | remote | - | Repository documentation |
@@ -176,7 +176,7 @@ Three browser providers are active, each with a distinct role:
 
 - **Webwright skill** - long-horizon or reusable web workflows, multi-step task automation, and web research tasks where a persistent browser session adds value.
 - **Playwright CLI** - UI evidence collection: screenshots, snapshots, traces, visual diffs, and page-state assertions. Invoke via the `playwright-cli` skill.
-- **Chrome DevTools MCP** (`chrome-devtools`, version 1.2.0) - DevTools-level diagnosis: console messages, network requests, heap snapshots, performance traces, Lighthouse audits, and memory profiling. Use when you need browser internals rather than just page screenshots.
+- **Chrome DevTools MCP** (`chrome-devtools`, version 1.5.0) - DevTools-level diagnosis: console messages, network requests, heap snapshots, performance traces, Lighthouse audits, and memory profiling. Use when you need browser internals rather than just page screenshots.
 
 The `/ry-design` command routes through Figma MCP (design context and asset download), shadcn/ui MCP (registry access), and Chrome DevTools MCP (validation). DeepWiki, Context7, and Grep MCP support research and documentation retrieval during design and exploration tasks.
 
@@ -195,7 +195,7 @@ browser artifacts, tokens, cookies, and credentials stay ignored.
 
 ## Security Boundary
 
-Owner full-auto posture is intentional and explicitly acknowledged. The primary `build` and `plan` agents use OpenCode's canonical v1.17.12 permission keys with `"allow"` for `read`, `edit`, `bash`, `task`, `external_directory`, and `doom_loop`. This is not a sandbox - it is a trusted owner workstation posture designed for maximum autonomy.
+Owner full-auto posture is intentional and explicitly acknowledged. The primary `build` and `plan` agents use OpenCode's canonical v1.17.13 permission keys with `"allow"` for `read`, `edit`, `bash`, `task`, `external_directory`, and `doom_loop`. This is not a sandbox - it is a trusted owner workstation posture designed for maximum autonomy.
 
 The `oc` launcher (from `scripts/install_yolo_launchers.sh --apply`) injects an allow-all `OPENCODE_CONFIG_CONTENT` environment override and sets `OPENCODE_DISABLE_CLAUDE_CODE=1`, mirroring the same no-prompt posture at the OS launcher level.
 
@@ -209,7 +209,7 @@ MCP secrets (`GITHUB_PERSONAL_ACCESS_TOKEN`, `CONTEXT7_API_KEY`, etc.) are passe
 
 ```bash
 bash scripts/validate_config.sh                            # JSON shape + skill/agent/command frontmatter + VERSION semver
-uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/
+uvx --from "pytest==9.1.1" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.37.0" pytest scripts/tests/
 bash scripts/check_deps_freshness.sh --check-freshness     # list pinned MCP dependencies + npm/PyPI freshness
 python3 scripts/check_action_pins.py .github/workflows --remote  # verify SHA-pinned GitHub Actions comments
 python3 scripts/check_plugin_hooks.py                      # verify plugin hook contract; forbids permission.ask as enforcement

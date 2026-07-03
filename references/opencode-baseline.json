@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Single source of truth for every pinned dependency the marketplace targets. Validators read this file and compare against opencode.json, .opencode/package.json, .opencode/bun.lock, workflow installations, and README/CHANGELOG text. Any drift fails CI. Bump these values in one place and let `scripts/check_baseline_consistency.py` find every reference that needs updating.",
-  "version": "1.7.10",
-  "updated": "2026-07-01",
+  "version": "1.7.11",
+  "updated": "2026-07-03",
   "source_of_truth": {
     "runtime_latest_channel": "npm:opencode-ai",
     "plugin_latest_channel": "npm:@opencode-ai/plugin",
@@ -12,23 +12,23 @@
   },
   "baseline": {
     "opencode_cli": {
-      "version": "1.17.12",
+      "version": "1.17.13",
       "npm_package": "opencode-ai",
-      "ref": "https://www.npmjs.com/package/opencode-ai/v/1.17.12"
+      "ref": "https://www.npmjs.com/package/opencode-ai/v/1.17.13"
     },
     "plugin_sdk": {
-      "version": "1.17.12",
+      "version": "1.17.13",
       "npm_package": "@opencode-ai/plugin",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.17.12"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.17.13"
     },
     "sdk": {
-      "version": "1.17.12",
+      "version": "1.17.13",
       "npm_package": "@opencode-ai/sdk",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.17.12"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.17.13"
     },
     "config_schema": {
-      "version": "v1.17.12",
-      "vendored_at": "references/opencode-config.schema.v1.17.12.json",
+      "version": "v1.17.13",
+      "vendored_at": "references/opencode-config.schema.v1.17.13.json",
       "external_refs_vendored_at": [
         "references/models.dev-model-schema.json"
       ],
@@ -42,15 +42,15 @@
       "version": "3.13"
     },
     "test_dependencies": {
-      "pytest": "9.0.3",
+      "pytest": "9.1.1",
       "pyyaml": "6.0.3",
       "jsonschema": "4.26.0",
-      "referencing": "0.36.2",
-      "ruff": "0.15.13"
+      "referencing": "0.37.0",
+      "ruff": "0.15.20"
     },
     "security_tooling": {
       "gitleaks": "8.30.1",
-      "codeql_action": "v4.36.0"
+      "codeql_action": "v4.36.3"
     }
   }
 }

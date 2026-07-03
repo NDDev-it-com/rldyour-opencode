@@ -31,7 +31,7 @@ This repository pins exact versions for every external dependency to keep startu
 For GitHub Actions updates, keep three facts in lockstep:
 
 1. The `uses:` value is an immutable 40-character SHA.
-2. The inline comment is the exact upstream semver tag for that SHA, for example `# v6.0.2`.
+2. The inline comment is the exact upstream semver tag for that SHA, for example `# v7.0.0`.
 3. `python3 scripts/check_action_pins.py .github/workflows --remote` resolves the tag to the pinned SHA. This catches Dependabot/comment drift such as a new SHA retaining an old `# vX.Y.Z` comment.
 
 ## Supply-chain rules

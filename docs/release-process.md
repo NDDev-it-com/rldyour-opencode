@@ -15,7 +15,7 @@ Multiple changes in one release follow the highest applicable bump. Atomic commi
 ## Release checklist
 
 1. `bash scripts/validate_config.sh` - exit 0.
-2. `uvx --from "pytest==9.0.3" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.36.2" pytest scripts/tests/` - all unit tests green.
+2. `uvx --from "pytest==9.1.1" --with "pyyaml==6.0.3" --with "jsonschema==4.26.0" --with "referencing==0.37.0" pytest scripts/tests/` - all unit tests green.
 3. `opencode debug config` - must resolve without error.
 4. `opencode debug skill | python3 -c "import json,sys;print(len(json.load(sys.stdin)))"` - equals the `.opencode/skills/` directory count.
 5. `bash scripts/check_lsps.sh` - at minimum every LSP defined in `opencode.json.lsp` must resolve to an executable.
