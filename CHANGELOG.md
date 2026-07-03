@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 
+## [1.7.12] - 2026-07-04
+
+### Security
+
+- Refresh GitHub Actions and CodeQL pins across the public module CI surface. Preserve documented `opencode-ai` `1.17.13`, `@opencode-ai/plugin` `1.17.13`, and `@opencode-ai/sdk` `1.17.13` baseline evidence.
+
 ## [1.7.11] - 2026-07-03
 
 ### Fixed
