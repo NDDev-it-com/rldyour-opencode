@@ -203,7 +203,7 @@ def _check_workflow_python_pins(
     was silently ignored. Workflows here typically install three packages
     in one line:
 
-        python3 -m pip install --upgrade pip "pytest==9.0.3" "PyYAML==6.0.3" "jsonschema==4.26.0"
+        python3 -m pip install --upgrade pip "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0"
 
     The fix walks each `pip install` line, then runs a second pass over
     that line to extract every `"pkg==ver"` token so drift on the
