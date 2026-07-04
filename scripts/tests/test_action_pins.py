@@ -36,6 +36,29 @@ jobs:
     ]
 
 
+def test_collect_action_pins_accepts_numeric_semver_comment(tmp_path: Path) -> None:
+    path = _write_workflow(
+        tmp_path,
+        """
+jobs:
+  test:
+    steps:
+      - uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/actionlint.yml@21bd3f7c3bbcbd7a9ecd3475b293d9e65aa8563a # 0.2.2
+""",
+    )
+
+    pins, errors = cap.collect_action_pins([path])
+
+    assert errors == 0
+    assert [(pin.action, pin.repo, pin.tag) for pin in pins] == [
+        (
+            "NDDev-it-com/nddev-ci-workflows/.github/workflows/actionlint.yml",
+            "NDDev-it-com/nddev-ci-workflows",
+            "0.2.2",
+        ),
+    ]
+
+
 def test_collect_action_pins_rejects_tag_only_uses(tmp_path: Path) -> None:
     path = _write_workflow(
         tmp_path,
