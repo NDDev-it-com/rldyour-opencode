@@ -21,7 +21,7 @@ from pathlib import Path
 
 USES_RE = re.compile(r"^\s*(?:-\s*)?uses:\s*(?P<target>\S+)(?:\s+#\s*(?P<tag>\S+))?\s*$")
 PINNED_RE = re.compile(r"^(?P<action>[^@\s]+)@(?P<sha>[0-9a-f]{40})$", re.IGNORECASE)
-SEMVER_TAG_RE = re.compile(r"^v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")
+SEMVER_TAG_RE = re.compile(r"^v?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")
 
 
 @dataclass(frozen=True)
