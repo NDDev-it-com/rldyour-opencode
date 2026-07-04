@@ -3,6 +3,18 @@
 ## [Unreleased]
 
 
+## [1.7.15] - 2026-07-04
+
+### Fixed
+
+- Migrate CI workflows to nddev-ci-workflows reusable contracts. Preserve documented `opencode-ai` `1.17.13`, `@opencode-ai/plugin` `1.17.13`, and `@opencode-ai/sdk` `1.17.13` baseline evidence.
+
+## [1.7.14] - 2026-07-04
+
+### Fixed
+
+- Migrate CI workflows to nddev-ci-workflows reusable contracts. Preserve documented `opencode-ai` `1.17.13`, `@opencode-ai/plugin` `1.17.13`, and `@opencode-ai/sdk` `1.17.13` baseline evidence.
+
 ## [1.7.13] - 2026-07-04
 
 ### Changed
