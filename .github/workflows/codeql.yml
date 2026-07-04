@@ -40,7 +40,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         language: ["javascript-typescript", "python"]
-    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/public-codeql.yml@21bd3f7c3bbcbd7a9ecd3475b293d9e65aa8563a # 0.2.2
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/public-codeql.yml@71f4345cad2998a16e8e14b800eee88c68d865ac # 0.2.3
     with:
       runner: ${{ matrix.os }}
       languages: '["${{ matrix.language }}"]'
