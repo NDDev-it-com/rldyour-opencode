@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 
+## [1.7.13] - 2026-07-04
+
+### Changed
+
+- CI/CD audit remediation: real actionlint run (antigravity), gitleaks history scan replacing regex (mimocode), digest-pinned gitleaks image (new-mac), CodeQL python+actions matrix with weekly schedule and security-and-quality queries (antigravity/mimocode), job-scoped release permissions, pinned pytest, harden-runner egress audit + persist-credentials on security jobs, strict instruction-docs validation and corrected script path globs (opencode), and stronger branch-protection required checks (new-mac). Preserve documented `opencode-ai` `1.17.13`, `@opencode-ai/plugin` `1.17.13`, and `@opencode-ai/sdk` `1.17.13` baseline evidence.
+
 ## [1.7.12] - 2026-07-04
 
 ### Security
