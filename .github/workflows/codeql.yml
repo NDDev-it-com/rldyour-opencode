@@ -35,44 +35,17 @@ concurrency:
 jobs:
   analyze:
     name: Analyze (${{ matrix.os }} / ${{ matrix.language }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
         language: ["javascript-typescript", "python"]
-    steps:
-      - name: Harden runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
-        with:
-          persist-credentials: false
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a  # v4.36.3
-        with:
-          languages: ${{ matrix.language }}
-          config-file: ./.github/codeql/codeql-config.yml
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a  # v4.36.3
-      - name: Analyze
-        uses: github/codeql-action/analyze@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a  # v4.36.3
-        with:
-          # Matrix runs upload multiple analyses for the same commit; include
-          # both dimensions so code scanning stores each result set separately.
-          category: "/os:${{ matrix.os }}/language:${{ matrix.language }}"
-          # CodeQL action uploads SARIF to code scanning by default. Keep the
-          # local output directory too so the SARIF remains downloadable as a
-          # workflow artifact for offline audit/debugging.
-          upload-database: false
-          output: codeql-results
-      - name: Upload CodeQL SARIF artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
-        with:
-          name: codeql-${{ matrix.os }}-${{ matrix.language }}-sarif
-          path: codeql-results
-          if-no-files-found: error
-          retention-days: 14
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/public-codeql.yml@21bd3f7c3bbcbd7a9ecd3475b293d9e65aa8563a # 0.2.2
+    with:
+      runner: ${{ matrix.os }}
+      languages: '["${{ matrix.language }}"]'
+      config_file: ./.github/codeql/codeql-config.yml
+      autobuild: true
+      output_directory: codeql-results
+      upload_sarif_artifact: true
+      artifact_name: codeql-${{ matrix.os }}-${{ matrix.language }}-sarif
