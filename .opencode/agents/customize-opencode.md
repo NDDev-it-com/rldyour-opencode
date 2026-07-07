@@ -59,7 +59,7 @@ The `opencode.json` file follows the OpenCode configuration schema (`https://ope
 ### Top-level keys
 
 - `$schema`: must be `"https://opencode.ai/config.json"`.
-- `model`: default model ID (e.g., `"opencode-go/glm-5.1"`).
+- `model`: default model ID (e.g., `"moonshotai/kimi-k2.7-code"`).
 - `small_model`: lightweight model for fast tasks.
 - `autoupdate`: boolean.
 - `share`: `"manual"` | `"auto"` | `"disabled"`; controls OpenCode session sharing only, not CI/CD execution.
@@ -143,7 +143,7 @@ After every edit to `opencode.json`, verify:
 
 1. Edit the relevant `permission` object (global or per-agent).
 2. Values must be `"allow"`, `"ask"`, `"deny"`, or an object with glob patterns (e.g., `bash: { "git diff": "allow", "*": "ask" }`).
-3. The OpenCode v1.17.13 canonical permission key set is: `read, edit, glob, grep, list, bash, task, external_directory, todowrite, question, webfetch, websearch, lsp, doom_loop, skill`. Note: `codesearch`, `repo_clone`, and `repo_overview` are not in the v1.16+ schema (verified against the built-in customize-opencode skill and `references/opencode-config.schema.v1.17.13.json`) - do not reintroduce them. The keys `todowrite, question, webfetch, websearch, doom_loop` accept only a flat action (no per-pattern object).
+3. The OpenCode v1.17.14 canonical permission key set is: `read, edit, glob, grep, list, bash, task, external_directory, todowrite, question, webfetch, websearch, lsp, doom_loop, skill`. Note: `codesearch`, `repo_clone`, and `repo_overview` are not in the v1.16+ schema (verified against the built-in customize-opencode skill and `references/opencode-config.schema.v1.17.14.json`) - do not reintroduce them. The keys `todowrite, question, webfetch, websearch, doom_loop` accept only a flat action (no per-pattern object).
 4. Unknown keys are silently accepted by the runtime today (issue [sst/opencode#15507](https://github.com/sst/opencode/issues/15507)). `scripts/_validate_helpers.py::CANONICAL_PERMISSION_KEYS` is the project's defense against PascalCase typos and stale keys; rejecting them at validation time is required.
 5. Within a per-tool object, **insertion order matters** - OpenCode evaluates the LAST matching rule. Place broad rules first and narrow rules last.
 
@@ -160,7 +160,7 @@ This means a subagent inheriting `bash: { "git diff": "allow", "*": "ask" }` wil
 ### Changing the default model
 
 1. Edit `model` at the top level.
-2. Model IDs must follow the `provider/model-name` format (e.g., `opencode-go/glm-5.1`, `openai/gpt-4o`).
+2. Model IDs must follow the `provider/model-name` format (e.g., `moonshotai/kimi-k2.7-code`, `openai/gpt-4o`).
 3. If changing the default model, consider whether `small_model` should also change.
 
 ## Forbidden actions
