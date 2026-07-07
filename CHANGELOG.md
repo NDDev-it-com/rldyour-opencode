@@ -3,6 +3,19 @@
 ## [Unreleased]
 
 
+## [1.7.18] - 2026-07-07
+
+### Fixed
+
+- Restore the consistent `@opencode-ai/plugin` `1.17.14` pin pair in
+  `.opencode/package.json` + `.opencode/bun.lock`. The `1.7.17` tag shipped
+  an inconsistent pair (package.json pinned plugin `1.17.13` while bun.lock
+  resolved `1.17.14`), the release verify job failed on
+  `bun install --frozen-lockfile`, and no GitHub Release exists for
+  `1.7.17`; `1.7.18` supersedes it through the canonical tag-driven
+  workflow.
+
+
 ## [1.7.17] - 2026-07-07
 
 ### Changed
