@@ -3,6 +3,24 @@
 ## [Unreleased]
 
 
+## [1.7.21] - 2026-07-08
+
+### Fixed
+
+- CloakBrowser default privacy-first browser backend across all adapters (ADR 0003). Preserve documented `opencode-ai` `1.17.14`, `@opencode-ai/plugin` `1.17.14`, and `@opencode-ai/sdk` `1.17.14` baseline evidence.
+
+## [1.7.20] - 2026-07-08
+
+### Fixed
+
+- CloakBrowser default privacy-first browser backend across all adapters (ADR 0003). Preserve documented `opencode-ai` `1.17.14`, `@opencode-ai/plugin` `1.17.14`, and `@opencode-ai/sdk` `1.17.14` baseline evidence.
+
+## [1.7.19] - 2026-07-08
+
+### Fixed
+
+- CloakBrowser default privacy-first browser backend across all adapters (ADR 0003). Preserve documented `opencode-ai` `1.17.14`, `@opencode-ai/plugin` `1.17.14`, and `@opencode-ai/sdk` `1.17.14` baseline evidence.
+
 ## [1.7.18] - 2026-07-07
 
 ### Fixed
