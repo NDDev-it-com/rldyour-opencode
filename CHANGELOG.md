@@ -3,6 +3,29 @@
 ## [Unreleased]
 
 
+## [1.7.17] - 2026-07-07
+
+### Changed
+
+- Switch the top-level `model` and `small_model` defaults from
+  `opencode-go/glm-5.1` to `moonshotai/kimi-k2.7-code` (owner directive:
+  Kimi K2.7 Code everywhere; GLM retired). The runtime smoke gate now
+  asserts the new model resolves through `opencode debug config`, and
+  active docs/agents/reviewer-protocol reference the new default.
+- Adopt the `opencode-ai` / `@opencode-ai/plugin` / `@opencode-ai/sdk`
+  `1.17.14` baseline (npm latest, released 2026-07-06): vendored config
+  schema `v1.17.14` is byte-identical to `v1.17.7`/`v1.17.13` (SHA-256
+  `57c02429`); surface adoption gains a `1.17.14` code-mode MCP adapter
+  row (Future) and the MCP reliability row covers the 1.17.14
+  paginated-catalog metadata fix.
+- Re-vendor `references/models.dev-model-schema.json` (5346 model IDs,
+  fetched 2026-07-07) so the vendored catalog proves
+  `moonshotai/kimi-k2.7-code` against the live models.dev schema channel.
+
+### Fixed
+
+- OpenCode adapter: default model to moonshotai/kimi-k2.7-code (GLM retired) and 1.17.14 runtime baseline adoption.
+
 ## [1.7.16] - 2026-07-04
 
 ### Fixed
