@@ -65,7 +65,7 @@ jobs:
       - name: Install pinned OpenCode CLI
         run: |
           set -euo pipefail
-          bun install -g opencode-ai@1.17.13
+          bun install -g opencode-ai@1.17.14
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
 
       - name: opencode --version
@@ -79,7 +79,7 @@ jobs:
           set -euo pipefail
           opencode debug config 2>&1 | tee /tmp/opencode-debug-config.txt
           # Smoke assertion: the resolver must surface our top-level model.
-          grep -q '"opencode-go/glm-5.1"' /tmp/opencode-debug-config.txt
+          grep -q '"moonshotai/kimi-k2.7-code"' /tmp/opencode-debug-config.txt
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
