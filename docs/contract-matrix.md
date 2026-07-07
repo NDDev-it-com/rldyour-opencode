@@ -76,6 +76,6 @@ through `ry-shell-strategy`.
 | `session.idle.sync-reminder` | `ry-sync-reminder` | `event` (`session.idle`) | advisory |
 
 `permission.ask` is intentionally absent. Source/runtime inspection originally
-proved this on OpenCode v1.15.4 and the current v1.17.13 baseline keeps the
+proved this on OpenCode v1.15.4 and the current v1.17.14 baseline keeps the
 same repository policy: enforcement uses static permission config plus
 runtime-proven `tool.execute.before` guards, not `permission.ask`.

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Machine-readable MCP server profiles. Each server in opencode.json.mcp belongs to exactly one profile. Profiles are used by scripts/validate_mcp_profiles.py to enforce skill.requires_mcp coverage and by scripts/smoke_mcp_capabilities.py --mode to bound CI smoke probes. The descriptive trust matrix lives in docs/security/mcp-trust-boundaries.md and stays in sync via the validator.",
-  "version": "1.7.16",
-  "updated": "2026-07-04",
+  "version": "1.7.17",
+  "updated": "2026-07-07",
   "profiles": {
     "base": {
       "description": "Always-on lightweight servers. Low context cost, no required secrets, safe to spawn on every session. Skills in any domain may rely on these without justification.",
