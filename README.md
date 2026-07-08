@@ -14,9 +14,9 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.7.21` |
+| Adapter version | `1.7.22` |
 | Runtime baseline | OpenCode 1.17.14 |
-| GitHub release tag | `1.7.21` |
+| GitHub release tag | `1.7.22` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
