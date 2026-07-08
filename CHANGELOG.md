@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 
+## [1.7.22] - 2026-07-08
+
+### Changed
+
+- Clean release: adopt nddev-ci-workflows 0.3.0 reusable CI and sole-authorship commit policy Preserve documented `opencode-ai` `1.17.14`, `@opencode-ai/plugin` `1.17.14`, and `@opencode-ai/sdk` `1.17.14` baseline evidence.
+
 ## [1.7.21] - 2026-07-08
 
 ### Fixed
