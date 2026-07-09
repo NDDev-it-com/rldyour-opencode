@@ -1,7 +1,7 @@
 <!-- Memory Metadata
-Last updated: 2026-05-22
-Last verified: 2026-05-22
-Last commit: 869dac43071c53d4b93d06ed006d873fb5f66b13 chore(release): opencode 1.7.11 (other)
+Last updated: 2026-07-10
+Last verified: 2026-07-10
+Last commit: 94b76fb2db9c249ba952ea46758cb6b9b4a3c41c feat(browser): enforce managed CloakBrowser transport (other)
 Scope: release readiness, versioning, and artifact hygiene
 Area: RELEASE
 -->
@@ -17,16 +17,16 @@ release readiness, versioning, and artifact hygiene
 - `path:.github/workflows/release.yml`
 
 ## Last verified
-- date: 2026-05-22
-- commit: `869dac43071c53d4b93d06ed006d873fb5f66b13`
-- checked by: Codex ry-start memory taxonomy sync
+- date: 2026-07-10
+- commit: `94b76fb2db9c249ba952ea46758cb6b9b4a3c41c`
+- checked by: Codex adapter release finalization
 
 ## Facts
-- Current rldyour-opencode adapter VERSION is `1.7.22`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
+- Current rldyour-opencode adapter VERSION is `1.7.23`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
 - Release memories record numeric versioning, tags, CI gates, and clean artifact hygiene.
 
 ## Evidence
-- `commit:869dac43071c53d4b93d06ed006d873fb5f66b13`
+- `commit:94b76fb2db9c249ba952ea46758cb6b9b4a3c41c`
 - `path:VERSION`
 - `path:CHANGELOG.md`
 - `path:.github/workflows/release.yml`
