@@ -27,7 +27,7 @@ CI, and which to gate behind explicit user authorization. It complements
 |---|---|---|---|---|---|---|---|
 | `serena` | local (uvx) | local-only | none | none | yes | no | local-launch |
 | `sequential-thinking` | local (bunx) | local-only | none | none | no | no | local-launch |
-| `chrome-devtools` | local (bunx) | local-only | none | yes (target site) | no | no | local-launch |
+| `chrome-devtools` | local (managed CloakBrowser wrapper) | local-only | none | yes (target site) | no | no | local-launch |
 | `shadcn` | local (bunx) | local-only | none | yes (registry) | no | yes (component scaffold) | local-launch |
 | `dart-flutter` | local (dart) | local-only | none | none | yes | yes | local-launch |
 | `context7` | remote | trusted-public | optional `CONTEXT7_API_KEY` (rate limit) | yes | no | no | remote-head |

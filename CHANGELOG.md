@@ -3,6 +3,16 @@
 ## [Unreleased]
 
 
+## [1.7.23] - 2026-07-10
+
+### Changed
+
+- Route OpenCode Chrome DevTools MCP through the exact managed, health-gated
+  CloakBrowser wrapper instead of direct `bunx` execution.
+- Adopt the published `opencode-ai`, `@opencode-ai/plugin`, and
+  `@opencode-ai/sdk` `1.17.18` baseline with its matching vendored schema.
+
+
 ## [1.7.22] - 2026-07-08
 
 ### Changed

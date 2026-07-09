@@ -6,7 +6,8 @@ This repository pins exact versions for every external dependency to keep startu
 
 | Where | What | How to bump |
 |---|---|---|
-| `opencode.json` → `mcp.<name>.command` | npm packages (`@modelcontextprotocol/server-sequential-thinking`, `chrome-devtools-mcp`, `shadcn`) | check npm view, update version, restart OpenCode, verify `opencode debug config` |
+| `opencode.json` → `mcp.<name>.command` | npm packages (`@modelcontextprotocol/server-sequential-thinking`, `shadcn`) | check npm view, update version, restart OpenCode, verify `opencode debug config` |
+| bootstrap browser contract | `chrome-devtools-mcp` runtime and CloakBrowser wrapper | update the bootstrap lock/version, keep this adapter's exact managed wrapper transport, then verify `opencode debug config` |
 | Browser provider policy | `@playwright/cli`, pinned Webwright checkout | check npm/GitHub source, update `config/browser-automation-policy.json`, verify browser provider validators |
 | `opencode.json` → `mcp.<name>.command` | Python tools via `uvx` (`serena-agent`) | check PyPI, update pinned version, verify MCP startup |
 | `opencode.json` → `mcp.<name>.command` | Dart SDK (`dart mcp-server`) | follow Dart SDK stable channel |

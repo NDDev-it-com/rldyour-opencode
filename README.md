@@ -14,13 +14,13 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.7.22` |
-| Runtime baseline | OpenCode 1.17.14 |
-| GitHub release tag | `1.7.22` |
+| Adapter version | `1.7.23` |
+| Runtime baseline | OpenCode 1.17.18 |
+| GitHub release tag | `1.7.23` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
-Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.14 (July 2026). The v1.14.48 → v1.17.14 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin-loading, skill discovery and file-based agent loading, `run --replay`, ACP/WebSocket runtime fixes, provider-compatible reasoning summaries, safer edit matching, backgroundable subagents, session context persistence, and permission reply routing fixes. The `1.17.14` config schema is byte-identical to the `v1.17.7` snapshot (SHA-256 `57c02429`).
+Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.18 (July 2026). The v1.14.48 → v1.17.18 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin loading, skill discovery, ACP/WebSocket reliability, safer edits, backgroundable subagents, Copilot zero-batch pricing protection, and the Meta Muse Spark system prompt. The `1.17.18` config schema is byte-identical to the `v1.17.7`/`v1.17.13`/`v1.17.14` snapshots (SHA-256 `57c02429`).
 
 ## What This Repository Provides
 
@@ -39,8 +39,10 @@ OpenCode's native config surfaces that this adapter populates:
   - `commands/*.md` - 11 slash commands
   - `plugins/*.ts` - 10 Bun-runtime TypeScript local plugins
   - `package.json` - `@opencode-ai/plugin` pin for local Bun dependency resolution
-- **Permission keys (canonical v1.17.14)**: `read`, `edit`, `bash`, `task`, `external_directory`, `doom_loop` - used in `opencode.json` `permission.*` fields.
-- **MCP JSON**: declared under `mcp` in `opencode.json`; local servers use `bunx` (npm) or `uvx` (Python) or `dart` (Dart SDK) launchers - never `npx`.
+- **Permission keys (canonical v1.17.18)**: `read`, `edit`, `bash`, `task`, `external_directory`, `doom_loop` - used in `opencode.json` `permission.*` fields.
+- **MCP JSON**: declared under `mcp` in `opencode.json`; registry-backed local
+  servers use `bunx`/`uvx`, Dart uses its SDK, and Chrome DevTools uses the
+  bootstrap-managed CloakBrowser wrapper - never `npx`.
 
 Source-only artifacts (scripts, tests, CI workflows, reference docs, ADRs) are not loaded by OpenCode at runtime; they exist for validation and release hygiene only.
 
@@ -129,13 +131,15 @@ bash scripts/doctor_opencode.sh
 
 ### MCP Servers
 
-Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm, `uvx` for Python, `dart` for Dart SDK.
+Local servers timeout 30 s, remote 15 s. Launcher convention: `bunx` for npm,
+`uvx` for Python, `dart` for Dart SDK, and the exact managed wrapper for Chrome
+DevTools.
 
 | Server | Type | Version | Purpose |
 |---|---|---|---|
 | serena | local (uvx) | 1.5.3 | Semantic code navigation, analysis, editing |
 | sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
-| chrome-devtools | local (bunx) | 1.5.0 | Chrome DevTools diagnostics |
+| chrome-devtools | local (managed CloakBrowser wrapper) | 1.5.0 | Chrome DevTools diagnostics |
 | shadcn | local (bunx) | 4.13.0 | shadcn/ui registry access |
 | dart-flutter | local (dart) | - | Dart/Flutter project support |
 | context7 | remote | - | Current library documentation |
@@ -195,7 +199,7 @@ browser artifacts, tokens, cookies, and credentials stay ignored.
 
 ## Security Boundary
 
-Owner full-auto posture is intentional and explicitly acknowledged. The primary `build` and `plan` agents use OpenCode's canonical v1.17.14 permission keys with `"allow"` for `read`, `edit`, `bash`, `task`, `external_directory`, and `doom_loop`. This is not a sandbox - it is a trusted owner workstation posture designed for maximum autonomy.
+Owner full-auto posture is intentional and explicitly acknowledged. The primary `build` and `plan` agents use OpenCode's canonical v1.17.18 permission keys with `"allow"` for `read`, `edit`, `bash`, `task`, `external_directory`, and `doom_loop`. This is not a sandbox - it is a trusted owner workstation posture designed for maximum autonomy.
 
 The `oc` launcher (from `scripts/install_yolo_launchers.sh --apply`) injects an allow-all `OPENCODE_CONFIG_CONTENT` environment override and sets `OPENCODE_DISABLE_CLAUDE_CODE=1`, mirroring the same no-prompt posture at the OS launcher level.
 

@@ -19,7 +19,12 @@ REQUIRED_SKILLS = {
     "webwright-task",
     "visual-diff-review",
 }
-SAFE_CHROME_ARGS = {"--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"}
+CHROME_COMMAND = [
+    "/bin/sh",
+    "-c",
+    'exec "$HOME/.local/bin/chrome-devtools-mcp" --headless --isolated '
+    "--no-usage-statistics --no-performance-crux",
+]
 
 
 class Failure(RuntimeError):
@@ -64,7 +69,7 @@ def validate() -> None:
     chrome = mcp.get("chrome-devtools") or {}
     require(bool(chrome), "chrome-devtools MCP server is required")
     command = [str(item) for item in chrome.get("command") or []]
-    require(set(command) >= SAFE_CHROME_ARGS, "chrome-devtools MCP args must keep safe defaults")
+    require(command == CHROME_COMMAND, "chrome-devtools must use the exact managed CloakBrowser wrapper invocation")
 
     for skill in REQUIRED_SKILLS:
         path = ROOT / ".opencode/skills" / skill / "SKILL.md"
