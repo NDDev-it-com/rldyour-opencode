@@ -1,19 +1,31 @@
 ---
 name: webwright-task
-description: "Запускает Webwright для длинных web tasks, RPA и воспроизводимых browser workflows. Используй для: найти, сравнить, выгрузить, повторить, reusable script. EN triggers: Webwright task, long-horizon web task, RPA, extraction, final_script.py."
+description: "Совместимый маршрут legacy Webwright task intent в управляемые Playwright CLI и Chrome DevTools MCP; Webwright runtime не запускается. Используй для: найти, сравнить, выгрузить, повторить, reusable workflow. EN triggers: Webwright task, long-horizon web task, RPA, extraction, reusable workflow."
 ---
 
-# Webwright Task
+# Webwright Task Compatibility Workflow
 
-Use Webwright for high-level long-horizon browser tasks and reusable web workflows through an adapter-owned CLI wrapper. Upstream-native OpenCode Webwright plugin support is NOT_PROVEN.
+## Mandatory CloakBrowser Boundary
 
-The release-grade install path is a pinned Webwright checkout from Microsoft GitHub.
+This boundary applies before every browser action:
+
+1. Run exactly:
+
+   ```bash
+   $HOME/.local/bin/cloakbrowser-cdp-health
+   ```
+
+   If the command is missing or exits nonzero, stop immediately and report `NOT_PROVEN`.
+2. Browser execution is permitted only through:
+   - the exact `$HOME/.local/bin/playwright-cli` executable; `run-code` and `--filename` are forbidden;
+   - the approved Chrome DevTools MCP transport, exactly `/bin/sh -c 'exec "$HOME/.local/bin/chrome-devtools-mcp" --headless --isolated --no-usage-statistics --no-performance-crux'`.
+3. Never execute the Webwright Python runtime, stock/raw/in-app Browser, `browser_agent`, `node_repl`, computer-use, Playwright MCP, raw Playwright, `bunx`, `npx`, direct package invocations, alternate CDP endpoints, alternate browser executables, alternate browser configs, or any fallback. No fallback is allowed.
+
+This skill name is retained only for routing compatibility. Execute long-horizon search, comparison, extraction, export, and repeatable workflows stepwise through the health-gated exact managed Playwright CLI. Use the health-gated approved Chrome DevTools MCP transport only for specialist diagnostics. Never install, import, or execute `webwright` Python code.
 
 Expected outputs:
 
-- `plan.md` for task intent and steps.
-- Screenshots and logs as evidence.
-- `final_script.py` for the rerunnable workflow.
-- `NOT_PROVEN` when the pinned Webwright checkout or browser runtime is unavailable.
-
-Use Playwright CLI for low-level browser control or screenshots. Use Chrome DevTools MCP for runtime, network, performance, memory, or Lighthouse debugging.
+- A bounded plan for the requested steps.
+- Exact managed-provider actions and emitted evidence paths.
+- A reproducible command transcript that preserves the mandatory health check before each browser action.
+- `NOT_PROVEN` for any state the managed boundary cannot verify.

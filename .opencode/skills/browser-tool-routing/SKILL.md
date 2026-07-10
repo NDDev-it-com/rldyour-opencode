@@ -1,28 +1,29 @@
 ---
 name: browser-tool-routing
-description: "Маршрутизирует browser tasks между Webwright, Playwright CLI и Chrome DevTools MCP. Используй для: браузер, UI, визуально, скриншот, Figma, фото, консоль, сеть, перфоманс, Lighthouse. EN triggers: browser tool routing, UI validation, screenshots, visual QA, console, network, performance."
+description: "Маршрутизирует browser tasks только через управляемые Playwright CLI и Chrome DevTools MCP. Используй для: проверь в браузере, UI, визуально, скриншот, Figma, консоль, сеть, перфоманс. EN triggers: browser routing, UI validation, screenshots, visual QA, console, network, performance."
 ---
 
 # Browser Tool Routing
 
-Provider model:
+## Mandatory CloakBrowser Boundary
 
-- Webwright: high-level long-horizon web tasks, reusable scripts, RPA, extraction, comparison, and evidence-first workflows.
-- Playwright CLI: low-level browser flow validation, deterministic screenshots, snapshots, headed sessions, traces, console/request checks, and final UI proof.
-- Chrome DevTools MCP: console/network/runtime/performance/memory/Lighthouse debugging and live Chrome inspection.
+This boundary applies before every browser action:
 
-RU triggers: проверь UI, проверь в браузере, визуально, pixel-perfect, сравни с Figma, сравни с фото, скриншот, консоль, сеть, перфоманс, Lighthouse.
-EN triggers: validate UI, browser check, visual QA, pixel-perfect, compare with Figma, compare with reference image, screenshot, console, network, performance, Lighthouse.
+1. Run exactly:
 
-Use Webwright for long-horizon web task execution and reusable `final_script.py` workflows. Use Playwright CLI for low-level browser flow validation, screenshot capture under `browser/`, snapshots, responsive matrices, and post-fix proof. Use Chrome DevTools MCP for console, network, runtime, layout, performance, memory, Lighthouse, and live Chrome debugging.
+   ```bash
+   $HOME/.local/bin/cloakbrowser-cdp-health
+   ```
 
-Decision tree:
+   If the command is missing or exits nonzero, stop immediately and report `NOT_PROVEN`.
+2. Browser execution is permitted only through:
+   - the exact `$HOME/.local/bin/playwright-cli` executable; `run-code` and `--filename` are forbidden;
+   - the approved Chrome DevTools MCP transport, exactly `/bin/sh -c 'exec "$HOME/.local/bin/chrome-devtools-mcp" --headless --isolated --no-usage-statistics --no-performance-crux'`.
+3. Never execute the Webwright Python runtime, stock/raw/in-app Browser, `browser_agent`, `node_repl`, computer-use, Playwright MCP, raw Playwright, `bunx`, `npx`, direct package invocations, alternate CDP endpoints, alternate browser executables, alternate browser configs, or any fallback. No fallback is allowed.
 
-1. If the user asks for a long-horizon web task, extraction, comparison, booking/search flow, export, or reusable script, use Webwright.
-2. If the user asks to validate UI, reproduce clicks/forms, capture screenshots, compare Figma/photo/screenshot, or prove final UI state, use Playwright CLI.
-3. If the user asks for console, network, runtime exception, computed style, layout debug, Lighthouse, performance, memory, or live Chrome inspection, use Chrome DevTools MCP.
-4. If the browser issue is unknown, reproduce with Playwright CLI first, then diagnose with Chrome DevTools MCP when runtime evidence is relevant.
-5. Never use Webwright as a DevTools replacement.
-6. Never use a browser-control MCP surface for Playwright; the approved provider is Playwright CLI.
+## Routing
 
-For unknown browser defects, reproduce with Playwright CLI first and then diagnose with Chrome DevTools MCP when runtime evidence is relevant.
+- Use the health-gated exact managed Playwright CLI for navigation, state transitions, screenshots, snapshots, traces, responsive matrices, visual evidence, and long-horizon stepwise workflows.
+- Use the health-gated approved Chrome DevTools MCP transport for console, network, runtime, DOM/layout, performance, Lighthouse, memory, and live DevTools inspection.
+- `webwright-task` is a compatibility workflow name. Route it to these same two managed providers; it never authorizes the Webwright runtime.
+- For unknown defects, reproduce with the managed CLI and add managed DevTools evidence only when needed.

@@ -8,8 +8,8 @@ historical patch in the line.
 
 | Version | Supported |
 |---|---|
-| Current exact tag `1.7.24` | yes |
-| Older `1.1.*` tags | no; upgrade to current exact tag |
+| Current exact tag `1.7.25` | yes |
+| Older patch tags | no; upgrade to current exact tag |
 | Older minor / major lines | no |
 
 When a security issue is reported against an unsupported version, the project will upgrade the report to the current branch instead of patching old releases.

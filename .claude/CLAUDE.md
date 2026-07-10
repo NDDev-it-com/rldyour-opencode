@@ -52,9 +52,11 @@ python3 scripts/check_baseline_consistency.py
 python3 scripts/validate_instruction_docs.py
 ```
 
-Browser/provider policy remains aligned globally:
-Webwright for long-horizon tasks, Playwright CLI for UI/asset evidence, and Chrome
-DevTools MCP for console/network/performance.
+Browser/provider policy fails closed globally. Before every browser action, run
+exact `$HOME/.local/bin/cloakbrowser-cdp-health`; missing or nonzero health is
+`NOT_PROVEN`. Execute only exact `$HOME/.local/bin/playwright-cli` or the
+configured managed Chrome DevTools MCP transport. `webwright-task` is a
+compatibility route only; the Webwright runtime and every fallback are forbidden.
 
 ## Task Policy
 

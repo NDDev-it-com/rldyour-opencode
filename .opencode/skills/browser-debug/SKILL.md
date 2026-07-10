@@ -1,17 +1,29 @@
 ---
 name: browser-debug
-description: "Отлаживает browser-only failures через Chrome DevTools MCP и Playwright CLI reproduction. Используй для: консоль, сеть, runtime, hydration, layout, memory, performance, Lighthouse. EN triggers: browser debug, console, network, runtime, layout, memory, performance, Lighthouse."
+description: "Отлаживает browser-only failures через управляемые Chrome DevTools MCP и Playwright CLI. Используй для: консоль, сеть, runtime, hydration, layout, memory, performance, Lighthouse. EN triggers: browser debug, console errors, network, runtime, layout, memory, performance, Lighthouse."
 ---
 
 # Browser Debug
 
-Diagnose browser-only failures with runtime evidence. Chrome DevTools MCP is the primary provider for console/network/runtime/performance/memory/Lighthouse and live Chrome inspection. Webwright does not replace Chrome DevTools MCP.
+## Mandatory CloakBrowser Boundary
 
-Workflow:
+This boundary applies before every browser action:
 
-1. Reproduce with Playwright CLI when deterministic flow evidence or screenshots are needed.
-2. Inspect console, network, runtime state, DOM/layout, performance traces, Lighthouse, and memory/heap data with Chrome DevTools MCP.
-3. Fix the root cause.
-4. Revalidate with Playwright CLI, then repeat Chrome DevTools MCP checks for runtime, network, performance, or memory defects.
+1. Run exactly:
 
-Use Webwright for reusable long-horizon web tasks, not for DevTools diagnosis.
+   ```bash
+   $HOME/.local/bin/cloakbrowser-cdp-health
+   ```
+
+   If the command is missing or exits nonzero, stop immediately and report `NOT_PROVEN`.
+2. Browser execution is permitted only through:
+   - the exact `$HOME/.local/bin/playwright-cli` executable; `run-code` and `--filename` are forbidden;
+   - the approved Chrome DevTools MCP transport, exactly `/bin/sh -c 'exec "$HOME/.local/bin/chrome-devtools-mcp" --headless --isolated --no-usage-statistics --no-performance-crux'`.
+3. Never execute the Webwright Python runtime, stock/raw/in-app Browser, `browser_agent`, `node_repl`, computer-use, Playwright MCP, raw Playwright, `bunx`, `npx`, direct package invocations, alternate CDP endpoints, alternate browser executables, alternate browser configs, or any fallback. No fallback is allowed.
+
+## Workflow
+
+1. Run the mandatory health command, then reproduce with the exact managed Playwright CLI when deterministic flow evidence or a screenshot is needed.
+2. Before every Chrome DevTools MCP action, rerun the mandatory health command. Use only the adapter-configured managed transport for console, network, DOM/runtime, computed layout, performance, Lighthouse, and memory evidence.
+3. Fix the root cause in code or configuration.
+4. Revalidate through the same health-gated managed providers and report exact evidence or `NOT_PROVEN`.

@@ -14,9 +14,9 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.7.24` |
+| Adapter version | `1.7.25` |
 | Runtime baseline | OpenCode 1.17.18 |
-| GitHub release tag | `1.7.24` |
+| GitHub release tag | `1.7.25` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
@@ -176,11 +176,21 @@ Run `opencode models <provider>` to list every accepted ID. To switch provider, 
 
 ## Browser / Design / DevTools Routing
 
-Three browser providers are active, each with a distinct role:
+Two browser execution providers are active. Every browser action first runs
+exact `$HOME/.local/bin/cloakbrowser-cdp-health`; missing or nonzero health
+stops with `NOT_PROVEN` and no fallback:
 
-- **Webwright skill** - long-horizon or reusable web workflows, multi-step task automation, and web research tasks where a persistent browser session adds value.
-- **Playwright CLI** - UI evidence collection: screenshots, snapshots, traces, visual diffs, and page-state assertions. Invoke via the `playwright-cli` skill.
-- **Chrome DevTools MCP** (`chrome-devtools`, version 1.5.0) - DevTools-level diagnosis: console messages, network requests, heap snapshots, performance traces, Lighthouse audits, and memory profiling. Use when you need browser internals rather than just page screenshots.
+- **Managed Playwright CLI** (`$HOME/.local/bin/playwright-cli`) - UI and flow
+  evidence. `run-code`, `--filename`, raw Playwright, package runners, and
+  alternate executables/configs are forbidden.
+- **Managed Chrome DevTools MCP** (`chrome-devtools`, version 1.5.0) - console,
+  network, runtime, layout, performance, Lighthouse, and memory diagnosis
+  through the exact CloakBrowser wrapper in `opencode.json`.
+
+`webwright-task` remains as a compatibility skill name for long-horizon intent,
+but routes to these providers and never executes the Webwright Python runtime.
+Stock/raw/in-app Browser, `browser_agent`, `node_repl`, computer-use, Playwright
+MCP, alternate CDP endpoints, direct packages, and all fallbacks are forbidden.
 
 The `/ry-design` command routes through Figma MCP (design context and asset download), shadcn/ui MCP (registry access), and Chrome DevTools MCP (validation). DeepWiki, Context7, and Grep MCP support research and documentation retrieval during design and exploration tasks.
 

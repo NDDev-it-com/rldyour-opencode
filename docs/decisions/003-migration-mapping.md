@@ -8,10 +8,11 @@
 > The ADR text itself is preserved unchanged. See `.serena/memories/CORE-02-PROJECT-SHAPE.md`
 > for current config facts.
 >
-> **Browser-provider supersession (2026-06-08).** The MCP mapping table below
-> is historical migration evidence. Current active browser automation uses
-> Webwright, Playwright CLI, and Chrome DevTools MCP; Playwright MCP is not an
-> active OpenCode MCP server.
+> **Browser-provider supersession (2026-07-10).** The MCP mapping table below
+> is historical migration evidence. Current browser execution is health-gated
+> and limited to exact managed Playwright CLI plus managed Chrome DevTools MCP.
+> `webwright-task` is compatibility routing only; Webwright runtime and
+> Playwright MCP are forbidden.
 
 ## Commit History Analysis
 

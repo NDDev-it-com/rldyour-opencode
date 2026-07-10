@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+## [1.7.25] - 2026-07-10
+
+### Security
+
+- Reduce browser execution to the bootstrap-owned CloakBrowser boundary: exact
+  managed Playwright CLI and Chrome DevTools MCP transports, mandatory health
+  verification before every browser action, and no fallback.
+- Retain `webwright-task` only as a compatibility route while forbidding the
+  Webwright runtime, raw or in-app browser providers, direct package runners,
+  alternate CDP endpoints, executables, and browser configs.
+- Add fail-closed policy validation and mutation tests for missing boundaries,
+  unqualified or alternate provider paths, and browser actions without an
+  immediately preceding health check.
+
+### Changed
+
+- Preserve the verified OpenCode, plugin, and SDK runtime baseline at
+  `1.17.18`; this release changes adapter policy, not the upstream runtime.
+
 
 ## [1.7.24] - 2026-07-10
 

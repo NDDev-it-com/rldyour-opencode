@@ -98,9 +98,14 @@ The system convergence path is owned by root `/ry-repair`:
 
 Browser routing remains shared across the control plane:
 
-- Webwright: high-level long-horizon browser workflows.
-- Playwright CLI: low-level UI evidence, screenshots, snapshots, and traces.
-- Chrome DevTools MCP: console, network, performance, memory, and Lighthouse.
+- Before every browser action, run exact
+  `$HOME/.local/bin/cloakbrowser-cdp-health`; missing or nonzero health stops as
+  `NOT_PROVEN`.
+- Execute only exact `$HOME/.local/bin/playwright-cli` or the exact managed
+  Chrome DevTools MCP transport from `opencode.json`.
+- `webwright-task` is compatibility routing only. The Webwright runtime and
+  every stock/raw/in-app, package-runner, alternate-CDP, or fallback path are
+  forbidden.
 
 OpenCode agents are not cmux orchestrators. cmux orchestrator mode exists only
 as one visible cmux terminal controlling visible worker terminals.
@@ -142,18 +147,18 @@ owner updates the inventory and release policy.
 
 Browser provider roles are fixed:
 
-- Webwright handles long-horizon workflows and reusable evidence scripts.
-- Playwright CLI handles low-level UI screenshots, snapshots, traces, and
-  visual evidence.
-- Chrome DevTools MCP handles DevTools, console, network, performance, memory,
-  Lighthouse, and live Chrome debugging.
+- Exact `$HOME/.local/bin/playwright-cli` handles health-gated browser flow and
+  UI evidence. `run-code` and `--filename` are forbidden.
+- The configured exact managed Chrome DevTools MCP wrapper handles health-gated
+  console, network, runtime, layout, performance, memory, and Lighthouse.
+- `webwright-task` preserves the old route name but runs only through these
+  managed providers; it never installs or executes Webwright Python code.
 
-Do not reclassify Webwright as MCP and do not silently introduce a second
-browser control provider.
+Do not introduce another browser-control provider or any fallback.
 
 ## Release And Tracked Context Policy
 
-OpenCode adapter releases are numeric-tagged. The current exact tag is `1.7.24`
+OpenCode adapter releases are numeric-tagged. The current exact tag is `1.7.25`
 (the active `product_version` in root `config/repositories.json`); older tags are
 historical unless the root tuple explicitly pins them.
 

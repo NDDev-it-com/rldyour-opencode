@@ -1,5 +1,5 @@
 {
-  "version": "1.7.24",
+  "version": "1.7.25",
   "generated_by": "scripts/generate_skills_index.py",
   "count": 38,
   "skills": [
@@ -25,7 +25,7 @@
       "domain": "browser",
       "triggers": [
         "browser debug",
-        "console",
+        "console errors",
         "network",
         "runtime",
         "layout",
@@ -43,7 +43,7 @@
       "path": ".opencode/skills/browser-tool-routing/SKILL.md",
       "domain": "browser",
       "triggers": [
-        "browser tool routing",
+        "browser routing",
         "UI validation",
         "screenshots",
         "visual QA",
@@ -63,11 +63,10 @@
       "triggers": [
         "validate UI",
         "browser check",
-        "regression test",
-        "responsive check",
-        "business logic in browser",
-        "screenshot",
-        "visual QA"
+        "regression",
+        "responsive",
+        "business logic",
+        "screenshot"
       ],
       "requires_mcp": [
         "chrome-devtools"
@@ -301,7 +300,6 @@
         "Playwright CLI validation",
         "screenshots",
         "snapshots",
-        "headed browser",
         "traces",
         "responsive"
       ],
@@ -602,8 +600,8 @@
       "triggers": [
         "visual diff",
         "pixel-perfect",
-        "compare with Figma",
-        "compare with reference image"
+        "compare Figma",
+        "reference image"
       ],
       "requires_mcp": [
         "figma",
@@ -637,7 +635,7 @@
         "long-horizon web task",
         "RPA",
         "extraction",
-        "final_script"
+        "reusable workflow"
       ],
       "requires_mcp": [],
       "network": true

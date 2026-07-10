@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Machine-readable rldyour workflow contract for the OpenCode adapter. Sister tool repos should map the same canonical IDs to their own native surfaces.",
-  "version": "1.7.24",
+  "version": "1.7.25",
   "updated": "2026-07-10",
   "adapter": "opencode",
   "security": {
@@ -231,7 +231,6 @@
   "browser_providers": {
     "policy": "root config/browser-automation-policy.json",
     "required_common_providers": [
-      "webwright",
       "playwright-cli",
       "chrome-devtools-mcp"
     ],
@@ -241,10 +240,12 @@
     "cli_providers": [
       "playwright-cli"
     ],
-    "task_harness_providers": [
-      "webwright"
+    "compatibility_workflows": [
+      "webwright-task"
     ],
-    "webwright_support": "adapter-owned-cli-wrapper; upstream-native NOT_PROVEN"
+    "forbidden_runtime_providers": [
+      "webwright"
+    ]
   },
   "skill_routes": {
     "browser.playwright-cli-validation": "playwright-cli-validation",
