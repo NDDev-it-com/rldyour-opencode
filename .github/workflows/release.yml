@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to release from VERSION (numeric SemVer X.Y.Z). Creates the tag when dispatching manually."
+        description: "Numeric SemVer X.Y.Z; manual dispatch only verifies an existing tag."
         required: true
 
 permissions:
@@ -38,6 +38,65 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
+      - name: Resolve existing release tag
+        id: release_tag
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "push" ]; then
+            release_version="$REF_NAME"
+          else
+            release_version="$INPUT_VERSION"
+            echo "manual dispatch only verifies an existing tag"
+          fi
+          if ! printf '%s' "$release_version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Invalid release version (not bare SemVer): $release_version" >&2
+            exit 1
+          fi
+
+          remote_ref="refs/tags/${release_version}"
+          remote_match="$(git ls-remote --refs origin "$remote_ref")"
+          remote_count="$(printf '%s\n' "$remote_match" | awk 'NF { count++ } END { print count + 0 }')"
+          if [ "$remote_count" -ne 1 ]; then
+            echo "Expected exactly one existing remote tag $remote_ref" >&2
+            exit 1
+          fi
+          read -r remote_oid remote_name <<< "$remote_match"
+          if [ "$remote_name" != "$remote_ref" ]; then
+            echo "Remote returned unexpected ref $remote_name" >&2
+            exit 1
+          fi
+          git fetch --no-tags --force origin "$remote_ref:$remote_ref"
+          local_oid="$(git rev-parse --verify "$remote_ref")"
+          if [ "$local_oid" != "$remote_oid" ]; then
+            echo "Fetched tag object does not match $remote_ref on origin" >&2
+            exit 1
+          fi
+          tag_commit="$(git rev-parse --verify "${remote_ref}^{commit}")"
+
+          git fetch --no-tags --force origin main:refs/remotes/origin/main
+          if [ "$EVENT_NAME" = "push" ]; then
+            git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+            if [ "$tag_commit" != "$GITHUB_SHA" ]; then
+              echo "Pushed tag peels to $tag_commit, not event commit $GITHUB_SHA" >&2
+              exit 1
+            fi
+          else
+            git merge-base --is-ancestor "$tag_commit" origin/main
+          fi
+          git checkout --detach "$tag_commit"
+
+          current="$(cat VERSION)"
+          if [ "$current" != "$release_version" ]; then
+            echo "VERSION file is $current but release asked for $release_version" >&2
+            exit 1
+          fi
+          printf 'tag=%s\n' "$release_version" >> "$GITHUB_OUTPUT"
+          printf 'version=%s\n' "$current" >> "$GITHUB_OUTPUT"
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
         with:
@@ -73,40 +132,6 @@ jobs:
       - name: Typecheck plugins
         working-directory: .opencode
         run: bunx --bun tsc --noEmit -p tsconfig.json
-      - name: VERSION matches release tag
-        # Map workflow_dispatch inputs through env so untrusted strings
-        # never reach the shell parser via `${{ ... }}` interpolation.
-        # GitHub Actions security hardening guide:
-        # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        # Reviewer wave 2026-05-18 security F-3 closure.
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
-        run: |
-          ver="$(cat VERSION)"
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            tag_input="$INPUT_VERSION"
-          else
-            tag_input="${GITHUB_REF##*/}"
-          fi
-          expected="${ver}"
-          if [ "$tag_input" != "$expected" ]; then
-            echo "[ERR] tag $tag_input does not match VERSION ($expected)"
-            exit 1
-          fi
-          echo "[OK] tag $tag_input matches VERSION $ver"
-      - name: Resolve release tag
-        id: release_tag
-        # Same env-mapped pattern as the VERSION check above; reviewer
-        # wave 2026-05-18 security F-3 closure.
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
-        run: |
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            printf 'tag=%s\n' "$INPUT_VERSION" >> "$GITHUB_OUTPUT"
-          else
-            printf 'tag=%s\n' "${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"
-          fi
-          printf 'version=%s\n' "$(cat VERSION)" >> "$GITHUB_OUTPUT"
       - name: Generate CycloneDX SBOM
         working-directory: .opencode
         run: npm sbom --sbom-format cyclonedx > ../sbom.json
@@ -154,18 +179,6 @@ jobs:
         uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
         with:
           subject-path: sbom.json
-      - name: Create release tag (workflow_dispatch only)
-        if: github.event_name == 'workflow_dispatch' && matrix.os == 'ubuntu-latest'
-        env:
-          RELEASE_VERSION: ${{ steps.release_tag.outputs.tag }}
-        run: |
-          set -euo pipefail
-          if git rev-parse -q --verify "refs/tags/${RELEASE_VERSION}" >/dev/null; then
-            echo "Tag ${RELEASE_VERSION} already exists locally"
-          else
-            git tag "${RELEASE_VERSION}"
-            git push origin "refs/tags/${RELEASE_VERSION}"
-          fi
       - name: Publish GitHub Release
         if: matrix.os == 'ubuntu-latest'
         env:
