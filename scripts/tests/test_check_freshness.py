@@ -357,6 +357,14 @@ def test_wrapper_json_envelope_shape() -> None:
     assert env["count"] >= 1
 
 
+def test_wrapper_avoids_empty_array_expansion_under_bash_3() -> None:
+    source = WRAPPER_SH.read_text(encoding="utf-8")
+
+    assert '${FRESHNESS_ARGS[@]}' not in source
+    assert '"$FRESHNESS_SCRIPT" --strict' in source
+    assert '"$FRESHNESS_SCRIPT")' in source
+
+
 def test_wrapper_unknown_flag_returns_2() -> None:
     result = subprocess.run(
         ["bash", str(WRAPPER_SH), "--no-such-flag"],

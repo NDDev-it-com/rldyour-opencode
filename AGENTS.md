@@ -153,15 +153,16 @@ browser control provider.
 
 ## Release And Tracked Context Policy
 
-OpenCode adapter releases are numeric-tagged. The current exact tag is `1.7.3`
+OpenCode adapter releases are numeric-tagged. The current exact tag is `1.7.24`
 (the active `product_version` in root `config/repositories.json`); older tags are
 historical unless the root tuple explicitly pins them.
 
 Before the root control plane advances the OpenCode gitlink:
 
 1. Commit OpenCode-owned changes in this repository.
-2. Tag the adapter release when product-version surfaces change.
-3. Push `main` and the numeric tag.
+2. Push the signed release commit to `main` and wait for all exact-SHA branch
+   workflows to succeed.
+3. Only then create and push the immutable numeric tag.
 4. Ensure durable `.serena/` context is tracked on `main` and runtime-local
    state is ignored.
 5. Update the root `config/repositories.json` expected head and version.

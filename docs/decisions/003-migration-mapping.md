@@ -88,7 +88,7 @@ Since OpenCode has NO hooks system, the lifecycle automation pattern must change
 | Server | Codex CC `.mcp.json` format | OpenCode `opencode.json` format |
 |---|---|---|
 | serena-agent | stdio with `--context=agent` | `{ "type": "local", "command": ["npx", "-y", "@anthropic/serena-mcp@1.3.0", "--context", "agent"] }` |
-| sequential-thinking | stdio npm package | `{ "type": "local", "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking@2025.12.18"] }` |
+| sequential-thinking | stdio npm package | `{ "type": "local", "command": ["bunx", "@modelcontextprotocol/server-sequential-thinking@2026.7.4"] }` |
 | playwright | stdio npm package | Historical only: retired Playwright MCP mapping; current provider is Playwright CLI, not an MCP server. |
 | context7 | remote HTTP | `{ "type": "remote", "url": "https://mcp.context7.com/mcp" }` |
 | deepwiki | remote HTTP | `{ "type": "remote", "url": "https://mcp.deepwiki.com/mcp" }` |

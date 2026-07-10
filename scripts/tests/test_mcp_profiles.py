@@ -220,6 +220,51 @@ def test_validator_detects_duplicate_membership(tmp_path: Path) -> None:
     assert any("multiple profiles" in p for p in payload["problems"]), payload["problems"]
 
 
+def test_validator_rejects_stale_sequential_thinking_pin(tmp_path: Path) -> None:
+    cfg = {
+        "mcp": {
+            "sequential-thinking": {
+                "type": "local",
+                "command": [
+                    "bunx",
+                    "@modelcontextprotocol/server-sequential-thinking@2025.12.18",
+                ],
+            }
+        }
+    }
+    profiles = {
+        "version": "1.0.0",
+        "profiles": {
+            "base": {"description": "x", "members": ["sequential-thinking"]}
+        },
+    }
+    (tmp_path / "opencode.json").write_text(json.dumps(cfg), encoding="utf-8")
+    (tmp_path / "profiles.json").write_text(json.dumps(profiles), encoding="utf-8")
+
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VALIDATOR),
+            "--profiles",
+            str(tmp_path / "profiles.json"),
+            "--opencode",
+            str(tmp_path / "opencode.json"),
+            "--skills-index",
+            str(tmp_path / "missing-index.json"),
+            "--json",
+        ],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=DEFAULT_TIMEOUT,
+    )
+
+    assert proc.returncode == 1, proc.stdout
+    payload = json.loads(proc.stdout)
+    assert any("exact current command" in problem for problem in payload["problems"])
+
+
 def test_validator_skill_requires_unknown_mcp(tmp_path: Path) -> None:
     """A skill requiring an MCP server not in opencode.json must fail."""
     cfg = {"mcp": {"serena": {"type": "local"}}}
@@ -370,4 +415,3 @@ def test_validator_missing_profiles_file_returns_two(tmp_path: Path) -> None:
     )
     assert proc.returncode == 2
     assert "required file missing" in proc.stderr
-

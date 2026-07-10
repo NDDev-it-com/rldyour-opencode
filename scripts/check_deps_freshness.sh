@@ -95,11 +95,15 @@ if [ ! -f "$FRESHNESS_SCRIPT" ]; then
     exit 2
 fi
 
-FRESHNESS_ARGS=()
-if $STRICT; then FRESHNESS_ARGS+=("--strict"); fi
-
 set +e
-FRESHNESS_JSON=$(echo "$PINS_JSON" | "$PYTHON" "$FRESHNESS_SCRIPT" "${FRESHNESS_ARGS[@]}")
+if $STRICT; then
+    FRESHNESS_JSON=$(echo "$PINS_JSON" | "$PYTHON" "$FRESHNESS_SCRIPT" --strict)
+else
+    # Bash 3.2 treats expansion of an empty array as unbound under `set -u`.
+    # Keep the no-argument path explicit so the macOS system Bash remains a
+    # supported freshness runner.
+    FRESHNESS_JSON=$(echo "$PINS_JSON" | "$PYTHON" "$FRESHNESS_SCRIPT")
+fi
 FRESHNESS_EXIT=$?
 set -e
 

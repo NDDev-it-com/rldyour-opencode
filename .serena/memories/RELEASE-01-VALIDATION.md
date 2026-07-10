@@ -22,7 +22,7 @@ release readiness, versioning, and artifact hygiene
 - checked by: Codex adapter release finalization
 
 ## Facts
-- Current rldyour-opencode adapter VERSION is `1.7.23`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
+- Current rldyour-opencode adapter VERSION is `1.7.24`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
 - Release memories record numeric versioning, tags, CI gates, and clean artifact hygiene.
 
 ## Evidence

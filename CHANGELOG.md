@@ -2,10 +2,19 @@
 
 ## [Unreleased]
 
+
+## [1.7.24] - 2026-07-10
+
 ### Changed
 
 - Repin every reusable `nddev-ci-workflows` caller to the signed `0.5.1`
   release and add an exact pin regression test.
+- Refresh the local Sequential Thinking MCP runtime from `2025.12.18` to
+  `2026.7.4` after package-level and real MCP transport compatibility checks;
+  keep Context7 on OpenCode's official remote endpoint and preserve the exact
+  bootstrap-owned CloakBrowser transport.
+- Preserve the `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk`
+  runtime baseline at `1.17.18`.
 
 
 ## [1.7.23] - 2026-07-10

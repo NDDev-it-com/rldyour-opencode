@@ -14,9 +14,9 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.7.23` |
+| Adapter version | `1.7.24` |
 | Runtime baseline | OpenCode 1.17.18 |
-| GitHub release tag | `1.7.23` |
+| GitHub release tag | `1.7.24` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
@@ -138,7 +138,7 @@ DevTools.
 | Server | Type | Version | Purpose |
 |---|---|---|---|
 | serena | local (uvx) | 1.5.3 | Semantic code navigation, analysis, editing |
-| sequential-thinking | local (bunx) | 2025.12.18 | Structured reasoning |
+| sequential-thinking | local (bunx) | 2026.7.4 | Structured reasoning |
 | chrome-devtools | local (managed CloakBrowser wrapper) | 1.5.0 | Chrome DevTools diagnostics |
 | shadcn | local (bunx) | 4.13.0 | shadcn/ui registry access |
 | dart-flutter | local (dart) | - | Dart/Flutter project support |

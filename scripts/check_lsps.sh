@@ -90,7 +90,7 @@ check_prereq "Docker" "Dockerfile" "docker-compose.yml" "docker-compose.yaml" "d
 
 echo ""
 if [ "$missing" -eq 0 ] && [ "$warnings" -eq 0 ]; then
-  printf "${GREEN}All checks passed.${NC}\n"
+  printf '%b\n' "${GREEN}All checks passed.${NC}"
   exit 0
 elif [ "$missing" -eq 0 ]; then
   printf "${YELLOW}0 missing, %d warnings.${NC}\n" "$warnings"

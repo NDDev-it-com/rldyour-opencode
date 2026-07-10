@@ -29,6 +29,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PROFILES_PATH = REPO_ROOT / "references" / "mcp-profiles.json"
 OPENCODE_JSON = REPO_ROOT / "opencode.json"
 SKILLS_INDEX = REPO_ROOT / ".opencode" / "skills" / "index.json"
+SEQUENTIAL_THINKING_COMMAND = [
+    "bunx",
+    "@modelcontextprotocol/server-sequential-thinking@2026.7.4",
+]
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -58,6 +62,15 @@ def _collect_problems(
     if not declared_servers:
         hard.append("opencode.json has no `mcp` section to validate against")
         return hard, soft
+
+    if "sequential-thinking" in declared_servers:
+        sequential = (opencode.get("mcp") or {}).get("sequential-thinking") or {}
+        command = sequential.get("command") if isinstance(sequential, dict) else None
+        if command != SEQUENTIAL_THINKING_COMMAND:
+            hard.append(
+                "sequential-thinking must use the exact current command "
+                f"{SEQUENTIAL_THINKING_COMMAND!r}"
+            )
 
     profile_map = profiles.get("profiles") or {}
     if not isinstance(profile_map, dict) or not profile_map:
