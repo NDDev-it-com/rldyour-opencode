@@ -2,8 +2,8 @@
   "branch": "main",
   "maintainer_access": "maintainer can administer; required checks still apply to pushes",
   "required_status_checks": [
-    "validate",
-    "shell-strict-mode",
+    "validate (ubuntu-latest)",
+    "shell-strict-mode (ubuntu-latest)",
     "Analyze (ubuntu-latest / javascript-typescript) / CodeQL (javascript-typescript)",
     "Analyze (ubuntu-latest / python) / CodeQL (python)",
     "gitleaks / Gitleaks secret scan",
