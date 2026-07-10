@@ -1,7 +1,7 @@
 <!-- Memory Metadata
-Last updated: 2026-05-22
-Last verified: 2026-05-22
-Last commit: d93a558050d54a80e578035d0e1627385ec7c1e4 test(runtime): stabilize opencode debug resolve smoke
+Last updated: 2026-07-10
+Last verified: 2026-07-10
+Last commit: d066d07c5b4a0bb4f37c64040e21d085ba0a5747 feat(browser): enforce managed CloakBrowser skill boundary (other)
 Scope: browser-visible validation and debugging workflows
 Area: BROWSER
 -->
@@ -13,20 +13,28 @@ browser-visible validation and debugging workflows
 
 ## Current source of truth
 - `path:README.md`
-- `path:.opencode/skills/browser-validation`
+- `path:.opencode/skills`
+- `path:opencode.json`
+- `path:references/rldyour-contract.json`
+- `path:scripts/validate_browser_provider_policy.py`
 
 ## Last verified
-- date: 2026-05-22
-- commit: `d93a558050d54a80e578035d0e1627385ec7c1e4`
-- checked by: Codex ry-start memory taxonomy sync
+- date: 2026-07-10
+- commit: `d066d07c5b4a0bb4f37c64040e21d085ba0a5747`
+- checked by: OpenCode CloakBrowser skill-boundary verification
 
 ## Facts
-- Browser memories route UI and runtime validation through Playwright and Chrome DevTools when relevant.
+- Before every browser action, run exact `$HOME/.local/bin/cloakbrowser-cdp-health`; missing or nonzero health stops as `NOT_PROVEN`.
+- Browser execution is limited to exact `$HOME/.local/bin/playwright-cli` and the exact managed Chrome DevTools MCP wrapper from `opencode.json`. `run-code` and `--filename` are forbidden.
+- `webwright-task` is a compatibility workflow routed to the managed providers. The Webwright Python runtime, stock/raw/in-app Browser, browser-agent/repl/computer-use surfaces, raw Playwright, direct packages, alternate CDP/executable/config paths, and all fallbacks are forbidden.
 
 ## Evidence
-- `commit:d93a558050d54a80e578035d0e1627385ec7c1e4`
+- `commit:d066d07c5b4a0bb4f37c64040e21d085ba0a5747`
 - `path:README.md`
-- `path:.opencode/skills/browser-validation`
+- `path:.opencode/skills`
+- `path:opencode.json`
+- `path:references/rldyour-contract.json`
+- `path:scripts/validate_browser_provider_policy.py`
 
 ## Known pitfalls
 - Treat this memory as derived context. Current code, configuration, runtime output, and GitHub state override stale memory text.
@@ -63,6 +71,7 @@ Update after verified changes to the referenced source-of-truth files.
 
 ## Validation Commands
 
+- Run `python3 scripts/validate_browser_provider_policy.py` to verify the exact boundary in all six browser skills, the managed provider inventory, the exact Chrome transport, and health-gated command examples.
 - Run the rldyour control-plane Serena memory validators in strict mode: `validate_serena_memory_schema` (`--strict-mode strict-all`) and `validate_serena_memory_semantics` (`--strict-current-facts --strict-metadata-dates --strict-evidence-commits`).
 
 ## Repair Procedure

@@ -1,7 +1,7 @@
 <!-- Memory Metadata
 Last updated: 2026-07-10
 Last verified: 2026-07-10
-Last commit: 94b76fb2db9c249ba952ea46758cb6b9b4a3c41c feat(browser): enforce managed CloakBrowser transport (other)
+Last commit: d066d07c5b4a0bb4f37c64040e21d085ba0a5747 feat(browser): enforce managed CloakBrowser skill boundary (other)
 Scope: release readiness, versioning, and artifact hygiene
 Area: RELEASE
 -->
@@ -18,15 +18,15 @@ release readiness, versioning, and artifact hygiene
 
 ## Last verified
 - date: 2026-07-10
-- commit: `94b76fb2db9c249ba952ea46758cb6b9b4a3c41c`
-- checked by: Codex adapter release finalization
+- commit: `d066d07c5b4a0bb4f37c64040e21d085ba0a5747`
+- checked by: OpenCode adapter release finalization
 
 ## Facts
-- Current rldyour-opencode adapter VERSION is `1.7.24`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
+- Current rldyour-opencode adapter VERSION is `1.7.25`; the release workflow publishes the matching numeric GitHub Release tag at the released commit.
 - Release memories record numeric versioning, tags, CI gates, and clean artifact hygiene.
 
 ## Evidence
-- `commit:94b76fb2db9c249ba952ea46758cb6b9b4a3c41c`
+- `commit:d066d07c5b4a0bb4f37c64040e21d085ba0a5747`
 - `path:VERSION`
 - `path:CHANGELOG.md`
 - `path:.github/workflows/release.yml`
