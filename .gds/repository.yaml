@@ -39,6 +39,10 @@ verification:
   commands:
     test:
       - "bash scripts/validate_config.sh"
+      - "python3 scripts/validate_opencode_schema.py"
+      - "python3 scripts/validate_opencode_baseline.py"
+      - "python3 scripts/validate_instruction_docs.py"
+      - "python3 -m pytest scripts/tests/"
   required:
     - "test"
 
