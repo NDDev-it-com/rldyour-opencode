@@ -43,7 +43,7 @@ def test_collect_action_pins_accepts_numeric_semver_comment(tmp_path: Path) -> N
 jobs:
   test:
     steps:
-      - uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/actionlint.yml@21bd3f7c3bbcbd7a9ecd3475b293d9e65aa8563a # 0.2.2
+      - uses: NDDev-it-com/ci-workflows/.github/workflows/actionlint.yml@21bd3f7c3bbcbd7a9ecd3475b293d9e65aa8563a # 0.2.2
 """,
     )
 
@@ -52,8 +52,8 @@ jobs:
     assert errors == 0
     assert [(pin.action, pin.repo, pin.tag) for pin in pins] == [
         (
-            "NDDev-it-com/nddev-ci-workflows/.github/workflows/actionlint.yml",
-            "NDDev-it-com/nddev-ci-workflows",
+            "NDDev-it-com/ci-workflows/.github/workflows/actionlint.yml",
+            "NDDev-it-com/ci-workflows",
             "0.2.2",
         ),
     ]
