@@ -26,6 +26,20 @@ updates:
       prefix: "chore(deps)"
       include: scope
 
+    cooldown:
+      default-days: 7
+    groups:
+      npm-minor:
+        applies-to: version-updates
+        update-types: [minor, patch]
+        patterns: ['*']
+      npm-major:
+        applies-to: version-updates
+        update-types: [major]
+        patterns: ['*']
+      npm-security:
+        applies-to: security-updates
+        patterns: ['*']
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -47,3 +61,6 @@ updates:
         applies-to: version-updates
         patterns:
           - "*"
+      github-actions-security:
+        applies-to: security-updates
+        patterns: ['*']
