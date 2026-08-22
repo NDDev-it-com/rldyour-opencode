@@ -17,14 +17,14 @@
       "ref": "https://www.npmjs.com/package/opencode-ai/v/1.17.18"
     },
     "plugin_sdk": {
-      "version": "1.18.5",
+      "version": "1.17.18",
       "npm_package": "@opencode-ai/plugin",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.18.5"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/plugin/v/1.17.18"
     },
     "sdk": {
-      "version": "1.18.5",
+      "version": "1.17.18",
       "npm_package": "@opencode-ai/sdk",
-      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.18.5"
+      "ref": "https://www.npmjs.com/package/@opencode-ai/sdk/v/1.17.18"
     },
     "config_schema": {
       "version": "v1.17.18",

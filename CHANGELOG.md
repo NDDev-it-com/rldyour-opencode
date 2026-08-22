@@ -7,9 +7,10 @@
 
 ### Fixed
 
-- Synchronize `@opencode-ai/plugin` and `@opencode-ai/sdk` `1.18.5` across
-  `package.json`, Bun lock data, and the declared baseline after the dependency
-  update landed only one of those surfaces.
+- Restore `@opencode-ai/plugin` and `@opencode-ai/sdk` to the behaviorally
+  verified OpenCode `1.17.18` line after a partial dependency bump moved only
+  `package.json`; the real runtime resolver demonstrated that it normalizes the
+  mismatched packages back to its own version.
 
 ### Changed
 
