@@ -3,6 +3,18 @@
 ## [Unreleased]
 
 
+## [1.7.28] - 2026-08-23
+
+### Fixed
+
+- Migrate reusable CI to the public OpenNetwork engine. Preserve documented `opencode-ai` `1.17.18`, `@opencode-ai/plugin` `1.17.18`, and `@opencode-ai/sdk` `1.17.18` baseline evidence.
+
+## [1.7.27] - 2026-08-23
+
+### Fixed
+
+- Migrate reusable CI to the public OpenNetwork engine. Preserve documented `opencode-ai` `1.17.18`, `@opencode-ai/plugin` `1.17.18`, and `@opencode-ai/sdk` `1.17.18` baseline evidence.
+
 ## [1.7.26] - 2026-08-22
 
 ### Fixed
