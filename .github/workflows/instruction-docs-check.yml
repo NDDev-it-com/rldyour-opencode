@@ -2,28 +2,8 @@ name: Instruction Docs Check
 
 on:
   pull_request:
-    paths:
-      - "AGENTS.md"
-      - ".claude/CLAUDE.md"
-      - ".serena/memories/**"
-      - "docs/**"
-      - "references/**"
-      - ".opencode/**"
-      - "README.md"
-      - "CHANGELOG.md"
-      - "VERSION"
   push:
     branches: [main]
-    paths:
-      - "AGENTS.md"
-      - ".claude/CLAUDE.md"
-      - ".serena/memories/**"
-      - "docs/**"
-      - "references/**"
-      - ".opencode/**"
-      - "README.md"
-      - "CHANGELOG.md"
-      - "VERSION"
   workflow_dispatch: {}
 
 permissions:

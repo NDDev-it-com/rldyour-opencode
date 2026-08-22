@@ -3,17 +3,7 @@ name: Typecheck Plugins
 on:
   push:
     branches: [main]
-    paths:
-      - ".opencode/plugins/**"
-      - ".opencode/tsconfig.json"
-      - ".opencode/package.json"
-      - ".opencode/bun.lock"
   pull_request:
-    paths:
-      - ".opencode/plugins/**"
-      - ".opencode/tsconfig.json"
-      - ".opencode/package.json"
-      - ".opencode/bun.lock"
   workflow_dispatch: {}
 
 permissions:

@@ -14,25 +14,7 @@ name: OpenCode Runtime
 on:
   push:
     branches: [main]
-    paths:
-      - "opencode.json"
-      - ".opencode/**"
-      - "scripts/validate_config.sh"
-      - "scripts/_validate_helpers.py"
-      - "scripts/check_plugin_hooks.py"
-      - "scripts/validate_contract.py"
-      - "references/rldyour-contract.json"
-      - ".github/workflows/opencode-runtime.yml"
   pull_request:
-    paths:
-      - "opencode.json"
-      - ".opencode/**"
-      - "scripts/validate_config.sh"
-      - "scripts/_validate_helpers.py"
-      - "scripts/check_plugin_hooks.py"
-      - "scripts/validate_contract.py"
-      - "references/rldyour-contract.json"
-      - ".github/workflows/opencode-runtime.yml"
   workflow_dispatch: {}
 
 permissions:
