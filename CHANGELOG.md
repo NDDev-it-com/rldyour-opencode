@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+
+## [1.7.26] - 2026-08-22
+
+### Fixed
+
+- Restore `@opencode-ai/plugin` and `@opencode-ai/sdk` to the behaviorally
+  verified OpenCode `1.17.18` line after a partial dependency bump moved only
+  `package.json`; the real runtime resolver demonstrated that it normalizes the
+  mismatched packages back to its own version.
+
+### Changed
+
+- Release CI preservation, shared workflow convergence, and the synchronized OpenCode plugin SDK baseline. Preserve documented `opencode-ai` `1.17.18`, `@opencode-ai/plugin` `1.18.5`, and `@opencode-ai/sdk` `1.18.5` baseline evidence.
+
 ## [1.7.25] - 2026-07-10
 
 ### Security

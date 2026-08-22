@@ -14,13 +14,19 @@
 
 | Field | Value |
 |---|---|
-| Adapter version | `1.7.25` |
+| Adapter version | `1.7.26` |
 | Runtime baseline | OpenCode 1.17.18 |
-| GitHub release tag | `1.7.25` |
+| GitHub release tag | `1.7.26` |
 
 Runtime baseline source: `references/opencode-baseline.json`. Submodule pins are owned by the root control-plane `config/repositories.json`.
 
-Validated against `opencode-ai`, `@opencode-ai/plugin`, and `@opencode-ai/sdk` 1.17.18 (July 2026). The v1.14.48 → v1.17.18 jump preserves the runtime hook surface and tool-ID naming while picking up current plugin loading, skill discovery, ACP/WebSocket reliability, safer edits, backgroundable subagents, Copilot zero-batch pricing protection, and the Meta Muse Spark system prompt. The `1.17.18` config schema is byte-identical to the `v1.17.7`/`v1.17.13`/`v1.17.14` snapshots (SHA-256 `57c02429`).
+Validated against `opencode-ai`, `@opencode-ai/plugin`, and
+`@opencode-ai/sdk` `1.17.18`. The v1.14.48 → v1.17.18 jump preserves the
+runtime hook surface and tool-ID naming while picking up current plugin
+loading, skill discovery, ACP/WebSocket reliability, safer edits,
+backgroundable subagents, Copilot zero-batch pricing protection, and the Meta
+Muse Spark system prompt. The `1.17.18` config schema is byte-identical to the
+`v1.17.7`/`v1.17.13`/`v1.17.14` snapshots (SHA-256 `57c02429`).
 
 ## What This Repository Provides
 

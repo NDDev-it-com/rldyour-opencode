@@ -33,7 +33,8 @@ CI baseline is an 11-workflow set under `.github/workflows/` plus `.github/depen
 
 - Actions pinned to commit SHA with an inline `# vN.M.K` comment naming the resolved tag.
 - Workflow-level `permissions:` block declares minimal scope (typically `contents: read`); job-level overrides only where strictly required (`contents: write` for release). Because this repository is public, CodeQL uses `actions: read` + `security-events: write` so SARIF is uploaded to GitHub code scanning alerts. The workflow still keeps the SARIF output directory as a downloadable artifact for offline audit/debugging.
-- `concurrency:` group on workflow + ref, with `cancel-in-progress: true` for non-release flows.
+- `concurrency:` group unique to each run, with `cancel-in-progress: false` for
+  every flow so queued and running evidence is preserved.
 - `timeout-minutes:` on every job (5-20 minutes depending on scope).
 - Public adapter workflows use standard public runner labels only. A dedicated
   `cross-platform.yml` matrix covers `ubuntu-latest`, `windows-latest`, and

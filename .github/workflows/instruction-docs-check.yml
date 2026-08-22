@@ -30,8 +30,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: instruction-docs-check-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   instruction-docs:
