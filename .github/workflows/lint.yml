@@ -3,17 +3,7 @@ name: Lint
 on:
   push:
     branches: [main]
-    paths:
-      - "scripts/*.py"
-      - "scripts/**/*.py"
-      - "pyrightconfig.json"
-      - ".github/workflows/lint.yml"
   pull_request:
-    paths:
-      - "scripts/*.py"
-      - "scripts/**/*.py"
-      - "pyrightconfig.json"
-      - ".github/workflows/lint.yml"
   workflow_dispatch: {}
 
 permissions:
