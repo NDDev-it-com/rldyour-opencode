@@ -195,6 +195,10 @@ python3 scripts/validate_mcp_profiles.py
 
 ## CI runner selection
 
+Every workflow run is evidence and must finish. Use a concurrency group unique
+to `github.run_id` and `cancel-in-progress: false`; never discard a queued or
+running check as superseded.
+
 This repository is public, so `pull_request` executes untrusted fork code.
 Every caller of a `NDDev-it-com/ci-workflows` reusable that exposes a `runner`
 input passes `runner: ubuntu-latest` explicitly, and must keep it. Several of

@@ -15,8 +15,8 @@ permissions:
 # Serialize parallel CI runs on the same ref. Stale PR pushes cancel
 # in-flight runs to free runner minutes for the latest revision.
 concurrency:
-  group: validate-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   validate:

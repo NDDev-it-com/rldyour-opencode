@@ -12,8 +12,8 @@ on:
 permissions: {}
 
 concurrency:
-  group: dependency-review-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   dependency-review:
@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: NDDev-it-com/ci-workflows/.github/workflows/public-dependency-review.yml@2ccb80e96f5771b6a6b4eae63a4f47e232906dc7 # 0.12.0
+    uses: NDDev-it-com/ci-workflows/.github/workflows/public-dependency-review.yml@7f69c724923d06b2c2057c5a6ad341c37f1a8995 # 0.13.3
     with:
       fail_on_severity: moderate
       comment_summary_in_pr: on-failure
