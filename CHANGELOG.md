@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+
+## [1.7.26] - 2026-08-22
+
+### Fixed
+
+- Synchronize `@opencode-ai/plugin` and `@opencode-ai/sdk` `1.18.5` across
+  `package.json`, Bun lock data, and the declared baseline after the dependency
+  update landed only one of those surfaces.
+
+### Changed
+
+- Release CI preservation, shared workflow convergence, and the synchronized OpenCode plugin SDK baseline. Preserve documented `opencode-ai` `1.17.18`, `@opencode-ai/plugin` `1.18.5`, and `@opencode-ai/sdk` `1.18.5` baseline evidence.
+
 ## [1.7.25] - 2026-07-10
 
 ### Security
