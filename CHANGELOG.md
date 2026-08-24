@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.7.29] - 2026-08-25
+
+### Fixed
+
+- Advance every reusable CI caller to the released OpenNetwork workflow engine
+  `0.1.8`, restoring root control-plane security capability proof.
+- Preserve the validated OpenCode CLI/plugin/SDK runtime baseline at `1.17.18`.
+
 
 ## [1.7.28] - 2026-08-23
 
