@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.7.31] - 2026-08-25
+
+### Fixed
+
+- Synchronize README, durable release memory, adapter baseline, and MCP profile
+  current-version claims with the exact immutable release identity.
+- Preserve the validated OpenCode CLI/plugin/SDK runtime baseline at `1.17.18`.
+
 ## [1.7.30] - 2026-08-25
 
 ### Fixed
