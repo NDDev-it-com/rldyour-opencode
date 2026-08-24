@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.7.30] - 2026-08-25
+
+### Fixed
+
+- Synchronize the exact supported security tag with the immutable adapter
+  release identity required by the root control-plane policy.
+- Preserve the validated OpenCode CLI/plugin/SDK runtime baseline at `1.17.18`.
+
 ## [1.7.29] - 2026-08-25
 
 ### Fixed
