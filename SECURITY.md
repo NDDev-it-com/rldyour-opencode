@@ -8,7 +8,7 @@ historical patch in the line.
 
 | Version | Supported |
 |---|---|
-| Current exact tag `1.7.31` | yes |
+| Current exact tag `1.7.33` | yes |
 | Older patch tags | no; upgrade to current exact tag |
 | Older minor / major lines | no |
 
