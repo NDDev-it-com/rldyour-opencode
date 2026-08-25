@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+
+## [1.7.33] - 2026-08-25
+
+### Fixed
+
+- Pin ci-workflows 0.1.10 and retain durable tool-cache evidence. Preserve documented `opencode-ai` `1.17.18`, `@opencode-ai/plugin` `1.17.18`, and `@opencode-ai/sdk` `1.17.18` baseline evidence.
+
+## [1.7.32] - 2026-08-25
+
+### Fixed
+
+- Pin ci-workflows 0.1.10 and retain durable tool-cache evidence. Preserve documented `opencode-ai` `1.17.18`, `@opencode-ai/plugin` `1.17.18`, and `@opencode-ai/sdk` `1.17.18` baseline evidence.
+
 ## [1.7.31] - 2026-08-25
 
 ### Fixed
