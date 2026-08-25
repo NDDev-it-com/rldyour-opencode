@@ -2,11 +2,11 @@
 
 `rldyour-opencode` is the rldyour AI CLI configuration for OpenCode: local plugins, MCP/LSP, permissions, commands, agents, browser/design workflows, and security review.
 
-[![validate](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/validate.yml)
-[![CodeQL](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/NDDev-it-com/rldyour-opencode/actions/workflows/codeql.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/NDDev-it-com/rldyour-opencode/badge)](https://scorecard.dev/viewer/?uri=github.com/NDDev-it-com/rldyour-opencode)
+[![validate](https://github.com/rldyourmnd/rldyour-opencode/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/rldyourmnd/rldyour-opencode/actions/workflows/validate.yml)
+[![CodeQL](https://github.com/rldyourmnd/rldyour-opencode/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/rldyourmnd/rldyour-opencode/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/rldyourmnd/rldyour-opencode/badge)](https://scorecard.dev/viewer/?uri=github.com/rldyourmnd/rldyour-opencode)
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Latest Release](https://img.shields.io/github/v/release/NDDev-it-com/rldyour-opencode)](https://github.com/NDDev-it-com/rldyour-opencode/releases/latest)
+[![Latest Release](https://img.shields.io/github/v/release/rldyourmnd/rldyour-opencode)](https://github.com/rldyourmnd/rldyour-opencode/releases/latest)
 
 `rldyour-opencode` is the rldyour AI CLI configuration for OpenCode: local TypeScript plugins, MCP/LSP, permissions, slash commands, subagents, browser/design workflows, and security review. Russian-first SDLC workflow, Serena integration, full-auto owner posture - all native to the OpenCode AI coding agent format.
 
@@ -250,7 +250,7 @@ Commands marked NOT_PROVEN (e.g., live MCP probes) require network access and in
 
 ## Release / Rollback
 
-Releases are tag-driven. Every product version must have a matching numeric GitHub Release at `github.com/NDDev-it-com/rldyour-opencode/releases`. A `VERSION` file update alone is not sufficient.
+Releases are tag-driven. Every product version must have a matching numeric GitHub Release at `github.com/rldyourmnd/rldyour-opencode/releases`. A `VERSION` file update alone is not sufficient.
 
 Version movement follows the control-plane policy: default is patch (`+0.0.1`) after a public release exists; minor and major bumps are owner-directed decisions only. `CHANGELOG.md` follows Keep a Changelog 1.1.0. `SECURITY.md` lists the exact supported version tag.
 
@@ -260,9 +260,9 @@ Version movement follows the control-plane policy: default is patch (`+0.0.1`) a
 
 - **License**: AGPL-3.0-or-later
 - **Author**: Danil Silantyev (github:rldyourmnd), CEO NDDev
-- **Issues**: [github.com/NDDev-it-com/rldyour-opencode/issues](https://github.com/NDDev-it-com/rldyour-opencode/issues) - bug reports, regression evidence, missing-component requests.
-- **Discussions**: [github.com/NDDev-it-com/rldyour-opencode/discussions](https://github.com/NDDev-it-com/rldyour-opencode/discussions) - general questions, workflow advice, configuration clarifications, sharing usage patterns.
-- **Releases**: [github.com/NDDev-it-com/rldyour-opencode/releases](https://github.com/NDDev-it-com/rldyour-opencode/releases) - numeric product tags (`X.Y.Z`) with release notes from CHANGELOG.
-- **Security**: Report vulnerabilities via [GitHub Security Advisories](https://github.com/NDDev-it-com/rldyour-opencode/security/advisories) - do not file public issues for security vulnerabilities.
+- **Issues**: [github.com/rldyourmnd/rldyour-opencode/issues](https://github.com/rldyourmnd/rldyour-opencode/issues) - bug reports, regression evidence, missing-component requests.
+- **Discussions**: [github.com/rldyourmnd/rldyour-opencode/discussions](https://github.com/rldyourmnd/rldyour-opencode/discussions) - general questions, workflow advice, configuration clarifications, sharing usage patterns.
+- **Releases**: [github.com/rldyourmnd/rldyour-opencode/releases](https://github.com/rldyourmnd/rldyour-opencode/releases) - numeric product tags (`X.Y.Z`) with release notes from CHANGELOG.
+- **Security**: Report vulnerabilities via [GitHub Security Advisories](https://github.com/rldyourmnd/rldyour-opencode/security/advisories) - do not file public issues for security vulnerabilities.
 
 This is a personal marketplace - response time is best-effort, no SLA. Feel free to fork and tailor to your own workflow.

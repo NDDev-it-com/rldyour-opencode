@@ -16,7 +16,7 @@ tuple.
 
 ## Source Of Truth
 
-- Repository: `NDDev-it-com/rldyour-opencode`
+- Repository: `rldyourmnd/rldyour-opencode`
 - Branch: `main`
 
 The durable source of truth is the current code/config/tests/git state, not a

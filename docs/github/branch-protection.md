@@ -1,7 +1,7 @@
 # Branch Protection and Required Checks
 
 This document fixes the **operator-side governance contract** for the
-`NDDev-it-com/rldyour-opencode` repository. The agent does not apply these
+`rldyourmnd/rldyour-opencode` repository. The agent does not apply these
 rules - owners do, via the GitHub web UI or `gh api`. The contract is
 captured here so future audits and successor maintainers know what to
 restore if branch protection is ever reset.
@@ -14,7 +14,7 @@ restore if branch protection is ever reset.
 
 ## Public repository CI/CD
 
-`NDDev-it-com/rldyour-opencode` is public, so existing CI/CD workflows are
+`rldyourmnd/rldyour-opencode` is public, so existing CI/CD workflows are
 automatic by default. `references/public-repo-ci-policy.md` is loaded by
 OpenCode through `opencode.json.instructions`; it authorizes running existing
 workflow surfaces for public-repo verification while keeping workflow edits,
@@ -94,10 +94,10 @@ requires the FULL context name including matrix params.
 
 ```bash
 # Read-only inspection:
-gh api repos/NDDev-it-com/rldyour-opencode/branches/main/protection | jq
+gh api repos/rldyourmnd/rldyour-opencode/branches/main/protection | jq
 
 # Apply minimum protection (single-developer profile, contains required checks):
-gh api -X PUT repos/NDDev-it-com/rldyour-opencode/branches/main/protection \
+gh api -X PUT repos/rldyourmnd/rldyour-opencode/branches/main/protection \
   -F required_status_checks.strict=true \
   -F required_status_checks.contexts[]='Validate rldyour-opencode / validate (ubuntu-latest)' \
   -F required_status_checks.contexts[]='Validate rldyour-opencode / shell-strict-mode (ubuntu-latest)' \

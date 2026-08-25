@@ -1117,7 +1117,7 @@ public upstream publication and release.
   `references/opencode-baseline.json` and `opencode-runtime.yml` checks.
 - **Public-facing repository metadata aligned to the canonical org/owner.**
   `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, and `docs/observability.md`
-  now use the `NDDev-it-com/rldyour-opencode` publish target plus maintainer
+  now use the `rldyourmnd/rldyour-opencode` publish target plus maintainer
   identity.
 
 ### Changed

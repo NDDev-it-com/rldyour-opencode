@@ -14,7 +14,7 @@ When something feels wrong:
 - `python3 scripts/smoke_mcp_capabilities.py` - verify every declared MCP server in `opencode.json` is reachable.
 - `python3 scripts/validate_instruction_docs.py` - verify `AGENTS.md` and `.claude/CLAUDE.md` are present, non-trivially large, and contain required anchor sections.
 - `opencode debug config` / `opencode debug info` / `opencode debug agent <name>` / `opencode debug skill` - live native resolution from the OpenCode CLI.
-- `gh run list --repo NDDev-it-com/rldyour-opencode --limit 10` - latest CI state.
+- `gh run list --repo rldyourmnd/rldyour-opencode --limit 10` - latest CI state.
 
 ## Plugin-side observability
 
