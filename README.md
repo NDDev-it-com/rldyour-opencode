@@ -57,7 +57,7 @@ Source-only artifacts (scripts, tests, CI workflows, reference docs, ADRs) are n
 **Install** - clone and copy into your project:
 
 ```bash
-git clone https://github.com/NDDev-it-com/rldyour-opencode.git
+git clone https://github.com/rldyourmnd/rldyour-opencode.git
 cd rldyour-opencode
 cp opencode.json /path/to/your/project/opencode.json
 cp -r .opencode /path/to/your/project/.opencode

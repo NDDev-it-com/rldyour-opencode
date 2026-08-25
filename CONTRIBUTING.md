@@ -25,7 +25,7 @@ The marketplace tracks runtime artifacts and durable agent context on `main`:
 
 ```bash
 # Prerequisites: Python 3.13, Bun 1.2+, uvx (uv), bash, git
-git clone https://github.com/NDDev-it-com/rldyour-opencode.git
+git clone https://github.com/rldyourmnd/rldyour-opencode.git
 cd rldyour-opencode
 
 # Install plugin SDK dependencies (used by typecheck workflow)
